@@ -1,3 +1,27 @@
+data/cifar-100-python
+data/fmnist
+data/raw
+data/processed
+data/cifar-10-batches-py
+*.json
+*.pkl
+*.eps
+*.tar.gz
+*.*~
+*.swp
+*.txt
+*.pth
+*.mat
+
+# DS_Store
+.DS_Store
+
+# pycharm
+.idea/
+
+# IPython Notebook
+.ipynb_checkpoints
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
