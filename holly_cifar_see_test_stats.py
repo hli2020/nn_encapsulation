@@ -9,7 +9,7 @@ from layers.modules.cap_layer import MarginLoss, SpreadLoss
 from layers.modules.cifar_train_val import *
 from utils.visualizer import Visualizer
 from utils.util import *
-from option.train_opt import args   # for cifar we also has test here
+from option.option import args   # for cifar we also has test here
 
 # ==============================
 args.experiment_name = ''

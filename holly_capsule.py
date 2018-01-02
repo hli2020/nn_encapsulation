@@ -2,26 +2,35 @@ from __future__ import print_function
 import torch.optim as optim
 import torch.utils.data as data
 from data.create_dset import create_dataset
-import torch.backends.cudnn as cudnn
-import torch.nn as nn
-from layers.modules.capsule import CapsNet
-from layers.modules.cap_layer import MarginLoss, SpreadLoss
-from layers.modules.cifar_train_val import *
-from utils.visualizer import Visualizer
-from utils.util import *
-from option.train_opt import args   # for cifar we also has test here
+from layers.capsule import CapsNet
+from layers.cap_layer import MarginLoss, SpreadLoss
+from layers.cifar_train_val import *
+# from utils.visualizer import Visualizer
+from object_detection.utils.visualizer import Visualizer
+from object_detection.utils.util import *
+from option.option import Options
 
-args.show_freq = 5
-args.show_test_after_epoch = -1
-args = show_jot_opt(args)
-vis = Visualizer(args)
+# config
+option = Options()
+option.setup_config()
+args = option.opt
 
+# init log file
+show_jot_opt(args)
+
+# dataset
 test_loader = data.DataLoader(create_dataset(args, 'test'), args.test_batch,
                               num_workers=args.num_workers, shuffle=False)
 train_loader = data.DataLoader(create_dataset(args, 'train'), args.train_batch,
                                num_workers=args.num_workers, shuffle=True)
 
+# init visualizer
+visual = Visualizer(args)
+
+# model
 model = CapsNet(num_classes=train_loader.dataset.num_classes, opts=args)
+
+# optim
 if args.optim == 'sgd':
     optimizer = optim.SGD(model.parameters(), lr=args.lr,
                           weight_decay=args.weight_decay, momentum=args.momentum, )
@@ -37,27 +46,23 @@ if args.scheduler is not None:
     scheduler = set_lr_schedule(optimizer, args.scheduler)
 print_log(model, args.file_name)
 
-# set loss
-if args.model_cifar == 'capsule':
-    if args.use_CE_loss:
-        criterion = nn.CrossEntropyLoss()
-    elif args.use_spread_loss:
-        criterion = SpreadLoss(args, fix_m=args.fix_m,
-                               num_classes=train_loader.dataset.num_classes)
-    else:
-        # default loss
-        criterion = MarginLoss(num_classes=train_loader.dataset.num_classes)
-elif args.model_cifar == 'resnet':
+# loss
+if args.use_CE_loss:
     criterion = nn.CrossEntropyLoss()
+elif args.use_spread_loss:
+    criterion = SpreadLoss(args, fix_m=args.fix_m,
+                           num_classes=train_loader.dataset.num_classes)
+else:
+    # default loss
+    criterion = MarginLoss(num_classes=train_loader.dataset.num_classes)
 
-if args.use_cuda:
-    criterion = criterion.cuda()
-    # if args.deploy:
-    # TODO: zombie process
-    #     model = torch.nn.DataParallel(model).cuda()
-    # else:
-    model = model.cuda()
-cudnn.benchmark = True
+
+
+
+
+
+
+
 
 if args.test_only:
     test_model_list = [1, 20, 80, 200, 300]

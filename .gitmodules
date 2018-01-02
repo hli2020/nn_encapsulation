@@ -1,0 +1,3 @@
+[submodule "object_detection"]
+	path = object_detection
+	url = https://github.com/hli2020/object_detection
