@@ -1,6 +1,5 @@
 import argparse
 import random
-# from utils.util import *
 from object_detection.utils.util import *
 
 
@@ -90,51 +89,3 @@ class Options(object):
         else:
             self.opt.loss_freq = 100    # in iter unit
             self.opt.save_freq = 5      # in epoch unit
-
-
-# # GENERAL SETTING
-# args.start_epoch = 1
-# args.max_epoch = args.epochs if hasattr(args, 'epochs') else args.max_iter
-#
-# args.debug = not args.deploy
-# # if args.deploy:
-# #     # when in deploy mode, we will use port_id = 2000 as default on server
-# #     args.port = 2000
-# args.phase = 'train'
-# args.save_folder = os.path.join('result', args.experiment_name, args.phase)
-#
-# if args.dataset == 'voc' or args.dataset == 'coco':
-#     if args.resume:
-#         args.resume = os.path.join(args.save_folder, (args.resume + '.pth'))
-#
-#     if type(args.schedule[0]) == str:
-#         temp_ = args.schedule[0].split(',')
-#         schedule = list()
-#         for i in range(len(temp_)):
-#             schedule.append(int(temp_[i]))
-#         args.schedule = schedule
-#
-#     if args.debug:
-#         args.loss_freq, args.save_freq = 10, 20
-#     else:
-#         args.loss_freq, args.save_freq = 50, 5000
-#
-# if args.dataset == 'cifar' and args.test_only:
-#     # for cifar only
-#     args.phase = 'test'
-#     args.max_epoch = 0
-#
-# if not os.path.exists(args.save_folder):
-#     mkdirs(args.save_folder)
-#
-# if torch.cuda.is_available():
-#     args.use_cuda = True
-#     torch.set_default_tensor_type('torch.cuda.FloatTensor')
-# else:
-#     args.use_cuda = False
-#     torch.set_default_tensor_type('torch.FloatTensor')
-#
-# if args.manual_seed == -1:
-#     args.manual_seed = random.randint(1, 10000)
-# random.seed(args.manual_seed)
-# torch.manual_seed(args.manual_seed)

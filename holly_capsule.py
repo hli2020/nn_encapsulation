@@ -4,7 +4,7 @@ import torch.utils.data as data
 from data.create_dset import create_dataset
 from layers.capsule import CapsNet
 from layers.cap_layer import MarginLoss, SpreadLoss
-from layers.cifar_train_val import *
+from layers.train_val import *
 # from utils.visualizer import Visualizer
 from object_detection.utils.visualizer import Visualizer
 from object_detection.utils.util import *
