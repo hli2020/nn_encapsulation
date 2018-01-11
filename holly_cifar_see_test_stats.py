@@ -57,7 +57,17 @@ for _, i in enumerate(test_model_list):
     print('test acc is {:.4f}'.format(info['test_acc']))
 
 
-
+# if args.test_only:
+#     test_model_list = [1, 20, 80, 200, 300]
+#
+#     for _, i in enumerate(test_model_list):
+#         model_file = \
+#             os.path.join(args.save_folder, 'epoch_{:d}.pth'.format(i))
+#         print('loading weights of model [{:s}]'.format(os.path.basename(model_file)))
+#         model = load_weights(model_file, model)
+#         args.cifar_model = model_file
+#         info = test(test_loader, model, criterion, args, vis)
+#         print('test acc is {:.4f}'.format(info['test_acc']))
 
 
 

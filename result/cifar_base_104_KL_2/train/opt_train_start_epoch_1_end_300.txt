@@ -1,0 +1,329 @@
+Experiment: cifar_base_104_KL_2
+------------ Training Options -------------
+KL_factor: 0.1
+KL_manner: 2
+b_init: zero
+basenet: vgg16_reducedfc.pth
+batch_size: 2
+beta1: 0.8
+cap_N: 3
+dataset: cifar
+debug: True
+deploy: False
+do_squash: False
+draw_hist: False
+epochs: 300
+experiment_name: cifar_base_104_KL_2
+file_name: result/cifar_base_104_KL_2/train/opt_train_start_epoch_1_end_300.txt
+fix_m: False
+gamma: 0.1
+has_relu_in_W: False
+look_into_details: False
+lr: 0.01
+manual_seed: 4191
+max_epoch: 300
+max_iter: 130000
+model_cifar: capsule
+momentum: 0.9
+multi_crop_test: False
+no_pretrain: False
+non_target_j: False
+num_workers: 2
+optim: sgd
+phase: train
+port: 4000
+prior_config: v2_512
+resume: None
+route_num: 4
+save_epoch: 20
+save_folder: result/cifar_base_104_KL_2/train
+schedule_cifar: [150, 225]
+scheduler: None
+send_images_to_visdom: False
+show_freq: 5
+show_test_after_epoch: -1
+skip_pre_squash: False
+skip_pre_transfer: False
+ssd_dim: 512
+start_epoch: 1
+test_batch: 128
+test_only: False
+train_batch: 128
+use_CE_loss: False
+use_KL: True
+use_cuda: True
+use_spread_loss: False
+version: v2
+visdom: True
+w_version: v2
+weight_decay: 0.0005
+------------------ End --------------------
+CapsNet (
+  (conv1): Conv2d(3, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+  (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+  (relu): ReLU (inplace)
+  (layer1): Sequential (
+    (0): BasicBlock (
+      (conv1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+    )
+    (1): BasicBlock (
+      (conv1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+    )
+    (2): BasicBlock (
+      (conv1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+    )
+  )
+  (layer2): Sequential (
+    (0): BasicBlock (
+      (conv1): Conv2d(16, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (downsample): Sequential (
+        (0): Conv2d(16, 32, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      )
+    )
+    (1): BasicBlock (
+      (conv1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+    )
+    (2): BasicBlock (
+      (conv1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+    )
+  )
+  (layer3): Sequential (
+    (0): BasicBlock (
+      (conv1): Conv2d(32, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (downsample): Sequential (
+        (0): Conv2d(32, 64, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      )
+    )
+    (1): BasicBlock (
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+    )
+    (2): BasicBlock (
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+    )
+  )
+  (tranfer_conv): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1))
+  (tranfer_bn): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+  (tranfer_relu): ReLU (inplace)
+  (cap_layer): CapLayer (
+    (W): Conv2d(256, 5120, kernel_size=(1, 1), stride=(1, 1), groups=32)
+  )
+)
+
+init learning rate 0.010000 at iter 0
+
+Train [cifar_base_104_KL_2]	epoch [0/300]|[0/391]	data: 0.507s |batch: 1.308s	loss: 4.63373	(KL: 1.47134 ||normal: 3.16239)	acc: 10.93750	acc5: 49.21875
+Train [cifar_base_104_KL_2]	epoch [0/300]|[5/391]	data: 0.093s |batch: 0.357s	loss: 4.08690	(KL: 1.47039 ||normal: 2.61652)	acc: 10.41667	acc5: 49.34896
+Train [cifar_base_104_KL_2]	epoch [0/300]|[10/391]	data: 0.056s |batch: 0.270s	loss: 3.70141	(KL: 1.46990 ||normal: 2.23151)	acc: 9.80114	acc5: 48.93466
+Train [cifar_base_104_KL_2]	epoch [0/300]|[15/391]	data: 0.041s |batch: 0.238s	loss: 3.39275	(KL: 1.46964 ||normal: 1.92311)	acc: 9.42383	acc5: 48.77930
+Train [cifar_base_104_KL_2]	epoch [0/300]|[20/391]	data: 0.034s |batch: 0.221s	loss: 3.19209	(KL: 1.46943 ||normal: 1.72266)	acc: 9.44940	acc5: 48.40030
+Train [cifar_base_104_KL_2]	epoch [0/300]|[25/391]	data: 0.029s |batch: 0.211s	loss: 3.04542	(KL: 1.46926 ||normal: 1.57615)	acc: 9.31490	acc5: 48.22716
+Train [cifar_base_104_KL_2]	epoch [0/300]|[30/391]	data: 0.026s |batch: 0.203s	loss: 2.91938	(KL: 1.46913 ||normal: 1.45025)	acc: 9.55141	acc5: 48.99194
+Train [cifar_base_104_KL_2]	epoch [0/300]|[35/391]	data: 0.024s |batch: 0.198s	loss: 2.82902	(KL: 1.46902 ||normal: 1.36000)	acc: 9.50521	acc5: 49.43576
+Train [cifar_base_104_KL_2]	epoch [0/300]|[40/391]	data: 0.022s |batch: 0.194s	loss: 2.75533	(KL: 1.46893 ||normal: 1.28639)	acc: 9.69893	acc5: 49.82851
+Train [cifar_base_104_KL_2]	epoch [0/300]|[45/391]	data: 0.021s |batch: 0.191s	loss: 2.70466	(KL: 1.46886 ||normal: 1.23580)	acc: 9.85054	acc5: 50.16984
+Train [cifar_base_104_KL_2]	epoch [0/300]|[50/391]	data: 0.020s |batch: 0.189s	loss: 2.66565	(KL: 1.46880 ||normal: 1.19685)	acc: 9.86520	acc5: 49.89277
+Train [cifar_base_104_KL_2]	epoch [0/300]|[55/391]	data: 0.019s |batch: 0.187s	loss: 2.62910	(KL: 1.46876 ||normal: 1.16034)	acc: 9.82143	acc5: 50.00000
+Train [cifar_base_104_KL_2]	epoch [0/300]|[60/391]	data: 0.018s |batch: 0.185s	loss: 2.59543	(KL: 1.46872 ||normal: 1.12671)	acc: 9.88730	acc5: 50.16650
+Train [cifar_base_104_KL_2]	epoch [0/300]|[65/391]	data: 0.017s |batch: 0.183s	loss: 2.56953	(KL: 1.46868 ||normal: 1.10085)	acc: 9.93134	acc5: 50.36695
+Train [cifar_base_104_KL_2]	epoch [0/300]|[70/391]	data: 0.017s |batch: 0.182s	loss: 2.54872	(KL: 1.46866 ||normal: 1.08007)	acc: 9.92518	acc5: 50.24208
+Train [cifar_base_104_KL_2]	epoch [0/300]|[75/391]	data: 0.016s |batch: 0.181s	loss: 2.52867	(KL: 1.46863 ||normal: 1.06003)	acc: 9.89926	acc5: 50.21587
+Train [cifar_base_104_KL_2]	epoch [0/300]|[80/391]	data: 0.016s |batch: 0.180s	loss: 2.50606	(KL: 1.46861 ||normal: 1.03745)	acc: 10.04051	acc5: 50.54977
+Train [cifar_base_104_KL_2]	epoch [0/300]|[85/391]	data: 0.016s |batch: 0.180s	loss: 2.48591	(KL: 1.46859 ||normal: 1.01732)	acc: 10.02907	acc5: 50.72674
+Train [cifar_base_104_KL_2]	epoch [0/300]|[90/391]	data: 0.016s |batch: 0.179s	loss: 2.46537	(KL: 1.46857 ||normal: 0.99680)	acc: 10.25927	acc5: 50.78984
+Train [cifar_base_104_KL_2]	epoch [0/300]|[95/391]	data: 0.015s |batch: 0.178s	loss: 2.45000	(KL: 1.46855 ||normal: 0.98145)	acc: 10.44108	acc5: 51.02539
+Train [cifar_base_104_KL_2]	epoch [0/300]|[100/391]	data: 0.015s |batch: 0.178s	loss: 2.44835	(KL: 1.46854 ||normal: 0.97980)	acc: 10.45019	acc5: 51.13707
+Train [cifar_base_104_KL_2]	epoch [0/300]|[105/391]	data: 0.015s |batch: 0.178s	loss: 2.43987	(KL: 1.46853 ||normal: 0.97134)	acc: 10.36262	acc5: 51.38561
+Train [cifar_base_104_KL_2]	epoch [0/300]|[110/391]	data: 0.014s |batch: 0.178s	loss: 2.43559	(KL: 1.46853 ||normal: 0.96706)	acc: 10.38851	acc5: 51.87922
+Train [cifar_base_104_KL_2]	epoch [0/300]|[115/391]	data: 0.014s |batch: 0.177s	loss: 2.43355	(KL: 1.46853 ||normal: 0.96502)	acc: 10.31789	acc5: 52.17538
+Train [cifar_base_104_KL_2]	epoch [0/300]|[120/391]	data: 0.014s |batch: 0.177s	loss: 2.42447	(KL: 1.46852 ||normal: 0.95594)	acc: 10.40160	acc5: 52.39540
+Train [cifar_base_104_KL_2]	epoch [0/300]|[125/391]	data: 0.014s |batch: 0.176s	loss: 2.42118	(KL: 1.46852 ||normal: 0.95266)	acc: 10.44767	acc5: 52.42436
+Train [cifar_base_104_KL_2]	epoch [0/300]|[130/391]	data: 0.014s |batch: 0.176s	loss: 2.42223	(KL: 1.46852 ||normal: 0.95371)	acc: 10.38287	acc5: 52.43321
+Train [cifar_base_104_KL_2]	epoch [0/300]|[135/391]	data: 0.014s |batch: 0.176s	loss: 2.42491	(KL: 1.46851 ||normal: 0.95640)	acc: 10.38028	acc5: 52.53906
+Train [cifar_base_104_KL_2]	epoch [0/300]|[140/391]	data: 0.014s |batch: 0.177s	loss: 2.42640	(KL: 1.46853 ||normal: 0.95788)	acc: 10.34464	acc5: 52.65957
+Train [cifar_base_104_KL_2]	epoch [0/300]|[145/391]	data: 0.014s |batch: 0.178s	loss: 2.42395	(KL: 1.46852 ||normal: 0.95542)	acc: 10.34354	acc5: 52.72902
+Train [cifar_base_104_KL_2]	epoch [0/300]|[150/391]	data: 0.014s |batch: 0.178s	loss: 2.42244	(KL: 1.46852 ||normal: 0.95392)	acc: 10.34768	acc5: 52.89218
+Train [cifar_base_104_KL_2]	epoch [0/300]|[155/391]	data: 0.014s |batch: 0.178s	loss: 2.41751	(KL: 1.46851 ||normal: 0.94900)	acc: 10.31651	acc5: 53.10998
+Train [cifar_base_104_KL_2]	epoch [0/300]|[160/391]	data: 0.014s |batch: 0.178s	loss: 2.41168	(KL: 1.46851 ||normal: 0.94317)	acc: 10.35520	acc5: 53.37733
+Train [cifar_base_104_KL_2]	epoch [0/300]|[165/391]	data: 0.014s |batch: 0.177s	loss: 2.40609	(KL: 1.46850 ||normal: 0.93759)	acc: 10.40098	acc5: 53.44974
+Train [cifar_base_104_KL_2]	epoch [0/300]|[170/391]	data: 0.014s |batch: 0.177s	loss: 2.39884	(KL: 1.46849 ||normal: 0.93035)	acc: 10.49433	acc5: 53.60015
+Train [cifar_base_104_KL_2]	epoch [0/300]|[175/391]	data: 0.014s |batch: 0.177s	loss: 2.39241	(KL: 1.46848 ||normal: 0.92392)	acc: 10.52912	acc5: 53.79972
+Train [cifar_base_104_KL_2]	epoch [0/300]|[180/391]	data: 0.013s |batch: 0.178s	loss: 2.38461	(KL: 1.46848 ||normal: 0.91613)	acc: 10.60083	acc5: 54.01847
+Train [cifar_base_104_KL_2]	epoch [0/300]|[185/391]	data: 0.013s |batch: 0.178s	loss: 2.37724	(KL: 1.46847 ||normal: 0.90877)	acc: 10.71489	acc5: 54.21707
+Train [cifar_base_104_KL_2]	epoch [0/300]|[190/391]	data: 0.013s |batch: 0.178s	loss: 2.37039	(KL: 1.46846 ||normal: 0.90193)	acc: 10.85978	acc5: 54.41754
+Train [cifar_base_104_KL_2]	epoch [0/300]|[195/391]	data: 0.013s |batch: 0.178s	loss: 2.36403	(KL: 1.46846 ||normal: 0.89558)	acc: 10.92156	acc5: 54.58785
+Train [cifar_base_104_KL_2]	epoch [0/300]|[200/391]	data: 0.013s |batch: 0.178s	loss: 2.35734	(KL: 1.46845 ||normal: 0.88889)	acc: 11.01912	acc5: 54.66029
+Train [cifar_base_104_KL_2]	epoch [0/300]|[205/391]	data: 0.013s |batch: 0.178s	loss: 2.35101	(KL: 1.46845 ||normal: 0.88256)	acc: 11.18401	acc5: 54.84299
+Train [cifar_base_104_KL_2]	epoch [0/300]|[210/391]	data: 0.013s |batch: 0.178s	loss: 2.34467	(KL: 1.46844 ||normal: 0.87624)	acc: 11.26333	acc5: 54.98001
+Train [cifar_base_104_KL_2]	epoch [0/300]|[215/391]	data: 0.013s |batch: 0.178s	loss: 2.33938	(KL: 1.46843 ||normal: 0.87095)	acc: 11.29196	acc5: 55.14323
+Train [cifar_base_104_KL_2]	epoch [0/300]|[220/391]	data: 0.013s |batch: 0.178s	loss: 2.33354	(KL: 1.46843 ||normal: 0.86512)	acc: 11.29808	acc5: 55.33442
+Train [cifar_base_104_KL_2]	epoch [0/300]|[225/391]	data: 0.013s |batch: 0.179s	loss: 2.32855	(KL: 1.46842 ||normal: 0.86013)	acc: 11.34195	acc5: 55.43418
+Train [cifar_base_104_KL_2]	epoch [0/300]|[230/391]	data: 0.013s |batch: 0.179s	loss: 2.32477	(KL: 1.46842 ||normal: 0.85635)	acc: 11.35349	acc5: 55.64800
+Train [cifar_base_104_KL_2]	epoch [0/300]|[235/391]	data: 0.013s |batch: 0.179s	loss: 2.32096	(KL: 1.46842 ||normal: 0.85254)	acc: 11.36785	acc5: 55.71041
+Train [cifar_base_104_KL_2]	epoch [0/300]|[240/391]	data: 0.013s |batch: 0.179s	loss: 2.31593	(KL: 1.46841 ||normal: 0.84751)	acc: 11.43672	acc5: 55.98094
+Train [cifar_base_104_KL_2]	epoch [0/300]|[245/391]	data: 0.013s |batch: 0.180s	loss: 2.31196	(KL: 1.46841 ||normal: 0.84355)	acc: 11.52185	acc5: 56.14837
+Train [cifar_base_104_KL_2]	epoch [0/300]|[250/391]	data: 0.013s |batch: 0.180s	loss: 2.30817	(KL: 1.46841 ||normal: 0.83977)	acc: 11.60670	acc5: 56.37761
+Train [cifar_base_104_KL_2]	epoch [0/300]|[255/391]	data: 0.013s |batch: 0.180s	loss: 2.30638	(KL: 1.46840 ||normal: 0.83798)	acc: 11.63025	acc5: 56.43616
+Train [cifar_base_104_KL_2]	epoch [0/300]|[260/391]	data: 0.013s |batch: 0.180s	loss: 2.30389	(KL: 1.46840 ||normal: 0.83549)	acc: 11.60800	acc5: 56.61219
+Train [cifar_base_104_KL_2]	epoch [0/300]|[265/391]	data: 0.013s |batch: 0.180s	loss: 2.29973	(KL: 1.46840 ||normal: 0.83133)	acc: 11.69525	acc5: 56.70818
+Train [cifar_base_104_KL_2]	epoch [0/300]|[270/391]	data: 0.013s |batch: 0.180s	loss: 2.29668	(KL: 1.46839 ||normal: 0.82829)	acc: 11.78506	acc5: 56.78621
+Train [cifar_base_104_KL_2]	epoch [0/300]|[275/391]	data: 0.013s |batch: 0.179s	loss: 2.29262	(KL: 1.46839 ||normal: 0.82423)	acc: 11.84330	acc5: 56.98030
+Train [cifar_base_104_KL_2]	epoch [0/300]|[280/391]	data: 0.013s |batch: 0.179s	loss: 2.28848	(KL: 1.46839 ||normal: 0.82010)	acc: 11.93839	acc5: 57.12022
+Train [cifar_base_104_KL_2]	epoch [0/300]|[285/391]	data: 0.013s |batch: 0.179s	loss: 2.28537	(KL: 1.46838 ||normal: 0.81699)	acc: 12.01923	acc5: 57.20334
+Train [cifar_base_104_KL_2]	epoch [0/300]|[290/391]	data: 0.013s |batch: 0.179s	loss: 2.28230	(KL: 1.46838 ||normal: 0.81392)	acc: 12.08655	acc5: 57.38026
+Train [cifar_base_104_KL_2]	epoch [0/300]|[295/391]	data: 0.013s |batch: 0.179s	loss: 2.27941	(KL: 1.46838 ||normal: 0.81103)	acc: 12.14105	acc5: 57.47202
+Train [cifar_base_104_KL_2]	epoch [0/300]|[300/391]	data: 0.013s |batch: 0.179s	loss: 2.27648	(KL: 1.46838 ||normal: 0.80810)	acc: 12.16518	acc5: 57.63860
+Train [cifar_base_104_KL_2]	epoch [0/300]|[305/391]	data: 0.013s |batch: 0.179s	loss: 2.27488	(KL: 1.46838 ||normal: 0.80651)	acc: 12.16554	acc5: 57.79463
+Train [cifar_base_104_KL_2]	epoch [0/300]|[310/391]	data: 0.012s |batch: 0.179s	loss: 2.27467	(KL: 1.46837 ||normal: 0.80630)	acc: 12.16590	acc5: 57.83260
+Train [cifar_base_104_KL_2]	epoch [0/300]|[315/391]	data: 0.012s |batch: 0.179s	loss: 2.27563	(KL: 1.46837 ||normal: 0.80725)	acc: 12.13163	acc5: 57.89903
+Train [cifar_base_104_KL_2]	epoch [0/300]|[320/391]	data: 0.013s |batch: 0.180s	loss: 2.27429	(KL: 1.46837 ||normal: 0.80592)	acc: 12.13736	acc5: 58.00234
+Train [cifar_base_104_KL_2]	epoch [0/300]|[325/391]	data: 0.013s |batch: 0.180s	loss: 2.27358	(KL: 1.46837 ||normal: 0.80520)	acc: 12.13574	acc5: 58.07851
+Train [cifar_base_104_KL_2]	epoch [0/300]|[330/391]	data: 0.013s |batch: 0.180s	loss: 2.27403	(KL: 1.46838 ||normal: 0.80566)	acc: 12.08695	acc5: 58.16182
+Train [cifar_base_104_KL_2]	epoch [0/300]|[335/391]	data: 0.013s |batch: 0.180s	loss: 2.27416	(KL: 1.46838 ||normal: 0.80578)	acc: 12.08612	acc5: 58.24730
+Train [cifar_base_104_KL_2]	epoch [0/300]|[340/391]	data: 0.013s |batch: 0.180s	loss: 2.27527	(KL: 1.46841 ||normal: 0.80687)	acc: 12.06928	acc5: 58.40359
+Train [cifar_base_104_KL_2]	epoch [0/300]|[345/391]	data: 0.013s |batch: 0.180s	loss: 2.27659	(KL: 1.46844 ||normal: 0.80816)	acc: 12.00325	acc5: 58.52827
+Train [cifar_base_104_KL_2]	epoch [0/300]|[350/391]	data: 0.013s |batch: 0.180s	loss: 2.27783	(KL: 1.46845 ||normal: 0.80938)	acc: 11.95023	acc5: 58.65385
+Train [cifar_base_104_KL_2]	epoch [0/300]|[355/391]	data: 0.013s |batch: 0.180s	loss: 2.27883	(KL: 1.46846 ||normal: 0.81037)	acc: 11.90967	acc5: 58.73859
+Train [cifar_base_104_KL_2]	epoch [0/300]|[360/391]	data: 0.013s |batch: 0.180s	loss: 2.27752	(KL: 1.46846 ||normal: 0.80905)	acc: 11.91136	acc5: 58.82748
+Train [cifar_base_104_KL_2]	epoch [0/300]|[365/391]	data: 0.013s |batch: 0.180s	loss: 2.27793	(KL: 1.46847 ||normal: 0.80947)	acc: 11.88525	acc5: 58.88619
+Train [cifar_base_104_KL_2]	epoch [0/300]|[370/391]	data: 0.013s |batch: 0.180s	loss: 2.27748	(KL: 1.46847 ||normal: 0.80901)	acc: 11.84931	acc5: 58.93910
+Train [cifar_base_104_KL_2]	epoch [0/300]|[375/391]	data: 0.013s |batch: 0.180s	loss: 2.27538	(KL: 1.46847 ||normal: 0.80691)	acc: 11.85588	acc5: 59.02801
+Train [cifar_base_104_KL_2]	epoch [0/300]|[380/391]	data: 0.013s |batch: 0.180s	loss: 2.27477	(KL: 1.46847 ||normal: 0.80630)	acc: 11.82538	acc5: 59.11663
+Train [cifar_base_104_KL_2]	epoch [0/300]|[385/391]	data: 0.013s |batch: 0.180s	loss: 2.27348	(KL: 1.46847 ||normal: 0.80501)	acc: 11.81995	acc5: 59.18070
+Train [cifar_base_104_KL_2]	epoch [0/300]|[390/391]	data: 0.013s |batch: 0.181s	loss: 2.27210	(KL: 1.46847 ||normal: 0.80363)	acc: 11.84800	acc5: 59.23000
+Test [cifar_base_104_KL_2]	epoch [0/300]	iter [0/79]		data: 0.212s | batch: 0.313s	loss 1.39898	acc: 7.81250
+Test [cifar_base_104_KL_2]	epoch [0/300]	iter [5/79]		data: 0.045s | batch: 0.138s	loss 1.41880	acc: 13.54167
+Test [cifar_base_104_KL_2]	epoch [0/300]	iter [10/79]		data: 0.029s | batch: 0.122s	loss 1.40674	acc: 13.84943
+Test [cifar_base_104_KL_2]	epoch [0/300]	iter [15/79]		data: 0.023s | batch: 0.120s	loss 1.41205	acc: 14.50195
+Test [cifar_base_104_KL_2]	epoch [0/300]	iter [20/79]		data: 0.021s | batch: 0.120s	loss 1.39322	acc: 14.50893
+Test [cifar_base_104_KL_2]	epoch [0/300]	iter [25/79]		data: 0.019s | batch: 0.117s	loss 1.40389	acc: 14.33293
+Test [cifar_base_104_KL_2]	epoch [0/300]	iter [30/79]		data: 0.017s | batch: 0.114s	loss 1.40443	acc: 14.46573
+Test [cifar_base_104_KL_2]	epoch [0/300]	iter [35/79]		data: 0.016s | batch: 0.112s	loss 1.39740	acc: 14.53993
+Test [cifar_base_104_KL_2]	epoch [0/300]	iter [40/79]		data: 0.015s | batch: 0.110s	loss 1.39675	acc: 14.63415
+Test [cifar_base_104_KL_2]	epoch [0/300]	iter [45/79]		data: 0.015s | batch: 0.110s	loss 1.39475	acc: 14.58899
+Test [cifar_base_104_KL_2]	epoch [0/300]	iter [50/79]		data: 0.014s | batch: 0.109s	loss 1.39346	acc: 14.69056
+Test [cifar_base_104_KL_2]	epoch [0/300]	iter [55/79]		data: 0.014s | batch: 0.109s	loss 1.38966	acc: 14.48103
+Test [cifar_base_104_KL_2]	epoch [0/300]	iter [60/79]		data: 0.014s | batch: 0.110s	loss 1.39372	acc: 14.39549
+Test [cifar_base_104_KL_2]	epoch [0/300]	iter [65/79]		data: 0.013s | batch: 0.109s	loss 1.39239	acc: 14.41761
+Test [cifar_base_104_KL_2]	epoch [0/300]	iter [70/79]		data: 0.013s | batch: 0.109s	loss 1.39243	acc: 14.37060
+Test [cifar_base_104_KL_2]	epoch [0/300]	iter [75/79]		data: 0.013s | batch: 0.108s	loss 1.39389	acc: 14.44285
+Test [cifar_base_104_KL_2]	epoch [0/300]	iter [78/79]		data: 0.013s | batch: 0.108s	loss 1.39707	acc: 14.44000
+Summary [cifar_base_104_KL_2]	epoch [0/300]		train_loss: 2.27210	test_loss: 1.39707	train_acc: 11.84800	test_acc: 14.44000	train_acc5: 59.23000
+
+model saved at result/cifar_base_104_KL_2/train/epoch_1.pth
+best model saved at result/cifar_base_104_KL_2/train/model_best_at_epoch_1.pth
+Train [cifar_base_104_KL_2]	epoch [1/300]|[0/391]	data: 0.344s |batch: 0.467s	loss: 2.16759	(KL: 1.46837 ||normal: 0.69921)	acc: 13.28125	acc5: 53.12500
+Train [cifar_base_104_KL_2]	epoch [1/300]|[5/391]	data: 0.068s |batch: 0.220s	loss: 2.17580	(KL: 1.46833 ||normal: 0.70747)	acc: 16.14583	acc5: 56.38021
+Train [cifar_base_104_KL_2]	epoch [1/300]|[10/391]	data: 0.043s |batch: 0.200s	loss: 2.16551	(KL: 1.46831 ||normal: 0.69721)	acc: 16.19318	acc5: 58.30966
+Train [cifar_base_104_KL_2]	epoch [1/300]|[15/391]	data: 0.033s |batch: 0.191s	loss: 2.16536	(KL: 1.46830 ||normal: 0.69706)	acc: 15.82031	acc5: 58.78906
+Train [cifar_base_104_KL_2]	epoch [1/300]|[20/391]	data: 0.028s |batch: 0.186s	loss: 2.16200	(KL: 1.46828 ||normal: 0.69372)	acc: 16.10863	acc5: 59.37500
+Train [cifar_base_104_KL_2]	epoch [1/300]|[25/391]	data: 0.025s |batch: 0.183s	loss: 2.15794	(KL: 1.46828 ||normal: 0.68966)	acc: 15.59495	acc5: 60.48678
+Train [cifar_base_104_KL_2]	epoch [1/300]|[30/391]	data: 0.022s |batch: 0.181s	loss: 2.14911	(KL: 1.46828 ||normal: 0.68083)	acc: 16.05343	acc5: 61.76915
+Train [cifar_base_104_KL_2]	epoch [1/300]|[35/391]	data: 0.021s |batch: 0.180s	loss: 2.13784	(KL: 1.46826 ||normal: 0.66958)	acc: 15.86372	acc5: 62.15278
+Train [cifar_base_104_KL_2]	epoch [1/300]|[40/391]	data: 0.019s |batch: 0.179s	loss: 2.12467	(KL: 1.46825 ||normal: 0.65642)	acc: 16.23476	acc5: 63.71951
+Train [cifar_base_104_KL_2]	epoch [1/300]|[45/391]	data: 0.018s |batch: 0.178s	loss: 2.11472	(KL: 1.46825 ||normal: 0.64647)	acc: 16.55910	acc5: 64.87772
+Train [cifar_base_104_KL_2]	epoch [1/300]|[50/391]	data: 0.017s |batch: 0.178s	loss: 2.10574	(KL: 1.46824 ||normal: 0.63749)	acc: 17.23346	acc5: 65.41054
+Train [cifar_base_104_KL_2]	epoch [1/300]|[55/391]	data: 0.017s |batch: 0.177s	loss: 2.09821	(KL: 1.46823 ||normal: 0.62998)	acc: 17.53627	acc5: 66.18304
+Train [cifar_base_104_KL_2]	epoch [1/300]|[60/391]	data: 0.016s |batch: 0.177s	loss: 2.09058	(KL: 1.46823 ||normal: 0.62235)	acc: 17.75102	acc5: 66.85451
+Train [cifar_base_104_KL_2]	epoch [1/300]|[65/391]	data: 0.016s |batch: 0.177s	loss: 2.08505	(KL: 1.46823 ||normal: 0.61682)	acc: 17.95691	acc5: 67.50710
+Train [cifar_base_104_KL_2]	epoch [1/300]|[70/391]	data: 0.016s |batch: 0.177s	loss: 2.08075	(KL: 1.46822 ||normal: 0.61252)	acc: 18.07879	acc5: 67.68266
+Train [cifar_base_104_KL_2]	epoch [1/300]|[75/391]	data: 0.015s |batch: 0.176s	loss: 2.07710	(KL: 1.46823 ||normal: 0.60888)	acc: 18.37993	acc5: 68.04071
+Train [cifar_base_104_KL_2]	epoch [1/300]|[80/391]	data: 0.015s |batch: 0.176s	loss: 2.07740	(KL: 1.46822 ||normal: 0.60918)	acc: 18.15201	acc5: 67.91088
+Train [cifar_base_104_KL_2]	epoch [1/300]|[85/391]	data: 0.015s |batch: 0.176s	loss: 2.07789	(KL: 1.46822 ||normal: 0.60967)	acc: 18.10501	acc5: 67.62355
+Train [cifar_base_104_KL_2]	epoch [1/300]|[90/391]	data: 0.014s |batch: 0.176s	loss: 2.07786	(KL: 1.46823 ||normal: 0.60963)	acc: 18.11470	acc5: 67.63393
+Train [cifar_base_104_KL_2]	epoch [1/300]|[95/391]	data: 0.014s |batch: 0.177s	loss: 2.07573	(KL: 1.46823 ||normal: 0.60750)	acc: 18.28613	acc5: 67.64323
+Train [cifar_base_104_KL_2]	epoch [1/300]|[100/391]	data: 0.014s |batch: 0.177s	loss: 2.07416	(KL: 1.46823 ||normal: 0.60593)	acc: 18.28589	acc5: 67.80631
+Train [cifar_base_104_KL_2]	epoch [1/300]|[105/391]	data: 0.014s |batch: 0.177s	loss: 2.07338	(KL: 1.46823 ||normal: 0.60514)	acc: 18.17512	acc5: 67.87294
+Train [cifar_base_104_KL_2]	epoch [1/300]|[110/391]	data: 0.014s |batch: 0.177s	loss: 2.07070	(KL: 1.46823 ||normal: 0.60247)	acc: 18.39105	acc5: 68.15878
+Train [cifar_base_104_KL_2]	epoch [1/300]|[115/391]	data: 0.014s |batch: 0.177s	loss: 2.06764	(KL: 1.46823 ||normal: 0.59941)	acc: 18.69612	acc5: 68.45366
+Train [cifar_base_104_KL_2]	epoch [1/300]|[120/391]	data: 0.013s |batch: 0.177s	loss: 2.06674	(KL: 1.46823 ||normal: 0.59851)	acc: 18.76291	acc5: 68.54339
+Train [cifar_base_104_KL_2]	epoch [1/300]|[125/391]	data: 0.013s |batch: 0.177s	loss: 2.06529	(KL: 1.46823 ||normal: 0.59705)	acc: 18.83061	acc5: 68.68180
+Train [cifar_base_104_KL_2]	epoch [1/300]|[130/391]	data: 0.013s |batch: 0.177s	loss: 2.06351	(KL: 1.46823 ||normal: 0.59527)	acc: 18.88717	acc5: 68.96469
+Train [cifar_base_104_KL_2]	epoch [1/300]|[135/391]	data: 0.013s |batch: 0.177s	loss: 2.06076	(KL: 1.46823 ||normal: 0.59253)	acc: 19.04297	acc5: 69.18658
+Train [cifar_base_104_KL_2]	epoch [1/300]|[140/391]	data: 0.013s |batch: 0.177s	loss: 2.05844	(KL: 1.46823 ||normal: 0.59021)	acc: 19.34840	acc5: 69.33178
+Train [cifar_base_104_KL_2]	epoch [1/300]|[145/391]	data: 0.013s |batch: 0.177s	loss: 2.05639	(KL: 1.46823 ||normal: 0.58816)	acc: 19.47239	acc5: 69.48844
+Train [cifar_base_104_KL_2]	epoch [1/300]|[150/391]	data: 0.014s |batch: 0.177s	loss: 2.05523	(KL: 1.46823 ||normal: 0.58700)	acc: 19.66060	acc5: 69.54677
+Train [cifar_base_104_KL_2]	epoch [1/300]|[155/391]	data: 0.017s |batch: 0.179s	loss: 2.05369	(KL: 1.46823 ||normal: 0.58546)	acc: 19.83173	acc5: 69.68149
+Train [cifar_base_104_KL_2]	epoch [1/300]|[160/391]	data: 0.020s |batch: 0.180s	loss: 2.05206	(KL: 1.46823 ||normal: 0.58383)	acc: 20.04076	acc5: 69.84181
+Train [cifar_base_104_KL_2]	epoch [1/300]|[165/391]	data: 0.023s |batch: 0.181s	loss: 2.05072	(KL: 1.46823 ||normal: 0.58249)	acc: 20.20425	acc5: 69.98776
+Train [cifar_base_104_KL_2]	epoch [1/300]|[170/391]	data: 0.025s |batch: 0.181s	loss: 2.04952	(KL: 1.46823 ||normal: 0.58129)	acc: 20.30793	acc5: 70.27595
+Train [cifar_base_104_KL_2]	epoch [1/300]|[175/391]	data: 0.027s |batch: 0.182s	loss: 2.04896	(KL: 1.46823 ||normal: 0.58073)	acc: 20.40572	acc5: 70.35689
+Train [cifar_base_104_KL_2]	epoch [1/300]|[180/391]	data: 0.029s |batch: 0.182s	loss: 2.04932	(KL: 1.46823 ||normal: 0.58108)	acc: 20.37293	acc5: 70.52400
+Train [cifar_base_104_KL_2]	epoch [1/300]|[185/391]	data: 0.029s |batch: 0.182s	loss: 2.04816	(KL: 1.46823 ||normal: 0.57992)	acc: 20.49731	acc5: 70.65272
+Train [cifar_base_104_KL_2]	epoch [1/300]|[190/391]	data: 0.029s |batch: 0.183s	loss: 2.04717	(KL: 1.46823 ||normal: 0.57893)	acc: 20.62336	acc5: 70.83606
+Train [cifar_base_104_KL_2]	epoch [1/300]|[195/391]	data: 0.028s |batch: 0.183s	loss: 2.04644	(KL: 1.46823 ||normal: 0.57820)	acc: 20.73501	acc5: 70.91040
+Train [cifar_base_104_KL_2]	epoch [1/300]|[200/391]	data: 0.028s |batch: 0.183s	loss: 2.04599	(KL: 1.46823 ||normal: 0.57775)	acc: 20.77114	acc5: 71.05488
+Train [cifar_base_104_KL_2]	epoch [1/300]|[205/391]	data: 0.028s |batch: 0.183s	loss: 2.04570	(KL: 1.46824 ||normal: 0.57747)	acc: 20.78656	acc5: 71.07858
+Train [cifar_base_104_KL_2]	epoch [1/300]|[210/391]	data: 0.027s |batch: 0.182s	loss: 2.04546	(KL: 1.46823 ||normal: 0.57723)	acc: 20.86049	acc5: 71.06043
+Train [cifar_base_104_KL_2]	epoch [1/300]|[215/391]	data: 0.027s |batch: 0.182s	loss: 2.04531	(KL: 1.46824 ||normal: 0.57707)	acc: 20.93822	acc5: 71.04311
+Train [cifar_base_104_KL_2]	epoch [1/300]|[220/391]	data: 0.026s |batch: 0.183s	loss: 2.04525	(KL: 1.46824 ||normal: 0.57701)	acc: 20.94174	acc5: 71.09021
+Train [cifar_base_104_KL_2]	epoch [1/300]|[225/391]	data: 0.026s |batch: 0.182s	loss: 2.04433	(KL: 1.46824 ||normal: 0.57610)	acc: 21.00041	acc5: 71.15597
+Train [cifar_base_104_KL_2]	epoch [1/300]|[230/391]	data: 0.026s |batch: 0.182s	loss: 2.04408	(KL: 1.46824 ||normal: 0.57583)	acc: 21.08360	acc5: 71.13433
+Train [cifar_base_104_KL_2]	epoch [1/300]|[235/391]	data: 0.025s |batch: 0.182s	loss: 2.04330	(KL: 1.46824 ||normal: 0.57506)	acc: 21.18313	acc5: 71.23941
+Train [cifar_base_104_KL_2]	epoch [1/300]|[240/391]	data: 0.025s |batch: 0.182s	loss: 2.04288	(KL: 1.46824 ||normal: 0.57464)	acc: 21.17479	acc5: 71.26232
+Train [cifar_base_104_KL_2]	epoch [1/300]|[245/391]	data: 0.025s |batch: 0.182s	loss: 2.04210	(KL: 1.46824 ||normal: 0.57386)	acc: 21.28112	acc5: 71.34464
+Train [cifar_base_104_KL_2]	epoch [1/300]|[250/391]	data: 0.025s |batch: 0.182s	loss: 2.04183	(KL: 1.46824 ||normal: 0.57359)	acc: 21.35520	acc5: 71.42679
+Train [cifar_base_104_KL_2]	epoch [1/300]|[255/391]	data: 0.024s |batch: 0.182s	loss: 2.04148	(KL: 1.46824 ||normal: 0.57324)	acc: 21.37146	acc5: 71.45996
+Train [cifar_base_104_KL_2]	epoch [1/300]|[260/391]	data: 0.024s |batch: 0.182s	loss: 2.04058	(KL: 1.46825 ||normal: 0.57234)	acc: 21.47390	acc5: 71.50982
+Train [cifar_base_104_KL_2]	epoch [1/300]|[265/391]	data: 0.024s |batch: 0.182s	loss: 2.03954	(KL: 1.46824 ||normal: 0.57129)	acc: 21.62535	acc5: 71.58717
+Train [cifar_base_104_KL_2]	epoch [1/300]|[270/391]	data: 0.024s |batch: 0.182s	loss: 2.03885	(KL: 1.46824 ||normal: 0.57061)	acc: 21.75392	acc5: 71.59825
+Train [cifar_base_104_KL_2]	epoch [1/300]|[275/391]	data: 0.024s |batch: 0.182s	loss: 2.03771	(KL: 1.46824 ||normal: 0.56946)	acc: 21.92595	acc5: 71.67969
+Train [cifar_base_104_KL_2]	epoch [1/300]|[280/391]	data: 0.023s |batch: 0.181s	loss: 2.03677	(KL: 1.46824 ||normal: 0.56853)	acc: 22.04460	acc5: 71.78047
+Train [cifar_base_104_KL_2]	epoch [1/300]|[285/391]	data: 0.023s |batch: 0.182s	loss: 2.03551	(KL: 1.46824 ||normal: 0.56726)	acc: 22.17821	acc5: 71.91051
+Train [cifar_base_104_KL_2]	epoch [1/300]|[290/391]	data: 0.023s |batch: 0.182s	loss: 2.03490	(KL: 1.46824 ||normal: 0.56666)	acc: 22.27502	acc5: 71.95823
+Train [cifar_base_104_KL_2]	epoch [1/300]|[295/391]	data: 0.023s |batch: 0.182s	loss: 2.03422	(KL: 1.46824 ||normal: 0.56597)	acc: 22.36592	acc5: 72.02808
+Train [cifar_base_104_KL_2]	epoch [1/300]|[300/391]	data: 0.023s |batch: 0.182s	loss: 2.03351	(KL: 1.46824 ||normal: 0.56527)	acc: 22.45120	acc5: 72.08524
+Train [cifar_base_104_KL_2]	epoch [1/300]|[305/391]	data: 0.023s |batch: 0.182s	loss: 2.03250	(KL: 1.46824 ||normal: 0.56425)	acc: 22.59242	acc5: 72.19158
+Train [cifar_base_104_KL_2]	epoch [1/300]|[310/391]	data: 0.023s |batch: 0.183s	loss: 2.03176	(KL: 1.46824 ||normal: 0.56352)	acc: 22.66379	acc5: 72.26939
+Train [cifar_base_104_KL_2]	epoch [1/300]|[315/391]	data: 0.023s |batch: 0.183s	loss: 2.03105	(KL: 1.46824 ||normal: 0.56281)	acc: 22.75020	acc5: 72.33979
+Train [cifar_base_104_KL_2]	epoch [1/300]|[320/391]	data: 0.023s |batch: 0.183s	loss: 2.03055	(KL: 1.46824 ||normal: 0.56231)	acc: 22.82418	acc5: 72.41044
+Train [cifar_base_104_KL_2]	epoch [1/300]|[325/391]	data: 0.022s |batch: 0.183s	loss: 2.02992	(KL: 1.46824 ||normal: 0.56168)	acc: 22.91028	acc5: 72.48370
+Train [cifar_base_104_KL_2]	epoch [1/300]|[330/391]	data: 0.022s |batch: 0.183s	loss: 2.02957	(KL: 1.46824 ||normal: 0.56133)	acc: 22.93712	acc5: 72.48159
+Train [cifar_base_104_KL_2]	epoch [1/300]|[335/391]	data: 0.022s |batch: 0.183s	loss: 2.02921	(KL: 1.46824 ||normal: 0.56097)	acc: 22.98177	acc5: 72.53534
+Train [cifar_base_104_KL_2]	epoch [1/300]|[340/391]	data: 0.022s |batch: 0.183s	loss: 2.02891	(KL: 1.46824 ||normal: 0.56066)	acc: 23.00220	acc5: 72.52108
+Train [cifar_base_104_KL_2]	epoch [1/300]|[345/391]	data: 0.022s |batch: 0.183s	loss: 2.02849	(KL: 1.46824 ||normal: 0.56025)	acc: 23.02204	acc5: 72.56142
+Train [cifar_base_104_KL_2]	epoch [1/300]|[350/391]	data: 0.022s |batch: 0.183s	loss: 2.02806	(KL: 1.46824 ||normal: 0.55981)	acc: 23.05244	acc5: 72.64290
+Train [cifar_base_104_KL_2]	epoch [1/300]|[355/391]	data: 0.022s |batch: 0.183s	loss: 2.02723	(KL: 1.46824 ||normal: 0.55899)	acc: 23.14343	acc5: 72.76378
+Train [cifar_base_104_KL_2]	epoch [1/300]|[360/391]	data: 0.021s |batch: 0.182s	loss: 2.02673	(KL: 1.46824 ||normal: 0.55849)	acc: 23.18863	acc5: 72.88998
+Train [cifar_base_104_KL_2]	epoch [1/300]|[365/391]	data: 0.021s |batch: 0.182s	loss: 2.02602	(KL: 1.46825 ||normal: 0.55778)	acc: 23.27954	acc5: 72.97430
+Train [cifar_base_104_KL_2]	epoch [1/300]|[370/391]	data: 0.021s |batch: 0.182s	loss: 2.02565	(KL: 1.46825 ||normal: 0.55740)	acc: 23.33221	acc5: 73.02055
+Train [cifar_base_104_KL_2]	epoch [1/300]|[375/391]	data: 0.021s |batch: 0.182s	loss: 2.02530	(KL: 1.46825 ||normal: 0.55705)	acc: 23.37309	acc5: 73.09466
+Train [cifar_base_104_KL_2]	epoch [1/300]|[380/391]	data: 0.021s |batch: 0.182s	loss: 2.02479	(KL: 1.46825 ||normal: 0.55654)	acc: 23.46211	acc5: 73.14222
+Train [cifar_base_104_KL_2]	epoch [1/300]|[385/391]	data: 0.021s |batch: 0.182s	loss: 2.02400	(KL: 1.46825 ||normal: 0.55576)	acc: 23.57918	acc5: 73.22094

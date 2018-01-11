@@ -1,0 +1,178 @@
+Experiment: capsule_202_v3_KL_only_final
+------------ Training Options -------------
+KL_factor: 0.1
+KL_manner: 1
+add_cap_dropout: False
+b_init: zero
+beta1: 0.9
+cap_N: 3
+cap_model: v3
+dataset: cifar10
+debug: True
+deploy: False
+do_squash: False
+draw_hist: False
+dropout_p: 0.2
+epochs: 300
+experiment_name: capsule_202_v3_KL_only_final
+file_name: result/capsule_202_v3_KL_only_final/train/opt_train_start_epoch_1_end_300.txt
+fix_m: False
+gamma: 0.1
+has_relu_in_W: False
+look_into_details: False
+lr: 0.0001
+manual_seed: 1095
+max_epoch: 300
+model_cifar: capsule
+momentum: 0.9
+multi_crop_test: True
+non_target_j: False
+num_workers: 2
+optim: rmsprop
+phase: train
+port: 4000
+route_num: 2
+save_epoch: 20
+save_folder: result/capsule_202_v3_KL_only_final/train
+schedule_cifar: [150, 225]
+scheduler: None
+send_images_to_visdom: False
+show_freq: 5
+show_test_after_epoch: -1
+squash_manner: sigmoid
+start_epoch: 1
+test_batch: 128
+test_only: False
+train_batch: 128
+use_CE_loss: False
+use_KL: True
+use_cuda: True
+use_spread_loss: False
+visdom: True
+w_version: v2
+weight_decay: 0.0005
+------------------ End --------------------
+CapsNet (
+  (conv1): Conv2d(3, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+  (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+  (relu): ReLU (inplace)
+  (layer1): Sequential (
+    (0): BasicBlock (
+      (conv1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+    )
+    (1): BasicBlock (
+      (conv1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+    )
+    (2): BasicBlock (
+      (conv1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+    )
+  )
+  (layer2): Sequential (
+    (0): BasicBlock (
+      (conv1): Conv2d(16, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (downsample): Sequential (
+        (0): Conv2d(16, 32, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      )
+    )
+    (1): BasicBlock (
+      (conv1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+    )
+    (2): BasicBlock (
+      (conv1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+    )
+  )
+  (layer3): Sequential (
+    (0): BasicBlock (
+      (conv1): Conv2d(32, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (downsample): Sequential (
+        (0): Conv2d(32, 64, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      )
+    )
+    (1): BasicBlock (
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+    )
+    (2): BasicBlock (
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+    )
+  )
+  (tranfer_conv): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1))
+  (tranfer_bn): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+  (tranfer_relu): ReLU (inplace)
+  (buffer): Sequential (
+    (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): ReLU (inplace)
+  )
+  (basic_cap): CapLayer2 (
+    (W): Conv2d(64, 4096, kernel_size=(1, 1), stride=(1, 1))
+  )
+  (cls_cap): CapLayer2 (
+    (W): Conv2d(64, 640, kernel_size=(1, 1), stride=(1, 1))
+  )
+  (buffer2): Sequential (
+    (0): Conv2d(64, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): ReLU (inplace)
+  )
+  (cap_smaller_in_share): CapLayer2 (
+    (W): Conv2d(512, 32768, kernel_size=(1, 1), stride=(1, 1), groups=4)
+  )
+  (cap_smaller_in_out_share): CapLayer2 (
+    (W): Conv2d(512, 16384, kernel_size=(1, 1), stride=(1, 1), groups=4)
+  )
+  (cls_smaller_in_share): CapLayer2 (
+    (W): Conv2d(2048, 20480, kernel_size=(1, 1), stride=(1, 1), groups=16)
+  )
+  (dropout): Dropout2d (p=0.1)
+  (bummer): Sequential (
+    (0): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True)
+    (1): ReLU (inplace)
+  )
+)
+
+init learning rate 0.000100 at iter 0
+
+Train [capsule_202_v3_KL_only_final]	epoch [0/300]|[0/391]	data: 0.117s |batch: 2.346s	loss: 0.89151	(KL: 0.19496 ||normal: 0.69656)	acc: 7.81250	acc5: 47.65625
+Train [capsule_202_v3_KL_only_final]	epoch [0/300]|[5/391]	data: 0.022s |batch: 1.634s	loss: 0.73132	(KL: 0.10282 ||normal: 0.62850)	acc: 10.41667	acc5: 49.34896
+Train [capsule_202_v3_KL_only_final]	epoch [0/300]|[10/391]	data: 0.013s |batch: 1.558s	loss: 0.67646	(KL: 0.07619 ||normal: 0.60026)	acc: 11.07955	acc5: 50.21307
+Train [capsule_202_v3_KL_only_final]	epoch [0/300]|[15/391]	data: 0.010s |batch: 1.529s	loss: 0.65476	(KL: 0.06891 ||normal: 0.58585)	acc: 10.93750	acc5: 50.92773
+Train [capsule_202_v3_KL_only_final]	epoch [0/300]|[20/391]	data: 0.008s |batch: 1.514s	loss: 0.63810	(KL: 0.06110 ||normal: 0.57700)	acc: 10.86310	acc5: 50.70685
+Train [capsule_202_v3_KL_only_final]	epoch [0/300]|[25/391]	data: 0.007s |batch: 1.505s	loss: 0.62820	(KL: 0.05461 ||normal: 0.57359)	acc: 10.15625	acc5: 50.66106
+Train [capsule_202_v3_KL_only_final]	epoch [0/300]|[30/391]	data: 0.006s |batch: 1.500s	loss: 0.61925	(KL: 0.05015 ||normal: 0.56910)	acc: 10.15625	acc5: 50.98286
+Train [capsule_202_v3_KL_only_final]	epoch [0/300]|[35/391]	data: 0.006s |batch: 1.496s	loss: 0.61394	(KL: 0.04635 ||normal: 0.56760)	acc: 10.19965	acc5: 51.08507

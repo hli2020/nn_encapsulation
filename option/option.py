@@ -7,9 +7,9 @@ class Options(object):
 
     def __init__(self):
 
-        self.parser = argparse.ArgumentParser(description='Object Detection')
-        self.parser.add_argument('--experiment_name', default='ssd_rerun')
-        self.parser.add_argument('--dataset', default='coco', help='[ voc|coco ]')
+        self.parser = argparse.ArgumentParser(description='Capsule Network')
+        self.parser.add_argument('--experiment_name', default='base_100')
+        self.parser.add_argument('--dataset', default='cifar10', help='[ cifar10 ]')
         self.parser.add_argument('--debug_mode', default=True, type=str2bool)
         self.parser.add_argument('--base_save_folder', default='result')
 
@@ -46,27 +46,27 @@ class Options(object):
         self.parser.add_argument('--batch_size_train', default=128, type=int)
         self.parser.add_argument('--batch_size_test', default=128, type=int)
         # self.parser.add_argument('--resume', default=None, type=str, help='Resume from checkpoint')
-        self.parser.add_argument('--max_epoch', default=20, type=int, help='Number of training epoches')
-        self.parser.add_argument('--schedule', default=[6, 12, 16], nargs='+', type=int)
+        self.parser.add_argument('--max_epoch', default=300, type=int, help='Number of training epoches')
+        self.parser.add_argument('--schedule', default=[150, 225], nargs='+', type=int)
 
         # loss
+        self.parser.add_argument('--loss_form', default='CE', type=str)
         self.parser.add_argument('--use_KL', action='store_true')
         self.parser.add_argument('--use_multiple', action='store_true', help='valid for N > 1')
         self.parser.add_argument('--KL_manner', default=1, type=int)
         self.parser.add_argument('--KL_factor', default=.1, type=float)
-        self.parser.add_argument('--use_CE_loss', action='store_true')
-        self.parser.add_argument('--use_spread_loss', action='store_true')
         self.parser.add_argument('--fix_m', action='store_true', help='valid for use_spread_loss only')
 
         # test
         self.parser.add_argument('--multi_crop_test', action='store_true')
 
         self.opt = self.parser.parse_args()
+        self.opt.phase = 'train_val'
 
     def setup_config(self):
 
-        self.opt.save_folder = os.path.join(self.opt.base_save_folder,
-                                            self.opt.experiment_name, self.opt.phase)
+        self.opt.save_folder = os.path.join(
+            self.opt.base_save_folder, self.opt.experiment_name)
         if not os.path.exists(self.opt.save_folder):
             mkdirs(self.opt.save_folder)
 
@@ -82,10 +82,9 @@ class Options(object):
             self.opt.use_cuda = False
             torch.set_default_tensor_type('torch.FloatTensor')
 
-        # TODO: test_after_epoch
         if self.opt.debug_mode:
-            self.opt.loss_freq = 10
-            self.opt.save_freq = self.opt.loss_freq
+            self.opt.show_test_after_epoch = 0
+            self.opt.show_freq = 1
         else:
-            self.opt.loss_freq = 100    # in iter unit
-            self.opt.save_freq = 5      # in epoch unit
+            self.opt.show_test_after_epoch = 100
+            self.opt.show_freq = 50

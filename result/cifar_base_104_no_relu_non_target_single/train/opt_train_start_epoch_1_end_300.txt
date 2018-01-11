@@ -1,0 +1,185 @@
+Experiment: cifar_base_104_no_relu
+------------ Training Options -------------
+b_init: zero
+basenet: vgg16_reducedfc.pth
+batch_size: 2
+beta1: 0.5
+cap_N: 3
+dataset: cifar
+debug: True
+deploy: False
+do_squash: False
+draw_hist: False
+epochs: 300
+experiment_name: cifar_base_104_no_relu
+file_name: result/cifar_base_104_no_relu/train/opt_train_start_epoch_1_end_300.txt
+gamma: 0.1
+has_relu_in_W: False
+look_into_details: False
+lr: 0.01
+manual_seed: 2000
+max_epoch: 300
+max_iter: 130000
+model_cifar: capsule
+momentum: 0.9
+multi_crop_test: True
+no_pretrain: False
+non_target_j: False
+num_workers: 2
+optim: sgd
+phase: train
+port: 4000
+prior_config: v2_512
+resume: None
+route_num: 3
+save_epoch: 20
+save_folder: result/cifar_base_104_no_relu/train
+schedule: [80000, 100000, 120000]
+schedule_cifar: [150, 225]
+scheduler: None
+send_images_to_visdom: False
+show_freq: 20
+show_test_after_epoch: -1
+skip_pre_squash: False
+skip_pre_transfer: False
+ssd_dim: 512
+start_epoch: 1
+test_batch: 128
+test_only: False
+train_batch: 128
+use_CE_loss: False
+use_cuda: True
+version: v2
+visdom: True
+w_version: v2
+weight_decay: 0.0005
+------------------ End --------------------
+CapsNet (
+  (conv1): Conv2d(3, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+  (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+  (relu): ReLU (inplace)
+  (layer1): Sequential (
+    (0): BasicBlock (
+      (conv1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+    )
+    (1): BasicBlock (
+      (conv1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+    )
+    (2): BasicBlock (
+      (conv1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+    )
+  )
+  (layer2): Sequential (
+    (0): BasicBlock (
+      (conv1): Conv2d(16, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (downsample): Sequential (
+        (0): Conv2d(16, 32, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      )
+    )
+    (1): BasicBlock (
+      (conv1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+    )
+    (2): BasicBlock (
+      (conv1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+    )
+  )
+  (layer3): Sequential (
+    (0): BasicBlock (
+      (conv1): Conv2d(32, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (downsample): Sequential (
+        (0): Conv2d(32, 64, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      )
+    )
+    (1): BasicBlock (
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+    )
+    (2): BasicBlock (
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+    )
+  )
+  (tranfer_conv): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1))
+  (tranfer_bn): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+  (tranfer_relu): ReLU (inplace)
+  (avgpool): AvgPool2d (size=6, stride=6, padding=0, ceil_mode=False, count_include_pad=True)
+  (fc): Linear (256 -> 10)
+  (cap_layer): CapLayer (
+    (W): Conv2d(256, 5120, kernel_size=(1, 1), stride=(1, 1), groups=32)
+  )
+)
+
+init learning rate 0.010000 at iter 0
+
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [0/391]		data: 0.330s | batch: 1.160s	loss: 3.11966	acc: 8.59375	acc5: 49.21875
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [20/391]		data: 0.022s | batch: 0.169s	loss: 1.76425	acc: 10.56548	acc5: 48.54911
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [40/391]		data: 0.015s | batch: 0.144s	loss: 1.32878	acc: 10.23247	acc5: 49.52363
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [60/391]		data: 0.012s | batch: 0.137s	loss: 1.16376	acc: 10.51486	acc5: 49.89754
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [80/391]		data: 0.011s | batch: 0.135s	loss: 1.06288	acc: 10.56134	acc5: 50.88735
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [100/391]		data: 0.010s | batch: 0.131s	loss: 1.00910	acc: 10.62036	acc5: 51.32271
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [120/391]		data: 0.009s | batch: 0.128s	loss: 0.98214	acc: 10.64695	acc5: 51.98864
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [140/391]		data: 0.009s | batch: 0.127s	loss: 0.95771	acc: 10.81560	acc5: 52.52105
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [160/391]		data: 0.008s | batch: 0.126s	loss: 0.92218	acc: 11.16557	acc5: 53.20749
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [180/391]		data: 0.008s | batch: 0.125s	loss: 0.89048	acc: 11.76623	acc5: 54.49327
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [200/391]		data: 0.008s | batch: 0.125s	loss: 0.86284	acc: 12.22404	acc5: 55.74860
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [220/391]		data: 0.008s | batch: 0.125s	loss: 0.83704	acc: 12.78988	acc5: 56.99236
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [240/391]		data: 0.008s | batch: 0.124s	loss: 0.82053	acc: 13.13537	acc5: 57.57586
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [260/391]		data: 0.008s | batch: 0.123s	loss: 0.80324	acc: 13.55663	acc5: 58.46205
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [280/391]		data: 0.007s | batch: 0.123s	loss: 0.78835	acc: 14.02914	acc5: 59.16926
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [300/391]		data: 0.015s | batch: 0.128s	loss: 0.77351	acc: 14.56343	acc5: 60.00831
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [320/391]		data: 0.016s | batch: 0.128s	loss: 0.76192	acc: 14.80724	acc5: 60.68925
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [340/391]		data: 0.015s | batch: 0.128s	loss: 0.75188	acc: 15.04078	acc5: 61.25596
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [360/391]		data: 0.015s | batch: 0.127s	loss: 0.74168	acc: 15.37396	acc5: 61.87673
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [380/391]		data: 0.014s | batch: 0.126s	loss: 0.73228	acc: 15.75418	acc5: 62.44464
+Train [cifar_base_104_no_relu]	epoch [0/300]	iter [390/391]		data: 0.014s | batch: 0.126s	loss: 0.72753	acc: 15.96200	acc5: 62.73600
+Test [cifar_base_104_no_relu]	epoch [0/300]	iter [0/79]		data: 0.384s | batch: 1.314s	loss 0.52270	acc: 25.00000
+Test [cifar_base_104_no_relu]	epoch [0/300]	iter [20/79]		data: 0.024s | batch: 0.723s	loss 0.53204	acc: 22.80506
+Test [cifar_base_104_no_relu]	epoch [0/300]	iter [40/79]		data: 0.015s | batch: 0.708s	loss 0.53050	acc: 22.77058
+Test [cifar_base_104_no_relu]	epoch [0/300]	iter [60/79]		data: 0.011s | batch: 0.704s	loss 0.53381	acc: 22.45133
+Test [cifar_base_104_no_relu]	epoch [0/300]	iter [78/79]		data: 0.010s | batch: 0.700s	loss 0.53614	acc: 22.33000
+Summary [cifar_base_104_no_relu]	epoch [0/300]		train_loss: 0.72753	test_loss: 0.53614	train_acc: 15.96200	test_acc: 22.33000	train_acc5: 62.73600
+
+model saved at result/cifar_base_104_no_relu/train/epoch_1.pth
+best model saved at result/cifar_base_104_no_relu/train/model_best_at_epoch_1.pth
+Train [cifar_base_104_no_relu]	epoch [1/300]	iter [0/391]		data: 0.504s | batch: 0.588s	loss: 0.54547	acc: 24.21875	acc5: 70.31250
+Train [cifar_base_104_no_relu]	epoch [1/300]	iter [20/391]		data: 0.053s | batch: 0.154s	loss: 0.55619	acc: 21.61458	acc5: 74.81399
+Train [cifar_base_104_no_relu]	epoch [1/300]	iter [40/391]		data: 0.030s | batch: 0.135s	loss: 0.56944	acc: 21.07470	acc5: 75.22866
+Train [cifar_base_104_no_relu]	epoch [1/300]	iter [60/391]		data: 0.023s | batch: 0.129s	loss: 0.56516	acc: 21.82377	acc5: 74.64139
+Train [cifar_base_104_no_relu]	epoch [1/300]	iter [80/391]		data: 0.019s | batch: 0.130s	loss: 0.56123	acc: 22.24151	acc5: 74.45988
+Train [cifar_base_104_no_relu]	epoch [1/300]	iter [100/391]		data: 0.018s | batch: 0.132s	loss: 0.55707	acc: 22.78775	acc5: 74.52816

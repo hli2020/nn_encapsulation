@@ -1,7 +1,6 @@
-from utils.from_wyang import AverageMeter, accuracy
-from utils.util import *
-from torch.optim.lr_scheduler import ReduceLROnPlateau, \
-    ExponentialLR, MultiStepLR, StepLR, LambdaLR
+# from utils.from_wyang import AverageMeter, accuracy
+from object_detection.utils.util import *
+from object_detection.utils.eval import accuracy
 
 
 def _update_all_data(all_data, stats):
@@ -11,53 +10,6 @@ def _update_all_data(all_data, stats):
     for i in range(21):
         all_data[3]['Y'][i].extend(stats[3]['Y'][i])
     return all_data
-
-
-def set_lr_schedule(optimizer, plan, others=None):
-    if plan == 'plateau':
-        scheduler = ReduceLROnPlateau(optimizer, 'max',
-                                      patience=25,
-                                      factor=0.7,
-                                      min_lr=0.00001)
-    elif plan == 'multi_step':
-        scheduler = MultiStepLR(optimizer,
-                                milestones=others['milestones'],
-                                gamma=others['gamma'])
-    return scheduler
-
-
-def adjust_learning_rate(optimizer, step, args):
-    """
-    Sets the learning rate to the initial LR decayed by 10 at every specified step
-    # Adapted from PyTorch Imagenet example:
-    # https://github.com/pytorch/examples/blob/master/imagenet/main.py
-    Input: step/epoch
-    """
-    try:
-        schedule_list = np.array(args.schedule)
-    except AttributeError:
-        schedule_list = np.array(args.schedule_cifar)
-    decay = args.gamma ** (sum(step >= schedule_list))
-    lr = args.lr * decay
-    for param_group in optimizer.param_groups:
-        param_group['lr'] = lr
-    return lr
-
-
-def load_weights(model_path, model):
-    print('test only mode, loading weights ...')
-    checkpoints = torch.load(model_path)
-    try:
-        print('best test accu is: {:.4f}'.format(checkpoints['best_test_acc']))
-    except KeyError:
-        print('best test accu is: {:.4f}'.format(checkpoints['best_acc']))
-    weights = checkpoints['state_dict']
-    try:
-        model.load_state_dict(weights)
-    except KeyError:
-        weights_new = collections.OrderedDict([(k[7:], v) for k, v in weights.items()])
-        model.load_state_dict(weights_new)
-    return model
 
 
 def remove_batch(dir, pattern):
@@ -88,7 +40,9 @@ def compute_KL(mean, std):
 def train(trainloader, model, criterion, optimizer, opt, vis, epoch):
 
     use_cuda = opt.use_cuda
-    structure = opt.model_cifar
+    #TODO: fix this
+    # structure = opt.model_cifar
+    structure = 'capsule'
     show_freq = opt.show_freq
 
     FIX_INPUT = False
@@ -132,7 +86,7 @@ def train(trainloader, model, criterion, optimizer, opt, vis, epoch):
         # check = torch.eq(one_sample, one_sample[0])
         # if check.sum().data[0] == len(one_sample):
         #     print('output is the same across all classes: {:.4f}\n'.format(one_sample[0].data[0]))
-        if opt.use_spread_loss:
+        if opt.loss_form == 'spread':
             loss = criterion(outputs, targets, epoch)
         else:
             loss = criterion(outputs, targets)
@@ -191,7 +145,9 @@ def train(trainloader, model, criterion, optimizer, opt, vis, epoch):
 def test(testloader, model, criterion, opt, vis, epoch=0):
 
     use_cuda = opt.use_cuda
-    structure = opt.model_cifar
+    #TODO: fix this
+    # structure = opt.model_cifar
+    structure = 'capsule'
     show_freq = opt.show_freq
 
     batch_time = AverageMeter()

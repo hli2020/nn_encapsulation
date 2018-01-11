@@ -1,0 +1,2 @@
+Epoch	Learning Rate	Train Loss	Test Loss	Train Acc.	Test Acc.	Train Acc5.	Test Acc5.	
+0	0.100000	0.742035	n/a	11.236000	n/a	52.336000	n/a	

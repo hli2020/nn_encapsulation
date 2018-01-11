@@ -1,0 +1,367 @@
+Experiment: cifar_base_101_1_depth_20
+------------ Training Options -------------
+KL_factor: 0.1
+KL_manner: 1
+add_cap_dropout: False
+b_init: zero
+beta1: 0.8
+cap_N: 3
+dataset: cifar100
+debug: True
+deploy: False
+do_squash: False
+draw_hist: False
+dropout_p: 0.2
+epochs: 300
+experiment_name: cifar_base_101_1_depth_20
+file_name: result/cifar_base_101_1_depth_20/train/opt_train_start_epoch_1_end_300.txt
+fix_m: False
+gamma: 0.1
+has_relu_in_W: False
+look_into_details: False
+lr: 0.1
+manual_seed: 4656
+max_epoch: 300
+model_cifar: resnet
+momentum: 0.9
+multi_crop_test: False
+non_target_j: False
+num_workers: 2
+optim: sgd
+phase: train
+port: 4000
+route_num: 4
+save_epoch: 20
+save_folder: result/cifar_base_101_1_depth_20/train
+schedule_cifar: [150, 225]
+scheduler: None
+send_images_to_visdom: False
+show_freq: 5
+show_test_after_epoch: -1
+skip_pre_squash: False
+skip_pre_transfer: False
+start_epoch: 1
+test_batch: 128
+test_only: False
+train_batch: 128
+use_CE_loss: False
+use_KL: False
+use_cuda: True
+use_spread_loss: False
+visdom: True
+w_version: v2
+weight_decay: 0.0005
+------------------ End --------------------
+CapsNet (
+  (conv1): Conv2d(3, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+  (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+  (relu): ReLU (inplace)
+  (layer1): Sequential (
+    (0): BasicBlock (
+      (conv1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+    )
+    (1): BasicBlock (
+      (conv1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+    )
+    (2): BasicBlock (
+      (conv1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+    )
+  )
+  (layer2): Sequential (
+    (0): BasicBlock (
+      (conv1): Conv2d(16, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (downsample): Sequential (
+        (0): Conv2d(16, 32, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      )
+    )
+    (1): BasicBlock (
+      (conv1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+    )
+    (2): BasicBlock (
+      (conv1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+    )
+  )
+  (layer3): Sequential (
+    (0): BasicBlock (
+      (conv1): Conv2d(32, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (downsample): Sequential (
+        (0): Conv2d(32, 64, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      )
+    )
+    (1): BasicBlock (
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+    )
+    (2): BasicBlock (
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU (inplace)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+    )
+  )
+  (tranfer_conv): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1))
+  (tranfer_bn): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+  (tranfer_relu): ReLU (inplace)
+  (avgpool): AvgPool2d (size=6, stride=6, padding=0, ceil_mode=False, count_include_pad=True)
+  (fc): Linear (256 -> 100)
+  (cap_layer): CapLayer (
+    (W): Conv2d(256, 51200, kernel_size=(1, 1), stride=(1, 1), groups=32)
+  )
+)
+
+init learning rate 0.100000 at iter 0
+
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [0/391]		data: 0.119s | batch: 0.701s	loss: 14.64890	acc: 1.56250	acc5: 5.46875
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [5/391]		data: 0.023s | batch: 0.142s	loss: 15.39796	acc: 0.91146	acc5: 5.59896
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [10/391]		data: 0.023s | batch: 0.096s	loss: 11.49311	acc: 0.92330	acc5: 5.68182
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [15/391]		data: 0.028s | batch: 0.082s	loss: 9.68455	acc: 0.87891	acc5: 5.66406
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [20/391]		data: 0.030s | batch: 0.074s	loss: 8.65435	acc: 0.93006	acc5: 5.50595
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [25/391]		data: 0.030s | batch: 0.069s	loss: 7.93960	acc: 0.93149	acc5: 5.40865
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [30/391]		data: 0.028s | batch: 0.064s	loss: 7.45099	acc: 0.98286	acc5: 5.51915
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [35/391]		data: 0.025s | batch: 0.059s	loss: 7.08602	acc: 0.93316	acc5: 5.38194
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [40/391]		data: 0.024s | batch: 0.055s	loss: 6.82475	acc: 0.93369	acc5: 5.16387
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [45/391]		data: 0.023s | batch: 0.053s	loss: 6.60009	acc: 0.98505	acc5: 5.26495
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [50/391]		data: 0.023s | batch: 0.051s	loss: 6.42960	acc: 1.05699	acc5: 5.34620
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [55/391]		data: 0.022s | batch: 0.049s	loss: 6.28981	acc: 1.03237	acc5: 5.48270
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [60/391]		data: 0.021s | batch: 0.048s	loss: 6.16294	acc: 1.03740	acc5: 5.43033
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [65/391]		data: 0.020s | batch: 0.047s	loss: 6.06466	acc: 1.06534	acc5: 5.38589
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [70/391]		data: 0.020s | batch: 0.046s	loss: 5.97972	acc: 1.04533	acc5: 5.30370
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [75/391]		data: 0.019s | batch: 0.045s	loss: 5.90404	acc: 1.01768	acc5: 5.21176
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [80/391]		data: 0.019s | batch: 0.044s	loss: 5.83547	acc: 0.97415	acc5: 5.12153
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [85/391]		data: 0.019s | batch: 0.043s	loss: 5.77124	acc: 0.92660	acc5: 5.08721
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [90/391]		data: 0.019s | batch: 0.043s	loss: 5.71236	acc: 0.93578	acc5: 5.10817
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [95/391]		data: 0.019s | batch: 0.042s	loss: 5.66958	acc: 0.91960	acc5: 5.11882
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [100/391]		data: 0.018s | batch: 0.042s	loss: 5.62559	acc: 0.91275	acc5: 5.08199
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [105/391]		data: 0.018s | batch: 0.042s	loss: 5.59451	acc: 0.90654	acc5: 5.03390
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [110/391]		data: 0.018s | batch: 0.041s	loss: 5.55884	acc: 0.93609	acc5: 5.05349
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [115/391]		data: 0.018s | batch: 0.041s	loss: 5.53413	acc: 0.93615	acc5: 5.03098
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [120/391]		data: 0.018s | batch: 0.040s	loss: 5.50436	acc: 0.92330	acc5: 5.01033
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [125/391]		data: 0.018s | batch: 0.040s	loss: 5.47858	acc: 0.94246	acc5: 5.00992
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [130/391]		data: 0.018s | batch: 0.040s	loss: 5.45232	acc: 0.92438	acc5: 5.00358
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [135/391]		data: 0.018s | batch: 0.039s	loss: 5.42965	acc: 0.91337	acc5: 5.02068
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [140/391]		data: 0.017s | batch: 0.039s	loss: 5.40479	acc: 0.94193	acc5: 5.05319
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [145/391]		data: 0.017s | batch: 0.039s	loss: 5.38853	acc: 0.92573	acc5: 5.01926
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [150/391]		data: 0.017s | batch: 0.039s	loss: 5.36526	acc: 0.92094	acc5: 5.04450
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [155/391]		data: 0.017s | batch: 0.038s	loss: 5.34853	acc: 0.94651	acc5: 5.01803
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [160/391]		data: 0.017s | batch: 0.038s	loss: 5.32845	acc: 0.95594	acc5: 5.02717
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [165/391]		data: 0.017s | batch: 0.038s	loss: 5.30830	acc: 0.96480	acc5: 5.02636
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [170/391]		data: 0.017s | batch: 0.038s	loss: 5.29003	acc: 0.95486	acc5: 5.02102
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [175/391]		data: 0.017s | batch: 0.038s	loss: 5.27386	acc: 0.94549	acc5: 5.01154
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [180/391]		data: 0.017s | batch: 0.038s	loss: 5.25663	acc: 0.94095	acc5: 4.98964
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [185/391]		data: 0.017s | batch: 0.037s	loss: 5.24029	acc: 0.95346	acc5: 4.99832
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [190/391]		data: 0.016s | batch: 0.037s	loss: 5.22662	acc: 0.94895	acc5: 5.00245
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [195/391]		data: 0.017s | batch: 0.037s	loss: 5.21259	acc: 0.94467	acc5: 5.04624
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [200/391]		data: 0.016s | batch: 0.037s	loss: 5.19880	acc: 0.94061	acc5: 5.02954
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [205/391]		data: 0.016s | batch: 0.037s	loss: 5.18579	acc: 0.94433	acc5: 5.04779
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [210/391]		data: 0.016s | batch: 0.037s	loss: 5.17363	acc: 0.93676	acc5: 5.01333
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [215/391]		data: 0.016s | batch: 0.037s	loss: 5.16121	acc: 0.93316	acc5: 5.02025
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [220/391]		data: 0.016s | batch: 0.036s	loss: 5.14942	acc: 0.93326	acc5: 5.03747
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [225/391]		data: 0.016s | batch: 0.036s	loss: 5.13961	acc: 0.92989	acc5: 5.01936
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [230/391]		data: 0.016s | batch: 0.036s	loss: 5.12890	acc: 0.91991	acc5: 5.00203
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [235/391]		data: 0.016s | batch: 0.036s	loss: 5.11839	acc: 0.90373	acc5: 5.00861
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [240/391]		data: 0.016s | batch: 0.036s	loss: 5.10909	acc: 0.90119	acc5: 5.05057
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [245/391]		data: 0.016s | batch: 0.036s	loss: 5.09958	acc: 0.90511	acc5: 5.03684
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [250/391]		data: 0.016s | batch: 0.036s	loss: 5.09099	acc: 0.91198	acc5: 5.03922
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [255/391]		data: 0.016s | batch: 0.036s	loss: 5.08224	acc: 0.92163	acc5: 5.02930
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [260/391]		data: 0.016s | batch: 0.036s	loss: 5.07339	acc: 0.93690	acc5: 5.03772
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [265/391]		data: 0.016s | batch: 0.036s	loss: 5.06558	acc: 0.92810	acc5: 5.03113
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [270/391]		data: 0.016s | batch: 0.036s	loss: 5.05758	acc: 0.92827	acc5: 5.05074
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [275/391]		data: 0.016s | batch: 0.036s	loss: 5.04995	acc: 0.93693	acc5: 5.05265
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [280/391]		data: 0.016s | batch: 0.035s	loss: 5.04224	acc: 0.93416	acc5: 5.04059
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [285/391]		data: 0.016s | batch: 0.035s	loss: 5.03530	acc: 0.94242	acc5: 5.03715
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [290/391]		data: 0.016s | batch: 0.035s	loss: 5.02862	acc: 0.93965	acc5: 5.04188
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [295/391]		data: 0.016s | batch: 0.035s	loss: 5.02207	acc: 0.93169	acc5: 5.02798
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [300/391]		data: 0.016s | batch: 0.035s	loss: 5.01592	acc: 0.93179	acc5: 5.01713
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [305/391]		data: 0.016s | batch: 0.035s	loss: 5.01005	acc: 0.92933	acc5: 5.01430
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [310/391]		data: 0.015s | batch: 0.035s	loss: 5.00387	acc: 0.92444	acc5: 5.00904
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [315/391]		data: 0.016s | batch: 0.035s	loss: 4.99805	acc: 0.91475	acc5: 5.00890
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [320/391]		data: 0.015s | batch: 0.035s	loss: 4.99212	acc: 0.94431	acc5: 5.04283
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [325/391]		data: 0.015s | batch: 0.035s	loss: 4.98668	acc: 0.95140	acc5: 5.02301
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [330/391]		data: 0.015s | batch: 0.035s	loss: 4.98100	acc: 0.94883	acc5: 5.02738
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [335/391]		data: 0.015s | batch: 0.035s	loss: 4.97609	acc: 0.94866	acc5: 5.01070
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [340/391]		data: 0.015s | batch: 0.035s	loss: 4.97081	acc: 0.94621	acc5: 5.01054
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [345/391]		data: 0.015s | batch: 0.035s	loss: 4.96542	acc: 0.93931	acc5: 5.01264
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [350/391]		data: 0.015s | batch: 0.035s	loss: 4.96009	acc: 0.94151	acc5: 5.02804
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [355/391]		data: 0.015s | batch: 0.035s	loss: 4.95568	acc: 0.94364	acc5: 5.03423
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [360/391]		data: 0.015s | batch: 0.035s	loss: 4.95079	acc: 0.94140	acc5: 5.01428
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [365/391]		data: 0.015s | batch: 0.035s	loss: 4.94631	acc: 0.94775	acc5: 5.01195
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [370/391]		data: 0.015s | batch: 0.035s	loss: 4.94185	acc: 0.94971	acc5: 5.00126
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [375/391]		data: 0.015s | batch: 0.035s	loss: 4.93738	acc: 0.95163	acc5: 5.00748
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [380/391]		data: 0.015s | batch: 0.035s	loss: 4.93311	acc: 0.95349	acc5: 4.99713
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [385/391]		data: 0.015s | batch: 0.035s	loss: 4.92877	acc: 0.95126	acc5: 4.99717
+Train [cifar_base_101_1_depth_20]	epoch [0/300]	iter [390/391]		data: 0.015s | batch: 0.035s	loss: 4.92465	acc: 0.96000	acc5: 5.01200
+Test [cifar_base_101_1_depth_20]	epoch [0/300]	iter [0/79]		data: 0.054s | batch: 0.065s	loss 4.59257	acc: 2.34375
+Test [cifar_base_101_1_depth_20]	epoch [0/300]	iter [5/79]		data: 0.011s | batch: 0.019s	loss 4.58603	acc: 1.17188
+Test [cifar_base_101_1_depth_20]	epoch [0/300]	iter [10/79]		data: 0.007s | batch: 0.015s	loss 4.59229	acc: 1.49148
+Test [cifar_base_101_1_depth_20]	epoch [0/300]	iter [15/79]		data: 0.006s | batch: 0.014s	loss 4.59518	acc: 1.46484
+Test [cifar_base_101_1_depth_20]	epoch [0/300]	iter [20/79]		data: 0.005s | batch: 0.013s	loss 4.59562	acc: 1.37649
+Test [cifar_base_101_1_depth_20]	epoch [0/300]	iter [25/79]		data: 0.005s | batch: 0.012s	loss 4.59483	acc: 1.41226
+Test [cifar_base_101_1_depth_20]	epoch [0/300]	iter [30/79]		data: 0.004s | batch: 0.012s	loss 4.59321	acc: 1.41129
+Test [cifar_base_101_1_depth_20]	epoch [0/300]	iter [35/79]		data: 0.004s | batch: 0.012s	loss 4.59580	acc: 1.32378
+Test [cifar_base_101_1_depth_20]	epoch [0/300]	iter [40/79]		data: 0.004s | batch: 0.012s	loss 4.59518	acc: 1.35290
+Test [cifar_base_101_1_depth_20]	epoch [0/300]	iter [45/79]		data: 0.004s | batch: 0.012s	loss 4.59444	acc: 1.37568
+Test [cifar_base_101_1_depth_20]	epoch [0/300]	iter [50/79]		data: 0.004s | batch: 0.012s	loss 4.59431	acc: 1.37868
+Test [cifar_base_101_1_depth_20]	epoch [0/300]	iter [55/79]		data: 0.004s | batch: 0.011s	loss 4.59513	acc: 1.33929
+Test [cifar_base_101_1_depth_20]	epoch [0/300]	iter [60/79]		data: 0.004s | batch: 0.011s	loss 4.59627	acc: 1.35758
+Test [cifar_base_101_1_depth_20]	epoch [0/300]	iter [65/79]		data: 0.004s | batch: 0.011s	loss 4.59722	acc: 1.33759
+Test [cifar_base_101_1_depth_20]	epoch [0/300]	iter [70/79]		data: 0.003s | batch: 0.011s	loss 4.59697	acc: 1.30942
+Test [cifar_base_101_1_depth_20]	epoch [0/300]	iter [75/79]		data: 0.003s | batch: 0.011s	loss 4.59764	acc: 1.33635
+Test [cifar_base_101_1_depth_20]	epoch [0/300]	iter [78/79]		data: 0.003s | batch: 0.011s	loss 4.59799	acc: 1.31000
+Summary [cifar_base_101_1_depth_20]	epoch [0/300]		train_loss: 4.92465	test_loss: 4.59799	train_acc: 0.96000	test_acc: 1.31000	train_acc5: 5.01200
+
+model saved at result/cifar_base_101_1_depth_20/train/epoch_1.pth
+best model saved at result/cifar_base_101_1_depth_20/train/model_best_at_epoch_1.pth
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [0/391]		data: 0.129s | batch: 0.158s	loss: 4.62589	acc: 0.78125	acc5: 3.90625
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [5/391]		data: 0.044s | batch: 0.062s	loss: 4.60392	acc: 0.65104	acc5: 5.59896
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [10/391]		data: 0.042s | batch: 0.059s	loss: 4.59743	acc: 0.78125	acc5: 6.32102
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [15/391]		data: 0.037s | batch: 0.054s	loss: 4.59792	acc: 1.07422	acc5: 6.59180
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [20/391]		data: 0.032s | batch: 0.049s	loss: 4.60018	acc: 1.00446	acc5: 6.13839
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [25/391]		data: 0.030s | batch: 0.046s	loss: 4.59640	acc: 1.11178	acc5: 6.34014
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [30/391]		data: 0.027s | batch: 0.044s	loss: 4.60071	acc: 1.18448	acc5: 6.27520
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [35/391]		data: 0.025s | batch: 0.042s	loss: 4.60207	acc: 1.17188	acc5: 5.98958
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [40/391]		data: 0.023s | batch: 0.041s	loss: 4.60067	acc: 1.20046	acc5: 5.94512
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [45/391]		data: 0.022s | batch: 0.040s	loss: 4.59937	acc: 1.25679	acc5: 5.94429
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [50/391]		data: 0.022s | batch: 0.039s	loss: 4.59854	acc: 1.28676	acc5: 5.88235
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [55/391]		data: 0.021s | batch: 0.039s	loss: 4.59777	acc: 1.29743	acc5: 5.81752
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [60/391]		data: 0.020s | batch: 0.038s	loss: 4.59842	acc: 1.28074	acc5: 5.73770
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [65/391]		data: 0.019s | batch: 0.038s	loss: 4.59720	acc: 1.37311	acc5: 5.95407
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [70/391]		data: 0.019s | batch: 0.037s	loss: 4.59860	acc: 1.39745	acc5: 5.99692
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [75/391]		data: 0.018s | batch: 0.037s	loss: 4.59889	acc: 1.37747	acc5: 6.00329
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [80/391]		data: 0.018s | batch: 0.036s	loss: 4.59950	acc: 1.35031	acc5: 5.96065
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [85/391]		data: 0.018s | batch: 0.036s	loss: 4.59887	acc: 1.35356	acc5: 5.99564
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [90/391]		data: 0.017s | batch: 0.036s	loss: 4.59875	acc: 1.36504	acc5: 6.03537
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [95/391]		data: 0.017s | batch: 0.036s	loss: 4.59872	acc: 1.34277	acc5: 6.02214
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [100/391]		data: 0.017s | batch: 0.035s	loss: 4.59871	acc: 1.34592	acc5: 5.99474
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [105/391]		data: 0.017s | batch: 0.035s	loss: 4.59894	acc: 1.34139	acc5: 5.97730
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [110/391]		data: 0.017s | batch: 0.035s	loss: 4.59869	acc: 1.33024	acc5: 5.96847
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [115/391]		data: 0.017s | batch: 0.035s	loss: 4.59883	acc: 1.32004	acc5: 5.95366
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [120/391]		data: 0.017s | batch: 0.035s	loss: 4.59881	acc: 1.29778	acc5: 5.92071
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [125/391]		data: 0.017s | batch: 0.035s	loss: 4.59828	acc: 1.28348	acc5: 5.98338
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [130/391]		data: 0.017s | batch: 0.034s	loss: 4.59777	acc: 1.27028	acc5: 5.93392
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [135/391]		data: 0.017s | batch: 0.034s	loss: 4.59784	acc: 1.25230	acc5: 5.87086
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [140/391]		data: 0.017s | batch: 0.034s	loss: 4.59809	acc: 1.24668	acc5: 5.87323
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [145/391]		data: 0.017s | batch: 0.034s	loss: 4.59795	acc: 1.25749	acc5: 5.88613
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [150/391]		data: 0.017s | batch: 0.034s	loss: 4.59720	acc: 1.29863	acc5: 5.88783
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [155/391]		data: 0.017s | batch: 0.034s	loss: 4.59712	acc: 1.30709	acc5: 5.95954
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [160/391]		data: 0.017s | batch: 0.034s	loss: 4.59735	acc: 1.31988	acc5: 6.00738
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [165/391]		data: 0.017s | batch: 0.034s	loss: 4.59695	acc: 1.33189	acc5: 6.04292
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [170/391]		data: 0.017s | batch: 0.034s	loss: 4.59714	acc: 1.34777	acc5: 6.01700
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [175/391]		data: 0.016s | batch: 0.034s	loss: 4.59671	acc: 1.36719	acc5: 6.03249
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [180/391]		data: 0.016s | batch: 0.034s	loss: 4.59643	acc: 1.35532	acc5: 6.03419
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [185/391]		data: 0.016s | batch: 0.034s	loss: 4.59643	acc: 1.36929	acc5: 6.09039
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [190/391]		data: 0.016s | batch: 0.034s	loss: 4.59625	acc: 1.37844	acc5: 6.12729
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [195/391]		data: 0.016s | batch: 0.034s	loss: 4.59564	acc: 1.39509	acc5: 6.15832
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [200/391]		data: 0.016s | batch: 0.034s	loss: 4.59539	acc: 1.41480	acc5: 6.17615
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [205/391]		data: 0.016s | batch: 0.034s	loss: 4.59517	acc: 1.42976	acc5: 6.19311
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [210/391]		data: 0.016s | batch: 0.034s	loss: 4.59492	acc: 1.45142	acc5: 6.21668
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [215/391]		data: 0.016s | batch: 0.034s	loss: 4.59482	acc: 1.43953	acc5: 6.23192
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [220/391]		data: 0.016s | batch: 0.034s	loss: 4.59493	acc: 1.42463	acc5: 6.22172
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [225/391]		data: 0.016s | batch: 0.034s	loss: 4.59469	acc: 1.40348	acc5: 6.20160
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [230/391]		data: 0.016s | batch: 0.034s	loss: 4.59450	acc: 1.40354	acc5: 6.21618
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [235/391]		data: 0.016s | batch: 0.034s	loss: 4.59451	acc: 1.40360	acc5: 6.28641
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [240/391]		data: 0.016s | batch: 0.034s	loss: 4.59456	acc: 1.40041	acc5: 6.26945
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [245/391]		data: 0.016s | batch: 0.034s	loss: 4.59442	acc: 1.38465	acc5: 6.24682
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [250/391]		data: 0.016s | batch: 0.034s	loss: 4.59445	acc: 1.37575	acc5: 6.22821
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [255/391]		data: 0.016s | batch: 0.034s	loss: 4.59422	acc: 1.36719	acc5: 6.26831
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [260/391]		data: 0.016s | batch: 0.034s	loss: 4.59398	acc: 1.37392	acc5: 6.29191
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [265/391]		data: 0.016s | batch: 0.034s	loss: 4.59402	acc: 1.37453	acc5: 6.30287
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [270/391]		data: 0.016s | batch: 0.034s	loss: 4.59359	acc: 1.38953	acc5: 6.35378
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [275/391]		data: 0.016s | batch: 0.033s	loss: 4.59327	acc: 1.38134	acc5: 6.36889
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [280/391]		data: 0.016s | batch: 0.033s	loss: 4.59291	acc: 1.37900	acc5: 6.38623
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [285/391]		data: 0.016s | batch: 0.033s	loss: 4.59210	acc: 1.39860	acc5: 6.43848
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [290/391]		data: 0.015s | batch: 0.033s	loss: 4.59188	acc: 1.41484	acc5: 6.49162
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [295/391]		data: 0.015s | batch: 0.033s	loss: 4.59124	acc: 1.43845	acc5: 6.55880
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [300/391]		data: 0.015s | batch: 0.033s	loss: 4.59074	acc: 1.45089	acc5: 6.57963
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [305/391]		data: 0.015s | batch: 0.033s	loss: 4.59021	acc: 1.45272	acc5: 6.58190
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [310/391]		data: 0.015s | batch: 0.033s	loss: 4.58991	acc: 1.44946	acc5: 6.59164
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [315/391]		data: 0.015s | batch: 0.033s	loss: 4.59005	acc: 1.44877	acc5: 6.56893
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [320/391]		data: 0.015s | batch: 0.033s	loss: 4.58982	acc: 1.44811	acc5: 6.56153
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [325/391]		data: 0.015s | batch: 0.033s	loss: 4.58951	acc: 1.46904	acc5: 6.59509
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [330/391]		data: 0.015s | batch: 0.033s	loss: 4.58935	acc: 1.46101	acc5: 6.62292
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [335/391]		data: 0.015s | batch: 0.033s	loss: 4.58858	acc: 1.48112	acc5: 6.67783
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [340/391]		data: 0.015s | batch: 0.033s	loss: 4.58828	acc: 1.48002	acc5: 6.69905
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [345/391]		data: 0.015s | batch: 0.033s	loss: 4.58763	acc: 1.48573	acc5: 6.72191
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [350/391]		data: 0.015s | batch: 0.033s	loss: 4.58729	acc: 1.48905	acc5: 6.73522
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [355/391]		data: 0.015s | batch: 0.033s	loss: 4.58717	acc: 1.49666	acc5: 6.76571
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [360/391]		data: 0.015s | batch: 0.033s	loss: 4.58654	acc: 1.50623	acc5: 6.79536
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [365/391]		data: 0.015s | batch: 0.033s	loss: 4.58604	acc: 1.50487	acc5: 6.81566
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [370/391]		data: 0.015s | batch: 0.033s	loss: 4.58574	acc: 1.50143	acc5: 6.83541
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [375/391]		data: 0.015s | batch: 0.033s	loss: 4.58510	acc: 1.50848	acc5: 6.85879
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [380/391]		data: 0.015s | batch: 0.033s	loss: 4.58457	acc: 1.51534	acc5: 6.88976
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [385/391]		data: 0.015s | batch: 0.033s	loss: 4.58373	acc: 1.53821	acc5: 6.94017
+Train [cifar_base_101_1_depth_20]	epoch [1/300]	iter [390/391]		data: 0.015s | batch: 0.033s	loss: 4.58309	acc: 1.55400	acc5: 6.97000
+Test [cifar_base_101_1_depth_20]	epoch [1/300]	iter [0/79]		data: 0.062s | batch: 0.070s	loss 4.47623	acc: 2.34375
+Test [cifar_base_101_1_depth_20]	epoch [1/300]	iter [5/79]		data: 0.015s | batch: 0.023s	loss 4.50764	acc: 2.60417
+Test [cifar_base_101_1_depth_20]	epoch [1/300]	iter [10/79]		data: 0.010s | batch: 0.017s	loss 4.50306	acc: 2.34375
+Test [cifar_base_101_1_depth_20]	epoch [1/300]	iter [15/79]		data: 0.007s | batch: 0.015s	loss 4.50758	acc: 2.29492
+Test [cifar_base_101_1_depth_20]	epoch [1/300]	iter [20/79]		data: 0.006s | batch: 0.014s	loss 4.50260	acc: 2.45536
+Test [cifar_base_101_1_depth_20]	epoch [1/300]	iter [25/79]		data: 0.005s | batch: 0.013s	loss 4.50261	acc: 2.49399
+Test [cifar_base_101_1_depth_20]	epoch [1/300]	iter [30/79]		data: 0.005s | batch: 0.013s	loss 4.50381	acc: 2.54536
+Test [cifar_base_101_1_depth_20]	epoch [1/300]	iter [35/79]		data: 0.005s | batch: 0.012s	loss 4.50822	acc: 2.58247
+Test [cifar_base_101_1_depth_20]	epoch [1/300]	iter [40/79]		data: 0.005s | batch: 0.012s	loss 4.51202	acc: 2.53430
+Test [cifar_base_101_1_depth_20]	epoch [1/300]	iter [45/79]		data: 0.004s | batch: 0.012s	loss 4.51126	acc: 2.56454
+Test [cifar_base_101_1_depth_20]	epoch [1/300]	iter [50/79]		data: 0.004s | batch: 0.012s	loss 4.51191	acc: 2.60417
+Test [cifar_base_101_1_depth_20]	epoch [1/300]	iter [55/79]		data: 0.004s | batch: 0.012s	loss 4.51103	acc: 2.65067
+Test [cifar_base_101_1_depth_20]	epoch [1/300]	iter [60/79]		data: 0.004s | batch: 0.012s	loss 4.51260	acc: 2.66393
+Test [cifar_base_101_1_depth_20]	epoch [1/300]	iter [65/79]		data: 0.004s | batch: 0.012s	loss 4.51300	acc: 2.76989
+Test [cifar_base_101_1_depth_20]	epoch [1/300]	iter [70/79]		data: 0.004s | batch: 0.012s	loss 4.51341	acc: 2.77289
+Test [cifar_base_101_1_depth_20]	epoch [1/300]	iter [75/79]		data: 0.004s | batch: 0.012s	loss 4.51557	acc: 2.76521
+Test [cifar_base_101_1_depth_20]	epoch [1/300]	iter [78/79]		data: 0.004s | batch: 0.012s	loss 4.51654	acc: 2.73000
+Summary [cifar_base_101_1_depth_20]	epoch [1/300]		train_loss: 4.58309	test_loss: 4.51654	train_acc: 1.55400	test_acc: 2.73000	train_acc5: 6.97000
+
+best model saved at result/cifar_base_101_1_depth_20/train/model_best_at_epoch_2.pth
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [0/391]		data: 0.129s | batch: 0.145s	loss: 4.52945	acc: 1.56250	acc5: 7.03125
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [5/391]		data: 0.047s | batch: 0.062s	loss: 4.54832	acc: 2.47396	acc5: 10.41667
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [10/391]		data: 0.044s | batch: 0.059s	loss: 4.53581	acc: 2.69886	acc5: 11.36364
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [15/391]		data: 0.040s | batch: 0.055s	loss: 4.53897	acc: 2.49023	acc5: 10.54688
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [20/391]		data: 0.040s | batch: 0.055s	loss: 4.52977	acc: 2.41815	acc5: 10.86310
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [25/391]		data: 0.038s | batch: 0.053s	loss: 4.53539	acc: 2.22356	acc5: 10.57692
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [30/391]		data: 0.039s | batch: 0.054s	loss: 4.53491	acc: 2.19254	acc5: 10.18145
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [35/391]		data: 0.037s | batch: 0.052s	loss: 4.52956	acc: 2.23524	acc5: 10.50347
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [40/391]		data: 0.035s | batch: 0.051s	loss: 4.52916	acc: 2.34375	acc5: 10.76601
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [45/391]		data: 0.031s | batch: 0.048s	loss: 4.52076	acc: 2.61549	acc5: 11.34511
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [50/391]		data: 0.030s | batch: 0.047s	loss: 4.51827	acc: 2.65012	acc5: 11.48897
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [55/391]		data: 0.028s | batch: 0.045s	loss: 4.51330	acc: 2.69252	acc5: 11.80246
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [60/391]		data: 0.027s | batch: 0.044s	loss: 4.51065	acc: 2.65113	acc5: 11.75717
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [65/391]		data: 0.025s | batch: 0.043s	loss: 4.50938	acc: 2.68703	acc5: 11.62405
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [70/391]		data: 0.025s | batch: 0.042s	loss: 4.50889	acc: 2.71787	acc5: 11.66373
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [75/391]		data: 0.024s | batch: 0.042s	loss: 4.50478	acc: 2.71382	acc5: 11.92434
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [80/391]		data: 0.023s | batch: 0.041s	loss: 4.50381	acc: 2.74884	acc5: 11.80556
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [85/391]		data: 0.022s | batch: 0.041s	loss: 4.50060	acc: 2.83430	acc5: 12.05487
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [90/391]		data: 0.022s | batch: 0.040s	loss: 4.49851	acc: 2.85886	acc5: 11.99348
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [95/391]		data: 0.021s | batch: 0.040s	loss: 4.49545	acc: 2.92155	acc5: 12.06868
+Train [cifar_base_101_1_depth_20]	epoch [2/300]	iter [100/391]		data: 0.021s | batch: 0.039s	loss: 4.49270	acc: 2.97803	acc5: 12.19059

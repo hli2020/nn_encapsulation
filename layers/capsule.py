@@ -1,13 +1,15 @@
-# Finger crossed!
 import math
 import torch.nn as nn
-from layers.from_wyang.models.cifar.resnet import BasicBlock, Bottleneck
-from layers.modules.cap_layer import CapLayer, CapLayer2, squash
+from layers.archive_from_wyang.models.cifar.resnet import BasicBlock, Bottleneck
+from layers.cap_layer import CapLayer, CapLayer2, squash
 import time
 import torch
 
 
 class CapsNet(nn.Module):
+    """
+    Capsule network.
+    """
     def __init__(self, opts, num_classes=100, depth=20):
         super(CapsNet, self).__init__()
 
@@ -31,7 +33,9 @@ class CapsNet(nn.Module):
         else:
             self.cap_model = 'v0'
         self.cap_N = opts.cap_N
-        self.structure = opts.model_cifar   # capsule or resnet
+        # TODO: fix this
+        # self.structure = opts.model_cifar   # capsule or resnet
+        self.structure = 'capsule'
         self.use_multiple = opts.use_multiple
 
         channel_in = 256 if depth == 50 else 64
