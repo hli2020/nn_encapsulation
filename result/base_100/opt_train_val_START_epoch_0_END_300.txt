@@ -31,7 +31,7 @@ num_workers: 2
 optim: rmsprop
 phase: train_val
 port_id: 8090
-random_seed: 1584
+random_seed: 8923
 route_num: 4
 save_folder: result/base_100
 schedule: [150, 225]
