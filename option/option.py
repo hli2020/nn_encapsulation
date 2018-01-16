@@ -16,7 +16,7 @@ class Options(object):
         self.parser.add_argument('--manual_seed', default=-1, type=int)
         self.parser.add_argument('--num_workers', default=2, type=int, help='Number of workers used in dataloading')
         self.parser.add_argument('--no_visdom', action='store_true')
-        self.parser.add_argument('--port_id', default=8080, type=int)
+        self.parser.add_argument('--port_id', default=8000, type=int)
 
         # model params
         self.parser.add_argument('--depth', default=14, type=int)
