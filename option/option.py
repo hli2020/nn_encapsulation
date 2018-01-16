@@ -8,7 +8,7 @@ class Options(object):
     def __init__(self):
 
         self.parser = argparse.ArgumentParser(description='Capsule Network')
-        self.parser.add_argument('--experiment_name', default='base_100')
+        self.parser.add_argument('--experiment_name', default='base')
         self.parser.add_argument('--dataset', default='cifar10', help='[ cifar10 ]')
         self.parser.add_argument('--debug_mode', default=True, type=str2bool)
         self.parser.add_argument('--base_save_folder', default='result')
@@ -16,12 +16,13 @@ class Options(object):
         self.parser.add_argument('--manual_seed', default=-1, type=int)
         self.parser.add_argument('--num_workers', default=2, type=int, help='Number of workers used in dataloading')
         self.parser.add_argument('--no_visdom', action='store_true')
-        self.parser.add_argument('--port_id', default=8090, type=int)
+        self.parser.add_argument('--port_id', default=8080, type=int)
 
         # model params
+        self.parser.add_argument('--depth', default=14, type=int)
         # network, v0 is the structure in the paper
-        self.parser.add_argument('--cap_model', default='v4_1', type=str,
-                                 help='only valid when model_cifar is [capsule], v0, v1, v2, v3')
+        self.parser.add_argument('--cap_model', default='v_base', type=str,
+                                 help='v_base, v0, v1, v2, v3, ...')    # v_base is resnet
         self.parser.add_argument('--cap_N', default=3, type=int)
         self.parser.add_argument('--route_num', default=4, type=int)
         # FOR cap_model=v0 only:
@@ -35,7 +36,7 @@ class Options(object):
         self.parser.add_argument('--squash_manner', default='sigmoid', type=str)
 
         # train
-        self.parser.add_argument('--lr', default=0.0001, type=float, help='initial learning rate')
+        self.parser.add_argument('--lr', default=0.01, type=float, help='initial learning rate')
         self.parser.add_argument('--scheduler', default=None, help='plateau, multi_step')
         self.parser.add_argument('--optim', default='rmsprop', type=str)
         self.parser.add_argument('--momentum', default=0.9, type=float, help='momentum')
@@ -59,6 +60,7 @@ class Options(object):
 
         # test
         self.parser.add_argument('--multi_crop_test', action='store_true')
+        self.parser.add_argument('--draw_hist', action='store_true')
 
         self.opt = self.parser.parse_args()
         self.opt.phase = 'train_val'
@@ -85,6 +87,8 @@ class Options(object):
         if self.opt.debug_mode:
             self.opt.show_test_after_epoch = 0
             self.opt.show_freq = 1
+            self.opt.save_epoch = 1
         else:
             self.opt.show_test_after_epoch = 100
-            self.opt.show_freq = 50
+            self.opt.show_freq = 100
+            self.opt.save_epoch = 25

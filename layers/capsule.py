@@ -10,16 +10,21 @@ class CapsNet(nn.Module):
     """
     Capsule network.
     """
-    def __init__(self, opts, num_classes=100, depth=20):
+    def __init__(self, opts, num_classes=100):
         super(CapsNet, self).__init__()
 
-        # ResNet part
-        # Model type specifies number of layers for CIFAR-10 model
+        self.inplanes = 16
+        self.cap_model = opts.cap_model
+        if hasattr(opts, 'depth'):
+            depth = opts.depth
+        else:
+            depth = 20  # default value
         assert (depth - 2) % 6 == 0, 'depth should be 6n+2'
         n = (depth - 2) / 6
         block = Bottleneck if depth >= 44 else BasicBlock
-        self.inplanes = 16
         input_ch = 1 if opts.dataset == 'fmnist' else 3
+        channel_in = 256 if depth == 50 else 64
+
         self.conv1 = nn.Conv2d(input_ch, 16, kernel_size=3, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(16)
         self.relu = nn.ReLU(inplace=True)
@@ -28,26 +33,19 @@ class CapsNet(nn.Module):
         self.layer3 = self._make_layer(block, 64, n, stride=2)
 
         # Capsule part
-        if hasattr(opts, 'cap_model'):
-            self.cap_model = opts.cap_model
-        else:
-            self.cap_model = 'v0'
-        self.cap_N = opts.cap_N
-        # TODO: fix this
-        # self.structure = opts.model_cifar   # capsule or resnet
-        self.structure = 'capsule'
+        if self.cap_model is not 'v_base':
+            self.cap_N = opts.cap_N
         self.use_multiple = opts.use_multiple
 
-        channel_in = 256 if depth == 50 else 64
-        self.tranfer_conv = nn.Conv2d(channel_in, 256, kernel_size=3)  # 256x8x8 -> 256x6x6
-        self.tranfer_bn = nn.BatchNorm2d(256)
-        self.tranfer_relu = nn.ReLU(True)
+        if self.cap_model == 'v_base':
+            # baseline
+            self.avgpool = nn.AvgPool2d(8)          # TODO: which number
+            self.fc = nn.Linear(64, num_classes)
 
-        # ablation study here
-        if self.structure == 'resnet':
-            self.avgpool = nn.AvgPool2d(6)
-            self.fc = nn.Linear(256, num_classes)
-        if self.cap_model == 'v0':
+        elif self.cap_model == 'v0':
+            self.tranfer_conv = nn.Conv2d(channel_in, 256, kernel_size=3)  # 256x8x8 -> 256x6x6
+            self.tranfer_bn = nn.BatchNorm2d(256)
+            self.tranfer_relu = nn.ReLU(True)
             # original capsule idea in the paper
             self.cap_layer = CapLayer(opts, num_in_caps=32*6*6, num_out_caps=num_classes,
                                       in_dim=8, out_dim=16, num_shared=32)
@@ -114,24 +112,26 @@ class CapsNet(nn.Module):
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
+
         x = self.layer1(x)                  # 16 x 32 x 32
         x = self.layer2(x)                  # 32 x 16 x 16
         x = self.layer3(x)                  # bs x 64(for depth=20) x 8 x 8
 
         # THE FOLLOWING ARE PARALLEL TO EACH OTHER
-        if self.structure == 'resnet' or self.cap_model == 'v0':
+        if self.cap_model == 'v_base':
+            x = self.avgpool(x)
+            x = x.view(x.size(0), -1)
+            x = self.fc(x)
+
+        elif self.cap_model == 'v0':
             x = self.tranfer_conv(x)
             x = self.tranfer_bn(x)
             x = self.tranfer_relu(x)        # bs x 256 x 6 x 6
-            if self.structure == 'capsule':
-                # print('conv time: {:.4f}'.format(time.time() - start))
-                start = time.time()
-                x, stats = self.cap_layer(x, target, curr_iter, vis)
-                # print('last cap total time: {:.4f}'.format(time.time() - start))
-            elif self.structure == 'resnet':
-                x = self.avgpool(x)
-                x = x.view(x.size(0), -1)
-                x = self.fc(x)
+            # print('conv time: {:.4f}'.format(time.time() - start))
+            start = time.time()
+            x, stats = self.cap_layer(x, target, curr_iter, vis)
+            # print('last cap total time: {:.4f}'.format(time.time() - start))
+
         elif self.cap_model == 'v1':
             x = self.buffer(x)
             x = self._do_squash(x)

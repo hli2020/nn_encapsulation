@@ -11,6 +11,7 @@ data/cifar-10-batches-py
 *.swp
 *.pth
 *.mat
+result/base
 
 # DS_Store
 .DS_Store

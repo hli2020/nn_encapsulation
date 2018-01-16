@@ -8,7 +8,7 @@ from layers.train_val import *
 
 from object_detection.utils.visualizer import Visualizer
 from object_detection.utils.util import *
-from object_detection.utils.train import set_lr_schedule, adjust_learning_rate
+from object_detection.utils.train import set_lr_schedule, adjust_learning_rate, save_checkpoint
 from option.option import Options
 
 # config
@@ -59,9 +59,13 @@ else:
     raise NameError('loss type not known')
 
 # train and test
-best_acc, best_epoch = 0, 0
-for epoch in range(args.max_epoch):
+best_acc, best_epoch = 100, 0
+epoch_size = len(train_loader)
 
+for epoch in range(args.max_epoch):
+# for epoch in range(1):
+
+    t = time.time()
     old_lr = optimizer.param_groups[0]['lr']
     if epoch == 0:
         print_log('\ninit learning rate {:f} at iter {:d}\n'.format(
@@ -74,49 +78,42 @@ for epoch in range(args.max_epoch):
         extra_info = test(test_loader, model, criterion, args, visual, epoch)
     else:
         extra_info = dict()
-        extra_info['test_loss'], extra_info['test_acc'] = 0, 0
+        extra_info['test_loss'], extra_info['test_acc_error'], extra_info['test_acc5_error'] = 0, 0, 0
 
     # SHOW EPOCH SUMMARY
     info.update(extra_info)
-    visual.print_loss(info, epoch, epoch_sum=True)
+    visual.print_loss(info, (epoch, 0, 0))
+
+    # SAVE model
+    test_acc = extra_info['test_acc_error']
+    is_best = test_acc < best_acc
+    best_epoch = epoch if is_best else best_epoch
+    best_acc = min(test_acc, best_acc)
+    save_checkpoint({
+            'epoch':                epoch+1,
+            'state_dict':           model.state_dict(),
+            'test_acc_err':         test_acc,
+            'best_test_acc_err':    best_acc,
+            'optimizer':            optimizer.state_dict()},
+        is_best, args, epoch)
+
+    t_one_epoch = time.time() - t
+    visual.print_info((epoch, epoch_size-1, epoch_size),
+                      (True, old_lr, t_one_epoch/epoch_size, test_acc, best_acc, best_epoch))
 
     # ADJUST LR
     if args.scheduler is not None:
-        scheduler.step(extra_info['test_acc'])
+        scheduler.step(extra_info['test_acc_error'])
     else:
         adjust_learning_rate(optimizer, epoch, args)
     new_lr = optimizer.param_groups[0]['lr']
     if old_lr != new_lr:
         print_log('\nchange learning rate from {:f} to '
-                  '{:f} at iter {:d}\n'.format(old_lr, new_lr, epoch), args.file_name)
+                  '{:f} at epoch {:d}\n'.format(old_lr, new_lr, epoch), args.file_name)
 
-    # SAVE model
-    test_acc = 0 if extra_info['test_acc'] == 'n/a' else extra_info['test_acc']
-    is_best = test_acc > best_acc
-    best_epoch = epoch if is_best else best_epoch
-    best_acc = max(test_acc, best_acc)
-    save_checkpoint({
-            'epoch':            epoch+1,
-            'state_dict':       model.state_dict(),
-            'test_acc':         test_acc,
-            'best_test_acc':    best_acc,
-            'optimizer':        optimizer.state_dict(),
-    }, is_best, args, epoch)
-    if args.use_KL:
-        kl_info = '<br/>KL_factor: {:.4f}'.format(args.KL_factor)
-    else:
-        kl_info = ''
-    common_suffix = 'curr best test acc {:.4f} at epoch {:d}<br/>' \
-                    'curr lr {:f}<br/>' \
-                    'epoch [{:d} | {:d}]{:s}'.format(
-                        best_acc, best_epoch, new_lr, epoch,
-                        args.epochs, kl_info)
-    msg = 'status: <b>RUNNING</b><br/>' + common_suffix
-    visual.vis.text(msg, win=200)
-
-print_log('Best acc: {:.4f}. Training done.'.format(best_acc), args.file_name)
-msg = 'status: <b>DONE</b><br/>' + common_suffix
-visual.vis.text(msg, win=200)
+print_log('\nBest acc error: {:.4f} at epoch {:d}. Training done.'.format(best_acc, best_epoch), args.file_name)
+visual.print_info((epoch, epoch_size-1, epoch_size),
+                  (False, old_lr, t_one_epoch/epoch_size, test_acc, best_acc, best_epoch))
 
 
 

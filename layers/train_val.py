@@ -12,26 +12,6 @@ def _update_all_data(all_data, stats):
     return all_data
 
 
-def remove_batch(dir, pattern):
-    for f in os.listdir(dir):
-        if re.search(pattern, f):
-            remove(os.path.join(dir, f))
-
-
-def save_checkpoint(state, is_best, args, epoch):
-
-    filepath = os.path.join(args.save_folder, 'epoch_{:d}.pth'.format(epoch+1))
-    if (epoch+1) % args.save_epoch == 0 or epoch == 0:
-        torch.save(state, filepath)
-        print_log('model saved at {:s}'.format(filepath), args.file_name)
-    if is_best:
-        # save the best model
-        remove_batch(args.save_folder, 'model_best')
-        best_path = os.path.join(args.save_folder, 'model_best_at_epoch_{:d}.pth'.format(epoch+1))
-        torch.save(state, best_path)
-        print_log('best model saved at {:s}'.format(best_path), args.file_name)
-
-
 def compute_KL(mean, std):
     loss = -0.5 * torch.sum(1 + torch.log(std**2) - mean**2 - std**2)
     return loss / std.size(0)
@@ -39,16 +19,12 @@ def compute_KL(mean, std):
 
 def train(trainloader, model, criterion, optimizer, opt, vis, epoch):
 
-    use_cuda = opt.use_cuda
-    #TODO: fix this
-    # structure = opt.model_cifar
-    structure = 'capsule'
-    show_freq = opt.show_freq
+    FIX_INPUT = False       # for quick debug
 
-    FIX_INPUT = False
-    has_data = False
-    # switch to train mode
     model.train()
+    has_data = False
+    use_cuda = opt.use_cuda
+    show_freq = opt.show_freq
 
     batch_time = AverageMeter()
     data_time = AverageMeter()
@@ -58,8 +34,8 @@ def train(trainloader, model, criterion, optimizer, opt, vis, epoch):
     top1 = AverageMeter()
     top5 = AverageMeter()
     end = time.time()
+    epoch_size = len(trainloader)
 
-    # bar = Bar('Progressing', max=len(trainloader))
     for batch_idx, (inputs, targets) in enumerate(trainloader):
         # measure data loading time
         data_time.update(time.time() - end)
@@ -77,7 +53,7 @@ def train(trainloader, model, criterion, optimizer, opt, vis, epoch):
         # compute output
         # update: last two entries have mean, std for KL loss
         outputs, stats = model(inputs, targets)  # 128 x 10 x 16
-        if structure == 'capsule':
+        if opt.cap_model != 'v_base':
             outputs = outputs.norm(dim=2)
 
         # _, ind = outputs[4, :].max(0)
@@ -114,6 +90,7 @@ def train(trainloader, model, criterion, optimizer, opt, vis, epoch):
         end = time.time()
         if batch_idx % show_freq == 0 or batch_idx == len(trainloader)-1:
             if opt.use_KL:
+                # TODO
                 curr_info = {
                     'loss': losses.avg,
                     'KL_loss': KL_losses.avg,
@@ -123,49 +100,34 @@ def train(trainloader, model, criterion, optimizer, opt, vis, epoch):
                     'data': data_time.avg,
                     'batch': batch_time.avg,
                 }
-            else:
-                curr_info = {
-                    'loss': losses.avg,
-                    'acc': top1.avg,
-                    'acc5': top5.avg,
-                    'data': data_time.avg,
-                    'batch': batch_time.avg,
-                }
-            vis.print_loss(curr_info, epoch, batch_idx,
-                           len(trainloader), epoch_sum=False, train=True)
-            vis.plot_loss(errors=curr_info,
-                          epoch=epoch, i=batch_idx, max_i=len(trainloader), train=True)
+
+            vis.print_loss((losses.avg, top1.avg, top5.avg),
+                           (epoch, batch_idx, epoch_size),
+                           (data_time.avg, batch_time.avg))
+            vis.plot_loss((losses.avg, top1.avg, top5.avg),
+                          (epoch, batch_idx, epoch_size))
     return {
+        # [dict], this is the result for one epoch
         'train_loss': losses.avg,
-        'train_acc': top1.avg,
-        'train_acc5': top5.avg,
+        'train_acc_error': 100. - top1.avg,
+        'train_acc5_error': 100. - top5.avg,
     }
 
 
 def test(testloader, model, criterion, opt, vis, epoch=0):
 
     use_cuda = opt.use_cuda
-    #TODO: fix this
-    # structure = opt.model_cifar
-    structure = 'capsule'
-    show_freq = opt.show_freq
-
-    batch_time = AverageMeter()
-    data_time = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
     top5 = AverageMeter()
 
-    # switch to evaluate mode
     model.eval()
 
-    end = time.time()
     stats_all_data = [[] for _ in range(4)]
     stats_all_data[3] = {'X': [], 'Y': [[] for _ in range(21)]}
 
+    print_log('Testing at epoch [{:d}/{:d}] ...'.format(epoch, opt.max_epoch))
     for batch_idx, (inputs, targets) in enumerate(testloader):
-        # measure data loading time
-        data_time.update(time.time() - end)
 
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
@@ -211,14 +173,14 @@ def test(testloader, model, criterion, opt, vis, epoch=0):
                 vis.plot_hist(stats, plot_info)
 
         if opt.draw_hist is False:
-            # The normal, rest testing procedure
-            if structure == 'capsule':
+            # Do evaluation: the normal, rest testing procedure
+            if opt.cap_model is not 'v_base':
                 outputs = outputs.norm(dim=2)
 
             if opt.multi_crop_test:
                 outputs = outputs.view(bs, ncrops, -1).mean(1)
 
-            if opt.use_spread_loss:
+            if opt.loss_form == 'spread':
                 loss = criterion(outputs, targets, epoch)
             else:
                 loss = criterion(outputs, targets)
@@ -227,22 +189,7 @@ def test(testloader, model, criterion, opt, vis, epoch=0):
             losses.update(loss.data[0], inputs.size(0))
             top1.update(prec1[0], inputs.size(0))
             top5.update(prec5[0], inputs.size(0))
-            # measure elapsed time
-            batch_time.update(time.time() - end)
-            end = time.time()
 
-            if batch_idx % show_freq == 0 or batch_idx == len(testloader)-1:
-                curr_info = {
-                    'loss': losses.avg,
-                    'acc': top1.avg,
-                    'data': data_time.avg,
-                    'batch': batch_time.avg,
-                }
-                vis.print_loss(curr_info, epoch, batch_idx,
-                               len(testloader), epoch_sum=False, train=False)
-                if opt.test_only is not True:
-                    vis.plot_loss(errors=curr_info,
-                                  epoch=epoch, i=batch_idx, max_i=len(testloader), train=False)
     # draw stats for all data here
     if opt.draw_hist and opt.which_batch_idx == -1:
         for i in range(21):
@@ -257,5 +204,6 @@ def test(testloader, model, criterion, opt, vis, epoch=0):
 
     return {
         'test_loss': losses.avg,
-        'test_acc': top1.avg,
+        'test_acc_error': 100.0 - top1.avg,
+        'test_acc5_error': 100.0 - top5.avg,
     }
