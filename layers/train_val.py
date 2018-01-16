@@ -174,7 +174,7 @@ def test(testloader, model, criterion, opt, vis, epoch=0):
 
         if opt.draw_hist is False:
             # Do evaluation: the normal, rest testing procedure
-            if opt.cap_model is not 'v_base':
+            if opt.cap_model != 'v_base':
                 outputs = outputs.norm(dim=2)
 
             if opt.multi_crop_test:
