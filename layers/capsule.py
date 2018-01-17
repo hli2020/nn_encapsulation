@@ -46,12 +46,13 @@ class CapsNet(nn.Module):
             self.tranfer_conv = nn.Conv2d(input_ch, opts.pre_ch_num, kernel_size=9, padding=1, stride=2)  # 256x13x13
             self.tranfer_bn = nn.BatchNorm2d(opts.pre_ch_num)
             self.tranfer_relu = nn.ReLU(True)
-            self.tranfer_conv1 = nn.Conv2d(opts.pre_ch_num, 256, kernel_size=3, stride=2)  # 256x6x6
-            self.tranfer_bn1 = nn.BatchNorm2d(256)
+            send_to_cap_ch_num = self.primary_cap_num * 8
+            self.tranfer_conv1 = nn.Conv2d(opts.pre_ch_num, send_to_cap_ch_num, kernel_size=3, stride=2)  # (say256)x6x6
+            self.tranfer_bn1 = nn.BatchNorm2d(send_to_cap_ch_num)
             self.tranfer_relu1 = nn.ReLU(True)
 
             self.cap_layer = CapLayer(opts, num_in_caps=self.primary_cap_num*6*6, num_out_caps=num_classes,
-                                      out_dim=16, num_shared=self.primary_cap_num)
+                                      out_dim=16, num_shared=self.primary_cap_num, in_dim=8)
         else:
             # different structures below
             ############ v1 ############

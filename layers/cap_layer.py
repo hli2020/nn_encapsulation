@@ -133,7 +133,7 @@ def compute_stats(target, pred, v, non_target_j=False, KL_manner=-1):
 
 class CapLayer(nn.Module):
     def __init__(self, opts, num_in_caps, num_out_caps,
-                 out_dim, num_shared):
+                 out_dim, in_dim, num_shared):
         super(CapLayer, self).__init__()
 
         self.FIND_DIFF = False    # for finding different prediction during routing
@@ -154,7 +154,7 @@ class CapLayer(nn.Module):
 
         if opts.w_version == 'v2':
             # faster
-            self.W = nn.Conv2d(256, num_shared*num_out_caps*out_dim,
+            self.W = nn.Conv2d(num_shared*in_dim, num_shared*num_out_caps*out_dim,
                                kernel_size=1, stride=1, groups=num_shared)
             if self.has_relu_in_W:
                 self.relu = nn.ReLU(True)
