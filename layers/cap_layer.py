@@ -133,13 +133,13 @@ def compute_stats(target, pred, v, non_target_j=False, KL_manner=-1):
 
 class CapLayer(nn.Module):
     def __init__(self, opts, num_in_caps, num_out_caps,
-                 in_dim, out_dim, num_shared):
+                 out_dim, num_shared):
         super(CapLayer, self).__init__()
-        # TODO: this is an internal argument
+
         self.FIND_DIFF = False
         self.non_target_j = opts.non_target_j
         self.has_relu_in_W = opts.has_relu_in_W
-        self.in_dim = in_dim
+        # self.in_dim = in_dim
         self.out_dim = out_dim
         self.num_shared = num_shared
         self.route_num = opts.route_num
@@ -155,12 +155,14 @@ class CapLayer(nn.Module):
         if opts.w_version == 'v0':
             # DEPRECATED
             # wrong version
-            self.W = [nn.Linear(in_dim, out_dim, bias=False) for _ in range(num_shared)]
+            # self.W = [nn.Linear(in_dim, out_dim, bias=False) for _ in range(num_shared)]
+            NotImplementedError()
         elif opts.w_version == 'v1':
             # DEPRECATED, FC implemented
             # 1152 (32 x 36), 8, 16, 10
             # W[x][y], x = 32, y = 10
-            self.W = [[nn.Linear(in_dim, out_dim, bias=False)] * num_out_caps for _ in range(num_shared)]
+            # self.W = [[nn.Linear(in_dim, out_dim, bias=False)] * num_out_caps for _ in range(num_shared)]
+            NotImplementedError()
         elif opts.w_version == 'v2':
             # faster
             self.W = nn.Conv2d(256, num_shared*num_out_caps*out_dim,
@@ -203,6 +205,7 @@ class CapLayer(nn.Module):
             # 1. pred_i_j_d2
             # start = time.time()
             if self.w_version == 'v1':
+                # DEPRECATED
                 input = input.view(bs, self.num_shared, -1, self.in_dim)
                 groups = input.chunk(self.num_shared, dim=1)
                 u = [group.chunk(h * w, dim=2) for group in groups]

@@ -21,10 +21,10 @@ class Options(object):
         # model params
         self.parser.add_argument('--depth', default=14, type=int)
         # network, v0 is the structure in the paper
-        self.parser.add_argument('--cap_model', default='v_base', type=str,
+        self.parser.add_argument('--cap_model', default='v0', type=str,
                                  help='v_base, v0, v1, v2, v3, ...')    # v_base is resnet
         self.parser.add_argument('--cap_N', default=3, type=int)
-        self.parser.add_argument('--route_num', default=4, type=int)
+        self.parser.add_argument('--route_num', default=3, type=int)
         # FOR cap_model=v0 only:
         self.parser.add_argument('--look_into_details', action='store_true')
         self.parser.add_argument('--add_cap_dropout', action='store_true')
@@ -33,10 +33,10 @@ class Options(object):
         self.parser.add_argument('--do_squash', action='store_true', help='for w_v3 alone')  # squash is much better
         self.parser.add_argument('--w_version', default='v2', type=str, help='[v0, v1, v2, v3]')
         self.parser.add_argument('--b_init', default='zero', type=str, help='[zero | rand | learn]')
-        self.parser.add_argument('--squash_manner', default='sigmoid', type=str)
+        self.parser.add_argument('--squash_manner', default='paper', type=str, help='[sigmoid|paper]')
 
         # train
-        self.parser.add_argument('--lr', default=0.01, type=float, help='initial learning rate')
+        self.parser.add_argument('--lr', default=0.0001, type=float, help='initial learning rate')
         self.parser.add_argument('--scheduler', default=None, help='plateau, multi_step')
         self.parser.add_argument('--optim', default='rmsprop', type=str)
         self.parser.add_argument('--momentum', default=0.9, type=float, help='momentum')
@@ -61,6 +61,7 @@ class Options(object):
         # test
         self.parser.add_argument('--multi_crop_test', action='store_true')
         self.parser.add_argument('--draw_hist', action='store_true')
+        self.parser.add_argument('--non_target_j', action='store_true')
 
         self.opt = self.parser.parse_args()
         self.opt.phase = 'train_val'

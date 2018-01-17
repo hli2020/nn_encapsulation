@@ -90,7 +90,7 @@ def train(trainloader, model, criterion, optimizer, opt, vis, epoch):
         end = time.time()
         if batch_idx % show_freq == 0 or batch_idx == len(trainloader)-1:
             if opt.use_KL:
-                # TODO
+                # TODO: merge the case w or w/o KL
                 curr_info = {
                     'loss': losses.avg,
                     'KL_loss': KL_losses.avg,
