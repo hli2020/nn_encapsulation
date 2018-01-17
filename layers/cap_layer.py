@@ -445,7 +445,7 @@ class SpreadLoss(nn.Module):
                  fix_m=False):
         super(SpreadLoss, self).__init__()
         self.num_classes = num_classes
-        self.total_epoch = opt.epochs
+        self.total_epoch = opt.max_epoch
         self.m_low = m_low
         self.m_high = m_high
         self.margin_epoch = margin_epoch
