@@ -1,0 +1,75 @@
+Experiment: base_101_v10_2
+------------ Test Options -----------------
+KL_factor: 0.1
+KL_manner: 1
+add_cap_BN_relu: False
+add_cap_dropout: False
+b_init: zero
+base_save_folder: result
+batch_size_test: 128
+batch_size_train: 128
+beta1: 0.9
+cap_N: 3
+cap_model: v0
+dataset: cifar10
+debug_mode: False
+depth: 14
+do_squash: False
+draw_hist: False
+dropout_p: 0.2
+experiment_name: base_101_v10_2
+fc_time: 1
+file_name: result/base_101_v10_2/opt_train_val_START_epoch_0_END_300.txt
+fix_m: False
+gamma: 0.1
+look_into_details: False
+loss_form: margin
+lr: 0.0001
+manual_seed: -1
+max_epoch: 300
+momentum: 0.9
+multi_crop_test: False
+no_visdom: False
+non_target_j: False
+num_workers: 2
+optim: adam
+phase: train_val
+port_id: 8000
+pre_ch_num: 32
+primary_cap_num: 32
+random_seed: 2090
+route_num: 3
+save_epoch: 25
+save_folder: result/base_101_v10_2
+schedule: [150, 200, 250]
+scheduler: None
+show_freq: 100
+show_test_after_epoch: 100
+squash_manner: paper
+use_KL: False
+use_cuda: False
+use_instanceBN: False
+use_multiple: False
+w_version: v3
+weight_decay: 0.0005
+------------------ End --------------------
+CapsNet (
+  (tranfer_conv): Conv2d (3, 32, kernel_size=(9, 9), stride=(2, 2), padding=(1, 1)), weights=((32, 3, 9, 9), (32,)), parameters=7808
+  (tranfer_bn): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True), weights=((32,), (32,)), parameters=64
+  (tranfer_relu): ReLU(inplace), weights=(), parameters=0
+  (tranfer_conv1): Conv2d (32, 32, kernel_size=(3, 3), stride=(2, 2)), weights=((32, 32, 3, 3), (32,)), parameters=9248
+  (tranfer_bn1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True), weights=((32,), (32,)), parameters=64
+  (tranfer_relu1): ReLU(inplace), weights=(), parameters=0
+  (cap_layer): CapLayer(
+    (fc1): Linear(in_features=1152, out_features=1152)
+    (relu1): ReLU(inplace)
+    (drop1): Dropout(p=0.5)
+    (fc2): Linear(in_features=1152, out_features=10)
+  ), weights=((1152, 1152), (1152,), (10, 1152), (10,)), parameters=1339786
+)
+Total param num # 5.176430 Mb
+
+init learning rate 0.0001000000 at iter 0
+
+[base_101_v10_2]	epoch/iter [0/300][0/391] ||	Loss: 11.1440, Top1_err: 89.0625, Top5_err: 52.3438 ||	Data/batch time: 0.1059/0.3646
+[base_101_v10_2]	epoch/iter [0/300][100/391] ||	Loss: 4.5300, Top1_err: 85.8911, Top5_err: 40.8648 ||	Data/batch time: 0.0019/0.1017
