@@ -23,7 +23,7 @@ class CapsNet(nn.Module):
         assert (depth - 2) % 6 == 0, 'depth should be 6n+2'
 
         # Capsule part
-        if self.cap_model is not 'v_base':
+        if self.cap_model != 'v_base':
             self.cap_N = opts.cap_N
             self.primary_cap_num = opts.primary_cap_num
 
@@ -121,7 +121,7 @@ class CapsNet(nn.Module):
             x = self.relu(x)
             x = self.layer1(x)                  # 16 x 32 x 32
             x = self.layer2(x)                  # 32 x 16 x 16
-            x = self.layer3(x)                  # bs x 64(for depth=20) x 8 x 8
+            x = self.layer3(x)                  # 64(for depth=20) x 8 x 8
             x = self.avgpool(x)
             x = x.view(x.size(0), -1)
             x = self.fc(x)

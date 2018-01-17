@@ -152,18 +152,7 @@ class CapLayer(nn.Module):
         self.add_cap_droput = opts.add_cap_dropout
         self.squash_manner = opts.squash_manner
 
-        if opts.w_version == 'v0':
-            # DEPRECATED
-            # wrong version
-            # self.W = [nn.Linear(in_dim, out_dim, bias=False) for _ in range(num_shared)]
-            NotImplementedError()
-        elif opts.w_version == 'v1':
-            # DEPRECATED, FC implemented
-            # 1152 (32 x 36), 8, 16, 10
-            # W[x][y], x = 32, y = 10
-            # self.W = [[nn.Linear(in_dim, out_dim, bias=False)] * num_out_caps for _ in range(num_shared)]
-            NotImplementedError()
-        elif opts.w_version == 'v2':
+        if opts.w_version == 'v2':
             # faster
             self.W = nn.Conv2d(256, num_shared*num_out_caps*out_dim,
                                kernel_size=1, stride=1, groups=num_shared)
@@ -200,38 +189,24 @@ class CapLayer(nn.Module):
             pred_list.extend(list(range(bs)))
             pred_list.extend(target.data)
 
-        if self.w_version == 'v1' or self.w_version == 'v2':
+        if self.w_version == 'v2':
 
             # 1. pred_i_j_d2
             # start = time.time()
-            if self.w_version == 'v1':
-                # DEPRECATED
-                input = input.view(bs, self.num_shared, -1, self.in_dim)
-                groups = input.chunk(self.num_shared, dim=1)
-                u = [group.chunk(h * w, dim=2) for group in groups]
-                # self.W[3][zz](u[3][0]), u[i][j], i = 1...32, j = 1...36, zz = 10
-                pred = [self.W[i][zz](in_vec) for zz in range(self.num_out_caps)
-                        for i, group in enumerate(u) for in_vec in group]
-                # pred, list[11520], each entry, Variable, size [128x1x1x16]
-                pred = torch.stack(pred).permute(1, 0, 2, 3, 4).squeeze()
-                # pred: [128, 1152, 10, 16]
-                pred = pred.resize(pred.size(0), int(pred.size(1)/self.num_out_caps),
-                                   self.num_out_caps, pred.size(2))
-            elif self.w_version == 'v2':
-                raw_output = self.W(input)
-                # bs, 5120, 6, 6
-                # -> bs, 32, 10, 16, 6, 6
-                # -> bs, 32, 6, 6, 10, 16
-                # -> bs, 1152, 10, 16
-                spatial_size = raw_output.size(2)
-                raw_output_1 = raw_output.resize(bs,
-                                                 self.num_shared, self.num_out_caps, self.out_dim,
-                                                 spatial_size, spatial_size).permute(0, 1, 4, 5, 2, 3)
-                pred = raw_output_1.resize(bs,
-                                           self.num_shared*spatial_size*spatial_size,
-                                           self.num_out_caps, self.out_dim)
-                if self.has_relu_in_W:
-                    pred = self.relu(pred)
+            raw_output = self.W(input)
+            # bs, 5120, 6, 6
+            # -> bs, 32, 10, 16, 6, 6
+            # -> bs, 32, 6, 6, 10, 16
+            # -> bs, 1152, 10, 16
+            spatial_size = raw_output.size(2)
+            raw_output_1 = raw_output.resize(bs,
+                                             self.num_shared, self.num_out_caps, self.out_dim,
+                                             spatial_size, spatial_size).permute(0, 1, 4, 5, 2, 3)
+            pred = raw_output_1.resize(bs,
+                                       self.num_shared*spatial_size*spatial_size,
+                                       self.num_out_caps, self.out_dim)
+            if self.has_relu_in_W:
+                pred = self.relu(pred)
             # print('cap W time: {:.4f}'.format(time.time() - start))
 
             if self.add_cap_droput:
@@ -280,24 +255,6 @@ class CapLayer(nn.Module):
                     print(temp[diff_ind, :])
                     print('\n')
 
-        # elif self.w_version == 'v0':
-        #     input = input.view(bs, self.num_shared, -1, self.in_dim)
-        #     groups = input.chunk(self.num_shared, dim=1)
-        #     u = [group.chunk(h * w, dim=2) for group in groups]
-        #     # self.W[1](u[1][0]), u[i][j], i = 1...32, j = 1...36
-        #     pred = [self.W[i](in_vec) for i, group in enumerate(u) for in_vec in group]
-        #     # pred, list[1152], each entry, Variable, size [128x1x1x16]
-        #     pred = torch.stack(pred).permute(1, 0, 2, 3, 4).squeeze()  # \hat(s)_j -> 128, 1152, 16
-        #
-        #     for i in range(self.route_num):
-        #         # print('b'), print(b[0, 0:3, :])
-        #         c = softmax_dim(b, axis=1)              # 128 x 10 x 1152, c_nji, \sum_j = 1
-        #         # print('c'), print(c[0, 0:3, :])
-        #         s = torch.matmul(c, pred)               # 128 x 10 x 16
-        #         v = squash(s)
-        #         delta_b = torch.matmul(pred, v.permute(0, 2, 1)).permute(0, 2, 1)
-        #         # print('delta_b'), print(delta_b[0, 0:3, :])
-        #         b = torch.add(b, delta_b)
         elif self.w_version == 'v3':
             x = self.avgpool(input)
             x = x.view(x.size(0), -1)

@@ -32,7 +32,7 @@ class Options(object):
         self.parser.add_argument('--dropout_p', default=0.2, type=float)
         self.parser.add_argument('--has_relu_in_W', action='store_true')
         self.parser.add_argument('--do_squash', action='store_true', help='for w_v3 alone')  # squash is much better
-        self.parser.add_argument('--w_version', default='v2', type=str, help='[v0, v1, v2, v3]')
+        self.parser.add_argument('--w_version', default='v2', type=str, help='[v2, v3]')
         self.parser.add_argument('--b_init', default='zero', type=str, help='[zero | rand | learn]')
         self.parser.add_argument('--squash_manner', default='paper', type=str, help='[sigmoid|paper]')
 
