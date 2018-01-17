@@ -3,8 +3,8 @@
 start=`date +%s`
 
 # train and test
-CUDA_VISIBLE_DEVICES=5 python holly_capsule.py \
---experiment_name=base_101_v4_rerun \
+CUDA_VISIBLE_DEVICES=4 python holly_capsule.py \
+--experiment_name=base_101_v5 \
 --debug_mode=False \
 --dataset=cifar10 \
 --cap_model=v0 \
@@ -12,6 +12,7 @@ CUDA_VISIBLE_DEVICES=5 python holly_capsule.py \
 --max_epoch=300 \
 --loss_form=margin \
 --optim=adam \
+--primary_cap_num=64 \
 --schedule 150 200 250 \
 --lr=0.0001
 

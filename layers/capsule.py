@@ -14,31 +14,30 @@ class CapsNet(nn.Module):
         super(CapsNet, self).__init__()
 
         self.cap_model = opts.cap_model
+        self.use_multiple = opts.use_multiple
         input_ch = 1 if opts.dataset == 'fmnist' else 3
         if hasattr(opts, 'depth'):
             depth = opts.depth
         else:
             depth = 20  # default value
         assert (depth - 2) % 6 == 0, 'depth should be 6n+2'
-        channel_in = 256 if depth == 50 else 64
-
-        self.inplanes = 16
-        n = (depth - 2) / 6
-        block = Bottleneck if depth >= 44 else BasicBlock
-        self.conv1 = nn.Conv2d(input_ch, 16, kernel_size=3, padding=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(16)
-        self.relu = nn.ReLU(inplace=True)
-        self.layer1 = self._make_layer(block, 16, n)
-        self.layer2 = self._make_layer(block, 32, n, stride=2)
-        self.layer3 = self._make_layer(block, 64, n, stride=2)
 
         # Capsule part
         if self.cap_model is not 'v_base':
             self.cap_N = opts.cap_N
-        self.use_multiple = opts.use_multiple
+            self.primary_cap_num = opts.primary_cap_num
 
         if self.cap_model == 'v_base':
             # baseline
+            self.inplanes = 16
+            n = (depth - 2) / 6
+            block = Bottleneck if depth >= 44 else BasicBlock
+            self.conv1 = nn.Conv2d(input_ch, 16, kernel_size=3, padding=1, bias=False)
+            self.bn1 = nn.BatchNorm2d(16)
+            self.relu = nn.ReLU(inplace=True)
+            self.layer1 = self._make_layer(block, 16, n)
+            self.layer2 = self._make_layer(block, 32, n, stride=2)
+            self.layer3 = self._make_layer(block, 64, n, stride=2)
             self.avgpool = nn.AvgPool2d(8)          # TODO: which number
             self.fc = nn.Linear(64, num_classes)
 
@@ -48,9 +47,11 @@ class CapsNet(nn.Module):
             self.tranfer_bn = nn.BatchNorm2d(256)
             self.tranfer_relu = nn.ReLU(True)
             self.tranfer_conv1 = nn.Conv2d(256, 256, kernel_size=3, stride=2)  # 256x6x6
+            self.tranfer_bn1 = nn.BatchNorm2d(256)
+            self.tranfer_relu1 = nn.ReLU(True)
 
-            self.cap_layer = CapLayer(opts, num_in_caps=32*6*6, num_out_caps=num_classes,
-                                      out_dim=16, num_shared=32)
+            self.cap_layer = CapLayer(opts, num_in_caps=self.primary_cap_num*6*6, num_out_caps=num_classes,
+                                      out_dim=16, num_shared=self.primary_cap_num)
         else:
             # different structures below
             ############ v1 ############
@@ -118,11 +119,9 @@ class CapsNet(nn.Module):
             x = self.conv1(x)
             x = self.bn1(x)
             x = self.relu(x)
-
             x = self.layer1(x)                  # 16 x 32 x 32
             x = self.layer2(x)                  # 32 x 16 x 16
             x = self.layer3(x)                  # bs x 64(for depth=20) x 8 x 8
-
             x = self.avgpool(x)
             x = x.view(x.size(0), -1)
             x = self.fc(x)
@@ -132,8 +131,8 @@ class CapsNet(nn.Module):
             x = self.tranfer_bn(x)
             x = self.tranfer_relu(x)
             x = self.tranfer_conv1(x)
-            x = self.tranfer_bn(x)
-            x = self.tranfer_relu(x)
+            x = self.tranfer_bn1(x)
+            x = self.tranfer_relu1(x)
             # print('conv time: {:.4f}'.format(time.time() - start))
             start = time.time()
             x, stats = self.cap_layer(x, target, curr_iter, vis)
