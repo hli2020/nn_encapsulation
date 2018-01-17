@@ -36,7 +36,7 @@ phase: train_val
 port_id: 8000
 pre_ch_num: 32
 primary_cap_num: 32
-random_seed: 3250
+random_seed: 7623
 route_num: 3
 save_epoch: 25
 save_folder: result/base_101_v6
@@ -66,5 +66,4 @@ Total param num # 0.489990 Mb
 
 init learning rate 0.0001000000 at iter 0
 
-[base_101_v6]	epoch/iter [0/300][0/391] ||	Loss: 3.1786, Top1_err: 90.6250, Top5_err: 43.7500 ||	Data/batch time: 0.1440/0.6827
-[base_101_v6]	epoch/iter [0/300][100/391] ||	Loss: 1.0097, Top1_err: 80.4455, Top5_err: 33.3772 ||	Data/batch time: 0.0025/0.0938
+[base_101_v6]	epoch/iter [0/300][0/391] ||	Loss: 3.1513, Top1_err: 88.2812, Top5_err: 49.2188 ||	Data/batch time: 0.2444/1.0010
