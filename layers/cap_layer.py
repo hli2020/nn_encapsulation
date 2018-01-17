@@ -138,8 +138,6 @@ class CapLayer(nn.Module):
 
         self.FIND_DIFF = False    # for finding different prediction during routing
         self.non_target_j = opts.non_target_j
-        self.has_relu_in_W = opts.has_relu_in_W
-        # self.in_dim = in_dim
         self.out_dim = out_dim
         self.num_shared = num_shared
         self.route_num = opts.route_num
@@ -149,15 +147,14 @@ class CapLayer(nn.Module):
         self.which_sample, self.which_j = 0, 0
         self.use_KL = opts.use_KL
         self.KL_manner = opts.KL_manner
-        self.add_cap_droput = opts.add_cap_dropout
+        self.add_cap_BN_relu = opts.add_cap_BN_relu
+        self.add_cap_dropout = opts.add_cap_dropout
         self.squash_manner = opts.squash_manner
 
         if opts.w_version == 'v2':
             # faster
             self.W = nn.Conv2d(num_shared*in_dim, num_shared*num_out_caps*out_dim,
                                kernel_size=1, stride=1, groups=num_shared)
-            if self.has_relu_in_W:
-                self.relu = nn.ReLU(True)
         elif opts.w_version == 'v3':
             # for fair comparison, use all FC layers
             self.avgpool = nn.AvgPool2d(6)
@@ -170,8 +167,13 @@ class CapLayer(nn.Module):
             self.b = Variable(torch.zeros(num_out_caps, num_in_caps), requires_grad=False)
         elif opts.b_init == 'learn':
             self.b = Variable(torch.zeros(num_out_caps, num_in_caps), requires_grad=True)
-        if self.add_cap_droput:
+
+        if self.add_cap_dropout:
             self.cap_droput = nn.Dropout2d(p=opts.dropout_p)
+        if self.add_cap_BN_relu:
+            # self.cap_BN = nn.BatchNorm2d(out_dim)  # loss is nan
+            self.cap_BN = nn.InstanceNorm2d(out_dim, affine=True)
+            self.cap_relu = nn.ReLU(True)
 
     def forward(self, input, target, curr_iter, vis):
 
@@ -194,10 +196,10 @@ class CapLayer(nn.Module):
             # 1. pred_i_j_d2
             # start = time.time()
             raw_output = self.W(input)
-            # bs, 5120, 6, 6
+            # pred: bs, 5120, 6, 6
             # -> bs, 32, 10, 16, 6, 6
             # -> bs, 32, 6, 6, 10, 16
-            # -> bs, 1152, 10, 16
+            # pred: -> bs, 1152, 10, 16
             spatial_size = raw_output.size(2)
             raw_output_1 = raw_output.resize(bs,
                                              self.num_shared, self.num_out_caps, self.out_dim,
@@ -205,13 +207,15 @@ class CapLayer(nn.Module):
             pred = raw_output_1.resize(bs,
                                        self.num_shared*spatial_size*spatial_size,
                                        self.num_out_caps, self.out_dim)
-            if self.has_relu_in_W:
-                pred = self.relu(pred)
-            # print('cap W time: {:.4f}'.format(time.time() - start))
-
-            if self.add_cap_droput:
-                pred = self.cap_droput(pred.permute(0, 3, 1, 2))
+            if self.add_cap_BN_relu:
+                pred = self.cap_BN(pred.permute(0, 3, 1, 2).contiguous())
                 pred = pred.permute(0, 2, 3, 1)
+                pred = self.cap_relu(pred)
+
+            if self.add_cap_dropout:
+                NotImplementedError()
+                # v = self.cap_droput(v)
+            # print('cap W time: {:.4f}'.format(time.time() - start))
 
             # 2. routing
             # start = time.time()
@@ -221,8 +225,11 @@ class CapLayer(nn.Module):
                 temp_ = [torch.matmul(c[:, zz, :].unsqueeze(dim=1), pred[:, :, zz, :].squeeze()).squeeze()
                          for zz in range(self.num_out_caps)]
                 s = torch.stack(temp_, dim=1)
-                # TODO: this is the only place to add the argument
-                v = squash(s, self.squash_manner)       # 128 x 10 x 16
+                # Here 'squash' has an additional argument, 'squash_manner'
+                # final output: v, bs x 10 x 16
+                v = squash(s, self.squash_manner)
+
+                # update b/c
                 temp_ = [torch.matmul(v[:, zz, :].unsqueeze(dim=1), pred[:, :, zz, :].permute(0, 2, 1)).squeeze()
                          for zz in range(self.num_out_caps)]
                 delta_b = torch.stack(temp_, dim=1).detach()
@@ -312,9 +319,8 @@ class CapLayer(nn.Module):
                 print('\n')
         # END of debug
 
-        return v, \
-               [batch_cos_dist, batch_i_length,
-                batch_cos_v, avg_len, mean, std]
+        return v, [batch_cos_dist, batch_i_length,
+                   batch_cos_v, avg_len, mean, std]
 
 
 class CapLayer2(nn.Module):

@@ -44,11 +44,13 @@ class CapsNet(nn.Module):
         elif self.cap_model == 'v0':
             # update Jan 17: original capsule idea in the paper
             self.tranfer_conv = nn.Conv2d(input_ch, opts.pre_ch_num, kernel_size=9, padding=1, stride=2)  # 256x13x13
-            self.tranfer_bn = nn.BatchNorm2d(opts.pre_ch_num)
+            self.tranfer_bn = nn.InstanceNorm2d(opts.pre_ch_num, affine=True) \
+                if opts.use_instanceBN else nn.BatchNorm2d(opts.pre_ch_num)
             self.tranfer_relu = nn.ReLU(True)
             send_to_cap_ch_num = self.primary_cap_num * 8
             self.tranfer_conv1 = nn.Conv2d(opts.pre_ch_num, send_to_cap_ch_num, kernel_size=3, stride=2)  # (say256)x6x6
-            self.tranfer_bn1 = nn.BatchNorm2d(send_to_cap_ch_num)
+            self.tranfer_bn1 = nn.InstanceNorm2d(send_to_cap_ch_num, affine=True) \
+                if opts.use_instanceBN else nn.BatchNorm2d(send_to_cap_ch_num)
             self.tranfer_relu1 = nn.ReLU(True)
 
             self.cap_layer = CapLayer(opts, num_in_caps=self.primary_cap_num*6*6, num_out_caps=num_classes,
@@ -101,7 +103,7 @@ class CapsNet(nn.Module):
             if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
                 n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
                 m.weight.data.normal_(0, math.sqrt(2. / n))
-            elif isinstance(m, nn.BatchNorm2d):
+            elif isinstance(m, nn.BatchNorm2d) or isinstance(m, nn.InstanceNorm2d):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
             elif isinstance(m, nn.Linear):

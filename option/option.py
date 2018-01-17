@@ -23,16 +23,17 @@ class Options(object):
         # network, v0 is the structure in the paper
         self.parser.add_argument('--cap_model', default='v0', type=str,
                                  help='v_base, v0, v1, v2, v3, ...')    # v_base is resnet
-        self.parser.add_argument('--cap_N', default=3, type=int)
+        self.parser.add_argument('--cap_N', default=3, type=int, help='multiple capLayers')
         self.parser.add_argument('--route_num', default=3, type=int)
-        # FOR cap_model=v0 only:
-        self.parser.add_argument('--primary_cap_num', default=64, type=int)
-        self.parser.add_argument('--pre_ch_num', default=32, type=int)
 
-        self.parser.add_argument('--look_into_details', action='store_true')
+        # FOR cap_model=v0 only:
+        self.parser.add_argument('--primary_cap_num', default=32, type=int)
+        self.parser.add_argument('--pre_ch_num', default=32, type=int)
         self.parser.add_argument('--add_cap_dropout', action='store_true')
         self.parser.add_argument('--dropout_p', default=0.2, type=float)
-        self.parser.add_argument('--has_relu_in_W', action='store_true')
+        self.parser.add_argument('--add_cap_BN_relu', action='store_true')
+        self.parser.add_argument('--use_instanceBN', action='store_true')
+
         self.parser.add_argument('--do_squash', action='store_true', help='for w_v3 alone')  # squash is much better
         self.parser.add_argument('--w_version', default='v2', type=str, help='[v2, v3]')
         self.parser.add_argument('--b_init', default='zero', type=str, help='[zero | rand | learn]')
@@ -56,7 +57,6 @@ class Options(object):
         # loss
         self.parser.add_argument('--loss_form', default='CE', type=str)
         self.parser.add_argument('--use_KL', action='store_true')
-        self.parser.add_argument('--use_multiple', action='store_true', help='valid for N > 1')
         self.parser.add_argument('--KL_manner', default=1, type=int)
         self.parser.add_argument('--KL_factor', default=.1, type=float)
         self.parser.add_argument('--fix_m', action='store_true', help='valid for use_spread_loss only')
@@ -65,6 +65,9 @@ class Options(object):
         self.parser.add_argument('--multi_crop_test', action='store_true')
         self.parser.add_argument('--draw_hist', action='store_true')
         self.parser.add_argument('--non_target_j', action='store_true')
+        # show stats
+        self.parser.add_argument('--look_into_details', action='store_true')
+        self.parser.add_argument('--use_multiple', action='store_true', help='valid for N > 1')
 
         self.opt = self.parser.parse_args()
         self.opt.phase = 'train_val'
