@@ -68,7 +68,7 @@ for epoch in range(args.max_epoch):
     t = time.time()
     old_lr = optimizer.param_groups[0]['lr']
     if epoch == 0:
-        print_log('\ninit learning rate {:f} at iter {:d}\n'.format(
+        print_log('\ninit learning rate {:.10f} at iter {:d}\n'.format(
             old_lr, epoch), args.file_name)
 
     # TRAIN
@@ -78,7 +78,7 @@ for epoch in range(args.max_epoch):
         extra_info = test(test_loader, model, criterion, args, visual, epoch)
     else:
         extra_info = dict()
-        extra_info['test_loss'], extra_info['test_acc_error'], extra_info['test_acc5_error'] = 0, 0, 0
+        extra_info['test_loss'], extra_info['test_acc_error'], extra_info['test_acc5_error'] = 0, 100, 100
 
     # SHOW EPOCH SUMMARY
     info.update(extra_info)
@@ -108,8 +108,8 @@ for epoch in range(args.max_epoch):
         adjust_learning_rate(optimizer, epoch, args)
     new_lr = optimizer.param_groups[0]['lr']
     if old_lr != new_lr:
-        print_log('\nchange learning rate from {:f} to '
-                  '{:f} at epoch {:d}\n'.format(old_lr, new_lr, epoch), args.file_name)
+        print_log('\nchange learning rate from {:.10f} to '
+                  '{:.10f} at epoch {:d}\n'.format(old_lr, new_lr, epoch), args.file_name)
 
 print_log('\nBest acc error: {:.4f} at epoch {:d}. Training done.'.format(best_acc, best_epoch), args.file_name)
 visual.print_info((epoch, epoch_size-1, epoch_size),
