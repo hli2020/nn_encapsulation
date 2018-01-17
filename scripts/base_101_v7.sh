@@ -13,6 +13,7 @@ CUDA_VISIBLE_DEVICES=2 python holly_capsule.py \
 --optim=adam \
 --pre_ch_num=32 \
 --add_cap_BN_relu \
+--use_instanceBN \
 --schedule 150 200 250 \
 --lr=0.0001
 
