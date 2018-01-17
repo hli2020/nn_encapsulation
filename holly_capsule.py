@@ -30,7 +30,9 @@ visual = Visualizer(args)
 
 # model
 model = CapsNet(num_classes=train_loader.dataset.num_classes, opts=args)
-print_log(model, args.file_name)
+model_summary, param_num = torch_summarize(model)
+print_log(model_summary, args.file_name)
+print_log('Total param num # {:f} Mb'.format(param_num), args.file_name)
 
 # optim
 optimizer = []
@@ -99,7 +101,8 @@ for epoch in range(args.max_epoch):
 
     t_one_epoch = time.time() - t
     visual.print_info((epoch, epoch_size-1, epoch_size),
-                      (True, old_lr, t_one_epoch/epoch_size, test_acc, best_acc, best_epoch))
+                      (True, old_lr, t_one_epoch/epoch_size,
+                       test_acc, best_acc, best_epoch, param_num))
 
     # ADJUST LR
     if args.scheduler is not None:

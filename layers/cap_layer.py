@@ -136,7 +136,7 @@ class CapLayer(nn.Module):
                  out_dim, num_shared):
         super(CapLayer, self).__init__()
 
-        self.FIND_DIFF = False
+        self.FIND_DIFF = False    # for finding different prediction during routing
         self.non_target_j = opts.non_target_j
         self.has_relu_in_W = opts.has_relu_in_W
         # self.in_dim = in_dim

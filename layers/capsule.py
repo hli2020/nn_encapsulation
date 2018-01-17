@@ -16,11 +16,6 @@ class CapsNet(nn.Module):
         self.cap_model = opts.cap_model
         self.use_multiple = opts.use_multiple
         input_ch = 1 if opts.dataset == 'fmnist' else 3
-        if hasattr(opts, 'depth'):
-            depth = opts.depth
-        else:
-            depth = 20  # default value
-        assert (depth - 2) % 6 == 0, 'depth should be 6n+2'
 
         # Capsule part
         if self.cap_model != 'v_base':
@@ -29,6 +24,11 @@ class CapsNet(nn.Module):
 
         if self.cap_model == 'v_base':
             # baseline
+            if hasattr(opts, 'depth'):
+                depth = opts.depth
+            else:
+                depth = 20  # default value
+            assert (depth - 2) % 6 == 0, 'depth should be 6n+2'
             self.inplanes = 16
             n = (depth - 2) / 6
             block = Bottleneck if depth >= 44 else BasicBlock
@@ -43,10 +43,10 @@ class CapsNet(nn.Module):
 
         elif self.cap_model == 'v0':
             # update Jan 17: original capsule idea in the paper
-            self.tranfer_conv = nn.Conv2d(input_ch, 256, kernel_size=9, padding=1, stride=2)  # 256x13x13
-            self.tranfer_bn = nn.BatchNorm2d(256)
+            self.tranfer_conv = nn.Conv2d(input_ch, opts.pre_ch_num, kernel_size=9, padding=1, stride=2)  # 256x13x13
+            self.tranfer_bn = nn.BatchNorm2d(opts.pre_ch_num)
             self.tranfer_relu = nn.ReLU(True)
-            self.tranfer_conv1 = nn.Conv2d(256, 256, kernel_size=3, stride=2)  # 256x6x6
+            self.tranfer_conv1 = nn.Conv2d(opts.pre_ch_num, 256, kernel_size=3, stride=2)  # 256x6x6
             self.tranfer_bn1 = nn.BatchNorm2d(256)
             self.tranfer_relu1 = nn.ReLU(True)
 
@@ -95,6 +95,7 @@ class CapsNet(nn.Module):
             ])
 
         # init the network
+        # TODO: merge with basic toolkit
         for m in self.modules():
             if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
                 n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
