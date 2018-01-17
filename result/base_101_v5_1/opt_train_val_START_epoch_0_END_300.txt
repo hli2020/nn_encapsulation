@@ -2202,3 +2202,10 @@ Summary	epoch/iter [298/300] ||	TRAIN, Top1_err: 21.9120, Top5_err: 1.4360 ||	TE
 [base_101_v5_1]	epoch/iter [299/300][0/391] ||	Loss: 0.2110, Top1_err: 29.6875, Top5_err: 1.5625 ||	Data/batch time: 0.2198/0.3470
 [base_101_v5_1]	epoch/iter [299/300][100/391] ||	Loss: 0.1836, Top1_err: 22.1535, Top5_err: 1.3769 ||	Data/batch time: 0.0041/0.1759
 [base_101_v5_1]	epoch/iter [299/300][200/391] ||	Loss: 0.1835, Top1_err: 22.1626, Top5_err: 1.3215 ||	Data/batch time: 0.0031/0.1751
+[base_101_v5_1]	epoch/iter [299/300][300/391] ||	Loss: 0.1815, Top1_err: 21.8127, Top5_err: 1.3055 ||	Data/batch time: 0.0028/0.1750
+[base_101_v5_1]	epoch/iter [299/300][390/391] ||	Loss: 0.1820, Top1_err: 21.8580, Top5_err: 1.3580 ||	Data/batch time: 0.0026/0.1749
+Summary	epoch/iter [299/300] ||	TRAIN, Top1_err: 21.8580, Top5_err: 1.3580 ||	TEST, Top1_err: 23.2500, Top5_err: 1.8400 ||
+
+model saved at result/base_101_v5_1/epoch_300.pth
+
+Best acc error: 22.4400 at epoch 272. Training done.
