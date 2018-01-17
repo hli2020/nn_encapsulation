@@ -43,16 +43,19 @@ class CapsNet(nn.Module):
 
         elif self.cap_model == 'v0':
             # update Jan 17: original capsule idea in the paper
+            # first conv
             self.tranfer_conv = nn.Conv2d(input_ch, opts.pre_ch_num, kernel_size=9, padding=1, stride=2)  # 256x13x13
             self.tranfer_bn = nn.InstanceNorm2d(opts.pre_ch_num, affine=True) \
                 if opts.use_instanceBN else nn.BatchNorm2d(opts.pre_ch_num)
             self.tranfer_relu = nn.ReLU(True)
-            send_to_cap_ch_num = self.primary_cap_num * 8
+            # second conv
+            factor = 8 if opts.w_version is 'v2' else 1
+            send_to_cap_ch_num = self.primary_cap_num * factor
             self.tranfer_conv1 = nn.Conv2d(opts.pre_ch_num, send_to_cap_ch_num, kernel_size=3, stride=2)  # (say256)x6x6
             self.tranfer_bn1 = nn.InstanceNorm2d(send_to_cap_ch_num, affine=True) \
                 if opts.use_instanceBN else nn.BatchNorm2d(send_to_cap_ch_num)
             self.tranfer_relu1 = nn.ReLU(True)
-
+            # capsLayer
             self.cap_layer = CapLayer(opts, num_in_caps=self.primary_cap_num*6*6, num_out_caps=num_classes,
                                       out_dim=16, num_shared=self.primary_cap_num, in_dim=8)
         else:

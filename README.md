@@ -12,3 +12,5 @@
 [object detection repo](https://github.com/hli2020/object_detection/tree/master/utils).
 
 - For now the capsule theory is mainly verified on small datasets.
+
+- Update torchvision: `conda install torchvision -c pytorch`

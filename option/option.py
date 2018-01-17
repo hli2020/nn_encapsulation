@@ -34,10 +34,13 @@ class Options(object):
         self.parser.add_argument('--add_cap_BN_relu', action='store_true')
         self.parser.add_argument('--use_instanceBN', action='store_true')
 
-        self.parser.add_argument('--do_squash', action='store_true', help='for w_v3 alone')  # squash is much better
-        self.parser.add_argument('--w_version', default='v2', type=str, help='[v2, v3]')
         self.parser.add_argument('--b_init', default='zero', type=str, help='[zero | rand | learn]')
         self.parser.add_argument('--squash_manner', default='paper', type=str, help='[sigmoid|paper]')
+        # v2 is the caps module; v3 is to replace the single cap layer to FC or other alternative
+        self.parser.add_argument('--w_version', default='v2', type=str, help='[v2, v3]')
+        # DEPRECATED. squash is much better
+        self.parser.add_argument('--do_squash', action='store_true', help='for w_v3 alone')
+        self.parser.add_argument('--fc_time', type=int, default=0, help='for w_v3 alone')
 
         # train
         self.parser.add_argument('--lr', default=0.0001, type=float, help='initial learning rate')

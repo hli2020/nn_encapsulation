@@ -53,8 +53,10 @@ def train(trainloader, model, criterion, optimizer, opt, vis, epoch):
         # compute output
         # update: last two entries have mean, std for KL loss
         outputs, stats = model(inputs, targets)  # 128 x 10 x 16
-        if opt.cap_model != 'v_base':
+        try:
             outputs = outputs.norm(dim=2)
+        except RuntimeError:
+            outputs = outputs
 
         # _, ind = outputs[4, :].max(0)
         # print('predict index: {:d}'.format(ind.data[0]))
@@ -174,8 +176,10 @@ def test(testloader, model, criterion, opt, vis, epoch=0):
 
         if opt.draw_hist is False:
             # Do evaluation: the normal, rest testing procedure
-            if opt.cap_model != 'v_base':
+            try:
                 outputs = outputs.norm(dim=2)
+            except RuntimeError:
+                outputs = outputs
 
             if opt.multi_crop_test:
                 outputs = outputs.view(bs, ncrops, -1).mean(1)

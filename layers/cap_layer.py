@@ -137,14 +137,16 @@ class CapLayer(nn.Module):
         super(CapLayer, self).__init__()
 
         self.FIND_DIFF = False    # for finding different prediction during routing
+        self.look_into_details = opts.look_into_details
+        self.which_sample, self.which_j = 0, 0
         self.non_target_j = opts.non_target_j
+
         self.out_dim = out_dim
         self.num_shared = num_shared
         self.route_num = opts.route_num
         self.w_version = opts.w_version
         self.num_out_caps = num_out_caps
-        self.look_into_details = opts.look_into_details
-        self.which_sample, self.which_j = 0, 0
+
         self.use_KL = opts.use_KL
         self.KL_manner = opts.KL_manner
         self.add_cap_BN_relu = opts.add_cap_BN_relu
@@ -156,10 +158,14 @@ class CapLayer(nn.Module):
             self.W = nn.Conv2d(num_shared*in_dim, num_shared*num_out_caps*out_dim,
                                kernel_size=1, stride=1, groups=num_shared)
         elif opts.w_version == 'v3':
-            # for fair comparison, use all FC layers
-            self.avgpool = nn.AvgPool2d(6)
-            self.fc = nn.Linear(256, 16*self.num_out_caps)
-            self.do_squash = opts.do_squash
+            # for fair comparison
+            if opts.fc_time > 0:    # for computing the parameter num
+                self.fc1 = nn.Linear(num_in_caps, num_in_caps)
+                self.relu1 = nn.ReLU(inplace=True)
+                self.drop1 = nn.Dropout(p=.5)
+            self.fc2 = nn.Linear(num_in_caps, num_out_caps)
+            # self.do_squash = opts.do_squash  # DEPRECATED
+            self.fc_time = opts.fc_time
 
         if opts.b_init == 'rand':
             self.b = Variable(torch.rand(num_out_caps, num_in_caps), requires_grad=False)
@@ -263,12 +269,15 @@ class CapLayer(nn.Module):
                     print('\n')
 
         elif self.w_version == 'v3':
-            x = self.avgpool(input)
-            x = x.view(x.size(0), -1)
-            x = self.fc(x)
-            v = x.resize(bs, self.num_out_caps, self.out_dim)
-            if self.do_squash:
-                v = squash(v)
+            # COMPLETELY nothing to do with capsule
+            x = input.view(input.size(0), -1)
+            for i in range(self.fc_time):
+                x = self.fc1(x)
+                x = self.relu1(x)
+                x = self.drop1(x)
+            v = self.fc2(x)
+            # if self.do_squash:
+            #     v = squash(v)
 
         # FOR debug, see the detailed values of b, c, v, delta_b
         if self.FIND_DIFF and HAS_DIFF:
