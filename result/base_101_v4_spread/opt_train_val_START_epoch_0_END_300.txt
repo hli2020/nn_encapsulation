@@ -1,0 +1,92 @@
+Experiment: base_101_v4_spread
+------------ Test Options -----------------
+KL_factor: 0.1
+KL_manner: 1
+add_cap_dropout: False
+b_init: zero
+base_save_folder: result
+batch_size_test: 128
+batch_size_train: 128
+beta1: 0.9
+cap_N: 3
+cap_model: v0
+dataset: cifar10
+debug_mode: False
+depth: 14
+do_squash: False
+draw_hist: False
+dropout_p: 0.2
+experiment_name: base_101_v4_spread
+file_name: result/base_101_v4_spread/opt_train_val_START_epoch_0_END_300.txt
+fix_m: False
+gamma: 0.1
+has_relu_in_W: False
+look_into_details: False
+loss_form: spread
+lr: 0.0001
+manual_seed: -1
+max_epoch: 300
+momentum: 0.9
+multi_crop_test: False
+no_visdom: False
+non_target_j: False
+num_workers: 2
+optim: adam
+phase: train_val
+port_id: 8000
+pre_ch_num: 32
+primary_cap_num: 32
+random_seed: 5154
+route_num: 3
+save_epoch: 25
+save_folder: result/base_101_v4_spread
+schedule: [150, 200, 250]
+scheduler: None
+show_freq: 100
+show_test_after_epoch: 100
+squash_manner: paper
+use_KL: False
+use_cuda: True
+use_multiple: False
+w_version: v2
+weight_decay: 0.0005
+------------------ End --------------------
+CapsNet (
+  (tranfer_conv): Conv2d(3, 32, kernel_size=(9, 9), stride=(2, 2), padding=(1, 1)), weights=((32, 3, 9, 9), (32,)), parameters=7808
+  (tranfer_bn): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True), weights=((32,), (32,)), parameters=64
+  (tranfer_relu): ReLU (inplace), weights=(), parameters=0
+  (tranfer_conv1): Conv2d(32, 256, kernel_size=(3, 3), stride=(2, 2)), weights=((256, 32, 3, 3), (256,)), parameters=73984
+  (tranfer_bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True), weights=((256,), (256,)), parameters=512
+  (tranfer_relu1): ReLU (inplace), weights=(), parameters=0
+  (cap_layer): CapLayer (
+    (W): Conv2d(256, 5120, kernel_size=(1, 1), stride=(1, 1), groups=32)
+  ), weights=((5120, 8, 1, 1), (5120,)), parameters=46080
+)
+Total param num # 0.489990 Mb
+
+init learning rate 0.0001000000 at iter 0
+
+[base_101_v4_spread]	epoch/iter [0/300][0/391] ||	Loss: 0.3766, Top1_err: 89.0625, Top5_err: 55.4688 ||	Data/batch time: 0.2149/1.0509
+[base_101_v4_spread]	epoch/iter [0/300][100/391] ||	Loss: 0.2826, Top1_err: 76.6012, Top5_err: 23.2364 ||	Data/batch time: 0.0039/0.1132
+[base_101_v4_spread]	epoch/iter [0/300][200/391] ||	Loss: 0.2588, Top1_err: 73.9661, Top5_err: 19.4729 ||	Data/batch time: 0.0027/0.1064
+[base_101_v4_spread]	epoch/iter [0/300][300/391] ||	Loss: 0.2468, Top1_err: 71.9944, Top5_err: 17.7663 ||	Data/batch time: 0.0023/0.1028
+[base_101_v4_spread]	epoch/iter [0/300][390/391] ||	Loss: 0.2402, Top1_err: 70.9460, Top5_err: 16.8180 ||	Data/batch time: 0.0021/0.1019
+Summary	epoch/iter [0/300] ||	TRAIN, Top1_err: 70.9460, Top5_err: 16.8180 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+model saved at result/base_101_v4_spread/epoch_1.pth
+[base_101_v4_spread]	epoch/iter [1/300][0/391] ||	Loss: 0.2276, Top1_err: 67.9688, Top5_err: 17.1875 ||	Data/batch time: 0.1665/0.2415
+[base_101_v4_spread]	epoch/iter [1/300][100/391] ||	Loss: 0.2041, Top1_err: 64.7973, Top5_err: 12.0668 ||	Data/batch time: 0.0031/0.1006
+[base_101_v4_spread]	epoch/iter [1/300][200/391] ||	Loss: 0.2040, Top1_err: 64.7544, Top5_err: 12.0180 ||	Data/batch time: 0.0024/0.1015
+[base_101_v4_spread]	epoch/iter [1/300][300/391] ||	Loss: 0.2024, Top1_err: 64.0365, Top5_err: 11.8018 ||	Data/batch time: 0.0021/0.1018
+[base_101_v4_spread]	epoch/iter [1/300][390/391] ||	Loss: 0.2005, Top1_err: 63.6440, Top5_err: 11.5940 ||	Data/batch time: 0.0020/0.1013
+Summary	epoch/iter [1/300] ||	TRAIN, Top1_err: 63.6440, Top5_err: 11.5940 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+[base_101_v4_spread]	epoch/iter [2/300][0/391] ||	Loss: 0.1799, Top1_err: 59.3750, Top5_err: 14.0625 ||	Data/batch time: 0.1859/0.2755
+[base_101_v4_spread]	epoch/iter [2/300][100/391] ||	Loss: 0.1886, Top1_err: 61.4403, Top5_err: 10.6822 ||	Data/batch time: 0.0035/0.1041
+[base_101_v4_spread]	epoch/iter [2/300][200/391] ||	Loss: 0.1865, Top1_err: 60.4827, Top5_err: 10.4089 ||	Data/batch time: 0.0026/0.1027
+[base_101_v4_spread]	epoch/iter [2/300][300/391] ||	Loss: 0.1836, Top1_err: 60.0239, Top5_err: 10.1744 ||	Data/batch time: 0.0022/0.1014
+[base_101_v4_spread]	epoch/iter [2/300][390/391] ||	Loss: 0.1821, Top1_err: 59.5900, Top5_err: 9.9480 ||	Data/batch time: 0.0021/0.1008
+Summary	epoch/iter [2/300] ||	TRAIN, Top1_err: 59.5900, Top5_err: 9.9480 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+[base_101_v4_spread]	epoch/iter [3/300][0/391] ||	Loss: 0.1764, Top1_err: 61.7188, Top5_err: 9.3750 ||	Data/batch time: 0.1883/0.2831
+[base_101_v4_spread]	epoch/iter [3/300][100/391] ||	Loss: 0.1764, Top1_err: 57.5727, Top5_err: 9.1507 ||	Data/batch time: 0.0036/0.1038
