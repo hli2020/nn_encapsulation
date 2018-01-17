@@ -26,7 +26,7 @@ class Options(object):
         self.parser.add_argument('--cap_N', default=3, type=int)
         self.parser.add_argument('--route_num', default=3, type=int)
         # FOR cap_model=v0 only:
-        self.parser.add_argument('--primary_cap_num', default=32, type=float)
+        self.parser.add_argument('--primary_cap_num', default=32, type=int)
         self.parser.add_argument('--look_into_details', action='store_true')
         self.parser.add_argument('--add_cap_dropout', action='store_true')
         self.parser.add_argument('--dropout_p', default=0.2, type=float)
