@@ -3,7 +3,6 @@ Experiment: cifar_base_104_no_relu
 b_init: zero
 basenet: vgg16_reducedfc.pth
 batch_size: 2
-beta1: 0.5
 cap_N: 3
 dataset: cifar
 debug: True
@@ -17,16 +16,13 @@ gamma: 0.1
 has_relu_in_W: False
 look_into_details: False
 lr: 0.01
-manual_seed: 2000
 max_epoch: 0
 max_iter: 130000
 model_cifar: capsule
 momentum: 0.9
-multi_crop_test: False
 no_pretrain: False
 non_target_j: False
 num_workers: 2
-optim: sgd
 phase: test
 port: 4000
 prior_config: v2_512
@@ -36,10 +32,9 @@ save_epoch: 20
 save_folder: result/cifar_base_104_no_relu/train
 schedule: [80000, 100000, 120000]
 schedule_cifar: [150, 225]
-scheduler: None
 send_images_to_visdom: False
 show_freq: 20
-show_test_after_epoch: -1
+show_test_after_epoch: 139
 skip_pre_squash: False
 skip_pre_transfer: False
 ssd_dim: 512
@@ -48,7 +43,7 @@ test_batch: 128
 test_only: True
 train_batch: 128
 use_CE_loss: False
-use_cuda: True
+use_cuda: False
 version: v2
 visdom: True
 w_version: v2

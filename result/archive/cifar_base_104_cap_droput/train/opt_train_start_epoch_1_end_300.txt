@@ -1,58 +1,63 @@
-Experiment: cifar_base_104_no_relu_multi_crop
+Experiment: cifar_base_104_cap_droput
 ------------ Training Options -------------
 KL_factor: 0.1
 KL_manner: 1
-add_cap_dropout: False
+add_cap_dropout: True
 b_init: zero
-beta1: 0.9
+basenet: vgg16_reducedfc.pth
+batch_size: 2
+beta1: 0.8
 cap_N: 3
-cap_model: v0
-dataset: cifar10
+dataset: cifar
 debug: True
 deploy: False
 do_squash: False
-draw_hist: True
-dropout_p: 0.2
+draw_hist: False
 epochs: 300
-experiment_name: cifar_base_104_no_relu_multi_crop
-file_name: result/cifar_base_104_no_relu_multi_crop/train/opt_train_start_epoch_1_end_300.txt
+experiment_name: cifar_base_104_cap_droput
+file_name: result/cifar_base_104_cap_droput/train/opt_train_start_epoch_1_end_300.txt
 fix_m: False
 gamma: 0.1
 has_relu_in_W: False
 look_into_details: False
-lr: 0.0001
-manual_seed: 9690
+lr: 0.01
+manual_seed: 9569
 max_epoch: 300
+max_iter: 130000
 model_cifar: capsule
 momentum: 0.9
 multi_crop_test: False
+no_pretrain: False
 non_target_j: False
 num_workers: 2
-optim: rmsprop
+optim: sgd
 phase: train
-port: 2000
+port: 4000
+prior_config: v2_512
+resume: None
 route_num: 4
 save_epoch: 20
-save_folder: result/cifar_base_104_no_relu_multi_crop/train
+save_folder: result/cifar_base_104_cap_droput/train
 schedule_cifar: [150, 225]
 scheduler: None
-see_all_sample: False
 send_images_to_visdom: False
 show_freq: 5
-squash_manner: sigmoid
+show_test_after_epoch: -1
+skip_pre_squash: False
+skip_pre_transfer: False
+ssd_dim: 512
 start_epoch: 1
 test_batch: 128
-test_only: True
+test_only: False
 train_batch: 128
 use_CE_loss: False
 use_KL: False
 use_cuda: False
-use_multiple: False
 use_spread_loss: False
+version: v2
 visdom: True
 w_version: v2
 weight_decay: 0.0005
-which_batch_idx: 2
 ------------------ End --------------------
 CapsNet (
   (conv1): Conv2d(3, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
@@ -140,5 +145,9 @@ CapsNet (
   (tranfer_relu): ReLU (inplace)
   (cap_layer): CapLayer (
     (W): Conv2d(256, 5120, kernel_size=(1, 1), stride=(1, 1), groups=32)
+    (cap_droput): Dropout2d (p=0.2)
   )
 )
+
+init learning rate 0.010000 at iter 0
+
