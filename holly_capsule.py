@@ -116,7 +116,8 @@ for epoch in range(args.max_epoch):
 
 print_log('\nBest acc error: {:.4f} at epoch {:d}. Training done.'.format(best_acc, best_epoch), args.file_name)
 visual.print_info((epoch, epoch_size-1, epoch_size),
-                  (False, old_lr, t_one_epoch/epoch_size, test_acc, best_acc, best_epoch))
+                  (False, old_lr, t_one_epoch/epoch_size,
+                   test_acc, best_acc, best_epoch, param_num))
 
 
 
