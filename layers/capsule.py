@@ -111,7 +111,7 @@ class CapsNet(nn.Module):
                 m.bias.data.zero_()
             elif isinstance(m, nn.Linear):
                 # print('linear layer!')
-                m.weight.data.normal_()
+                m.weight.data.normal_(std=0.05)
                 m.bias.data.zero_()
         # print('passed init')
 
