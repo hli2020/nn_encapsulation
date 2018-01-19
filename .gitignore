@@ -4,6 +4,7 @@ data/raw
 data/processed
 data/cifar-10-batches-py
 *.json
+*.JPEG
 *.pkl
 *.eps
 *.tar.gz
@@ -11,6 +12,7 @@ data/cifar-10-batches-py
 *.swp
 *.pth
 *.mat
+*.npy
 result/base
 
 # DS_Store
