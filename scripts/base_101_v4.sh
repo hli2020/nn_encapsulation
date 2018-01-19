@@ -2,13 +2,13 @@
 
 start=`date +%s`
 
+#--experiment_name=base_101_v4_rerun \
 # train and test
-CUDA_VISIBLE_DEVICES=5 python holly_capsule.py \
---experiment_name=base_101_v4_rerun \
+CUDA_VISIBLE_DEVICES=0 python holly_capsule.py \
+--experiment_name=base_101_v4_less_aug \
 --debug_mode=False \
 --dataset=cifar10 \
 --cap_model=v0 \
---depth=14 \
 --max_epoch=300 \
 --loss_form=margin \
 --optim=adam \
