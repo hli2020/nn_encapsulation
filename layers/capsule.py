@@ -1,6 +1,6 @@
 import math
 import torch.nn as nn
-from layers.archive_from_wyang.models.cifar.resnet import BasicBlock, Bottleneck
+from layers.models.cifar.resnet import BasicBlock, Bottleneck
 from layers.cap_layer import CapLayer, CapLayer2, squash
 import time
 import torch

@@ -11,8 +11,16 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torch.backends.cudnn as cudnn
 
+import numpy as np
+
 
 def validate(val_loader, model, criterion):
+
+    cls_num = 1000
+    acc_per_cls = {
+        'top1': np.zeros([cls_num, 3], dtype=float),
+        'top5': np.zeros([cls_num, 3], dtype=float),
+    }
     batch_time = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
@@ -32,7 +40,8 @@ def validate(val_loader, model, criterion):
         loss = criterion(output, target_var)
 
         # measure accuracy and record loss
-        prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
+        [prec1, prec5], acc_per_cls = \
+            accuracy(output.data, target, topk=(1, 5), acc_per_cls=acc_per_cls)
         losses.update(loss.data[0], input.size(0))
         top1.update(prec1[0], input.size(0))
         top5.update(prec5[0], input.size(0))
