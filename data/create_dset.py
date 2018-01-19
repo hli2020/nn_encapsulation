@@ -13,9 +13,10 @@ def create_dataset(opts, phase=None):
         # T.RandomHorizontalFlip(),
         # T.ColorJitter(brightness=.2, contrast=.2, saturation=.2, hue=.2),
         transform = T.Compose([
-            T.Resize(34),
+            T.Resize(40),
             T.RandomCrop(32),
             T.RandomHorizontalFlip(),
+            T.ColorJitter(brightness=.2, contrast=.2, saturation=.2, hue=.2),
             T.ToTensor(),
         ])
     elif phase == 'test':
@@ -28,7 +29,7 @@ def create_dataset(opts, phase=None):
             ])
         else:
             transform = T.Compose([
-                T.Resize(34),
+                T.Resize(40),
                 T.RandomCrop(32),
                 T.ToTensor(),
             ])
