@@ -1,4 +1,6 @@
 from __future__ import print_function
+import torch.nn.parallel
+import torch.backends.cudnn as cudnn
 import torch.optim as optim
 import torch.utils.data as data
 from data.create_dset import create_dataset
@@ -11,6 +13,7 @@ from object_detection.utils.util import *
 from object_detection.utils.train import set_lr_schedule, adjust_learning_rate, save_checkpoint
 from option.option import Options
 
+cudnn.benchmark = True
 # config
 option = Options()
 option.setup_config()
@@ -30,6 +33,11 @@ visual = Visualizer(args)
 
 # model
 model = CapsNet(num_classes=train_loader.dataset.num_classes, opts=args)
+if args.dataset == 'tiny_imagenet':
+    model = torch.nn.DataParallel(model).cuda()
+else:
+    model = model.cuda()
+
 model_summary, param_num = torch_summarize(model)
 print_log(model_summary, args.file_name)
 print_log('Total param num # {:f} Mb'.format(param_num), args.file_name)
@@ -59,6 +67,7 @@ elif args.loss_form == 'margin':
     criterion = MarginLoss(num_classes=train_loader.dataset.num_classes)
 else:
     raise NameError('loss type not known')
+criterion = criterion.cuda()
 
 # train and test
 best_acc, best_epoch = 100, 0
