@@ -32,14 +32,20 @@ class CapsNet(nn.Module):
             self.inplanes = 16
             n = (depth - 2) / 6
             block = Bottleneck if depth >= 44 else BasicBlock
-            self.conv1 = nn.Conv2d(input_ch, 16, kernel_size=3, padding=1, bias=False)
+
+            if opts.dataset == 'tiny_imagenet':
+                stride_num, fc_num, pool_stride, pool_input = 2, 64*4, 8, 16
+            else:
+                stride_num, fc_num, pool_stride, pool_input = 1, 64, 1, 8
+
+            self.conv1 = nn.Conv2d(input_ch, 16, kernel_size=3, padding=1, bias=False, stride=stride_num)
             self.bn1 = nn.BatchNorm2d(16)
             self.relu = nn.ReLU(inplace=True)
             self.layer1 = self._make_layer(block, 16, n)
             self.layer2 = self._make_layer(block, 32, n, stride=2)
             self.layer3 = self._make_layer(block, 64, n, stride=2)
-            self.avgpool = nn.AvgPool2d(8)          # TODO: which number
-            self.fc = nn.Linear(64, num_classes)
+            self.avgpool = nn.AvgPool2d(pool_input, stride=pool_stride)          # TODO: which number
+            self.fc = nn.Linear(fc_num, num_classes)
 
         elif self.cap_model == 'v0':
             # update Jan 17: original capsule idea in the paper

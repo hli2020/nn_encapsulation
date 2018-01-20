@@ -62,15 +62,15 @@ def create_dataset(opts, phase=None):
                                 std=[0.229, 0.224, 0.225])
         if phase == 'train':
             transform = T.Compose([
-                T.Resize(256),
-                T.CenterCrop(224),
+                T.Resize(156),
+                T.CenterCrop(128),
                 T.ToTensor(),
                 normalize
             ])
         elif phase == 'val':
             transform = T.Compose([
-                T.Resize(256),
-                T.CenterCrop(224),
+                T.Resize(156),
+                T.CenterCrop(128),
                 T.ToTensor(),
                 normalize
             ])

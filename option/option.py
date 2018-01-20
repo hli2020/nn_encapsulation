@@ -20,7 +20,7 @@ class Options(object):
         self.parser.add_argument('--port_id', default=8000, type=int)
 
         # model params
-        self.parser.add_argument('--depth', default=14, type=int)
+        self.parser.add_argument('--depth', default=14, type=int)  # for now, only valid for v_base
         # network, v0 is the structure in the paper
         self.parser.add_argument('--cap_model', default='v0', type=str,
                                  help='v_base, v0, v1, v2, v3, ...')    # v_base is resnet
