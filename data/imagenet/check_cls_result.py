@@ -16,6 +16,7 @@ import numpy as np
 
 def validate(val_loader, model, criterion):
 
+    file_name = 'resent18_log.txt'
     cls_num = 1000
     acc_per_cls = {
         'top1': np.zeros([cls_num, 3], dtype=float),
@@ -50,7 +51,7 @@ def validate(val_loader, model, criterion):
         batch_time.update(time.time() - end)
         end = time.time()
 
-        if i % print_freq == 0:
+        if i % print_freq == 0 or i == len(val_loader):
             print('Test: [{0}/{1}]\t'
                   'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                   'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
@@ -59,8 +60,13 @@ def validate(val_loader, model, criterion):
                    i, len(val_loader), batch_time=batch_time, loss=losses,
                    top1=top1, top5=top5))
 
-    print(' * Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f}'
-          .format(top1=top1, top5=top5))
+    print_log('Final Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f}\n'
+              .format(top1=top1, top5=top5), file_name, init=True)
+    for k, _ in acc_per_cls.items():
+        acc_per_cls[k][:, 2] = acc_per_cls[k][:, 0] / acc_per_cls[k][:, 1]
+    for i in range(cls_num):
+        print_log('class {:4d}\t{:.4f}\t{:.4f}'
+                  .format(i+1, acc_per_cls['top1'][i, 2], acc_per_cls['top5'][i, 2]), file_name)
 
     return top1.avg
 
@@ -70,7 +76,7 @@ model = models.resnet18(pretrained=True)
 model = torch.nn.DataParallel(model).cuda()
 criterion = nn.CrossEntropyLoss().cuda()
 
-print_freq = 100
+print_freq = 5
 batch_size = 256
 data_path = '/home/hongyang/dataset/imagenet_cls/cls'
 valdir = os.path.join(data_path, 'val')
@@ -84,7 +90,7 @@ val_loader = torch.utils.data.DataLoader(
         transforms.ToTensor(),
         normalize,
     ])),
-    batch_size=batch_size, shuffle=False,
+    batch_size=batch_size, shuffle=True,
     num_workers=4, pin_memory=True)
 
 validate(val_loader, model, criterion)

@@ -21,9 +21,9 @@ show_jot_opt(args)
 
 # dataset
 test_loader = data.DataLoader(create_dataset(args, 'test'), args.batch_size_test,
-                              num_workers=args.num_workers, shuffle=False)
+                              num_workers=args.num_workers, shuffle=False, pin_memory=True)
 train_loader = data.DataLoader(create_dataset(args, 'train'), args.batch_size_train,
-                               num_workers=args.num_workers, shuffle=True)
+                               num_workers=args.num_workers, shuffle=True, pin_memory=True)
 
 # init visualizer
 visual = Visualizer(args)

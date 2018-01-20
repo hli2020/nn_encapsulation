@@ -15,9 +15,9 @@ cls_num = 1000
 save_prefix = 'set1'    # differnt settings
 val_folder = os.path.join(os.getcwd(), save_prefix, 'val')
 train_folder = os.path.join(os.getcwd(), save_prefix, 'train')
-start_cls = 466
-end_cls = 600
-phase = 'train'
+start_cls = 1
+end_cls = 1000
+phase = 'val'
 
 
 def read_hdf5_ref(file, ref):
@@ -81,7 +81,7 @@ if phase == 'val':
     val_im_list = sort_up_file(f, val_gt['image_list'].transpose())
 
     cnt = 0
-    for root, dirs, files in os.walk(val_ori_im):
+    for root, dirs, files in sorted(os.walk(val_ori_im)):
 
         if files != []:
             # the current class
@@ -107,7 +107,7 @@ if phase == 'val':
 # note: f[f['bbox_new']['REVISED'][index][0]]
 if phase == 'train':
     cnt = 0
-    for root, dirs, files in os.walk(train_bbox_gt):
+    for root, dirs, files in sorted(os.walk(train_bbox_gt)):
         for curr_cls in files:
             if curr_cls[-3:] == 'mat':
                 cnt += 1
@@ -126,12 +126,13 @@ if phase == 'train':
                     already_saved_num = len(os.listdir(curr_cls_save_path))
                     if already_saved_num >= len(f['bbox_new']['xml']):
                         print('HEADS UP! cls {:s}, cnt={:d} is already saved!'.format(curr_cls_name, cnt))
+                        f.close()
                         continue
 
                     im_bbox_xml = _process2(f, f['bbox_new']['xml'])
                     im_bbox = _process2(f, f['bbox_new']['bbox'])
                     im_list = _process(f, f['bbox_new']['im_name'])
-
+                    f.close()
                     for ind, curr_im in enumerate(im_list):
                         curr_bbox = im_bbox[ind] if im_bbox_xml[ind].ndim == 1 else im_bbox_xml[ind]
                         if curr_bbox.ndim == 1:
