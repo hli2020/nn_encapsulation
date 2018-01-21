@@ -37,7 +37,7 @@ phase: train_val
 port_id: 8000
 pre_ch_num: 32
 primary_cap_num: 32
-random_seed: 5893
+random_seed: 9657
 route_num: 3
 save_epoch: 25
 save_folder: result/base_200_v1
@@ -115,7 +115,7 @@ DataParallel (
         (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
       )
     )
-    (avgpool): AvgPool2d (size=16, stride=8, padding=0, ceil_mode=False, count_include_pad=True)
+    (avgpool): AvgPool2d (size=8, stride=8, padding=0, ceil_mode=False, count_include_pad=True)
     (fc): Linear (256 -> 200)
   ), weights=((16, 3, 3, 3), (16,), (16,), (16, 16, 3, 3), (16,), (16,), (16, 16, 3, 3), (16,), (16,), (16, 16, 3, 3), (16,), (16,), (16, 16, 3, 3), (16,), (16,), (32, 16, 3, 3), (32,), (32,), (32, 32, 3, 3), (32,), (32,), (32, 16, 1, 1), (32,), (32,), (32, 32, 3, 3), (32,), (32,), (32, 32, 3, 3), (32,), (32,), (64, 32, 3, 3), (64,), (64,), (64, 64, 3, 3), (64,), (64,), (64, 32, 1, 1), (64,), (64,), (64, 64, 3, 3), (64,), (64,), (64, 64, 3, 3), (64,), (64,), (200, 256), (200,)), parameters=226008
 )

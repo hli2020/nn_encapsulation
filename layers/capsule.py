@@ -136,9 +136,7 @@ class CapsNet(nn.Module):
             x = self.layer2(x)                  # 32 x 16 x 16
             x = self.layer3(x)                  # 64(for depth=20) x 8 x 8
             x = self.avgpool(x)
-            print(x.size())
             x = x.view(x.size(0), -1)
-            print(x.size())
             x = self.fc(x)
 
         elif self.cap_model == 'v0':
