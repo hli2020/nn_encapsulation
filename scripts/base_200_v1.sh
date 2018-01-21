@@ -4,7 +4,8 @@ start=`date +%s`
 
 # train and test
 CUDA_VISIBLE_DEVICES=0,1 python holly_capsule.py \
---experiment_name=base_200_v1 \
+--experiment_name=base_200_v1_rerun \
+--num_workers=32 \
 --debug_mode=False \
 --dataset=tiny_imagenet \
 --setting=top1 \
