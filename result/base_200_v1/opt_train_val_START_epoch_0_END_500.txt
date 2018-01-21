@@ -158,3 +158,5 @@ Summary	epoch/iter [2/500] ||	TRAIN, Top1_err: 76.7457, Top5_err: 50.3650 ||	TES
 Summary	epoch/iter [3/500] ||	TRAIN, Top1_err: 73.4312, Top5_err: 45.7312 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
 
 [base_200_v1]	epoch/iter [4/500][0/500] ||	Loss: 3.1515, Top1_err: 72.0703, Top5_err: 44.1406 ||	Data/batch time: 3.4632/3.5369
+[base_200_v1]	epoch/iter [4/500][100/500] ||	Loss: 3.0740, Top1_err: 71.8383, Top5_err: 43.3168 ||	Data/batch time: 1.2694/1.3495
+[base_200_v1]	epoch/iter [4/500][200/500] ||	Loss: 3.0612, Top1_err: 71.5631, Top5_err: 43.1437 ||	Data/batch time: 1.2527/1.3302

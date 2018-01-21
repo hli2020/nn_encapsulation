@@ -142,3 +142,4 @@ model saved at result/base_200_v2/epoch_1.pth
 Summary	epoch/iter [1/500] ||	TRAIN, Top1_err: 76.4208, Top5_err: 50.5883 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
 
 [base_200_v2]	epoch/iter [2/500][0/500] ||	Loss: 3.1064, Top1_err: 70.5078, Top5_err: 42.5781 ||	Data/batch time: 6.2871/6.4734
+[base_200_v2]	epoch/iter [2/500][100/500] ||	Loss: 3.1547, Top1_err: 72.3662, Top5_err: 45.3550 ||	Data/batch time: 2.5389/2.7163

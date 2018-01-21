@@ -1,4 +1,4 @@
-Experiment: base_201_v1
+Experiment: base_201_v2
 ------------ Test Options -----------------
 KL_factor: 0.1
 KL_manner: 1
@@ -9,7 +9,7 @@ base_save_folder: result
 batch_size_test: 100
 batch_size_train: 100
 beta1: 0.9
-bigger_input: False
+bigger_input: True
 cap_N: 3
 cap_model: v0
 dataset: tiny_imagenet
@@ -18,9 +18,9 @@ depth: 14
 do_squash: False
 draw_hist: False
 dropout_p: 0.2
-experiment_name: base_201_v1
+experiment_name: base_201_v2
 fc_time: 0
-file_name: result/base_201_v1/opt_train_val_START_epoch_0_END_500.txt
+file_name: result/base_201_v2/opt_train_val_START_epoch_0_END_500.txt
 fix_m: False
 gamma: 0.1
 look_into_details: False
@@ -38,10 +38,10 @@ phase: train_val
 port_id: 8000
 pre_ch_num: 256
 primary_cap_num: 32
-random_seed: 5154
+random_seed: 3126
 route_num: 2
 save_epoch: 25
-save_folder: result/base_201_v1
+save_folder: result/base_201_v2
 schedule: [200, 300, 400]
 scheduler: None
 setting: top1
@@ -63,7 +63,7 @@ DataParallel (
     (tranfer_conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(2, 2))
     (tranfer_bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
     (tranfer_relu1): ReLU (inplace)
-    (max_pool): MaxPool2d (size=(5, 5), stride=(5, 5), dilation=(1, 1))
+    (max_pool): MaxPool2d (size=(9, 9), stride=(9, 9), dilation=(1, 1))
     (cap_layer): CapLayer (
       (W): Conv2d(256, 102400, kernel_size=(1, 1), stride=(1, 1), groups=32)
     )
@@ -73,4 +73,4 @@ Total param num # 6.008789 Mb
 
 init learning rate 0.0001000000 at iter 0
 
-[base_201_v1]	epoch/iter [0/500][0/2558] ||	Loss: 0.7653, Top1_err: 100.0000, Top5_err: 98.0000 ||	Data/batch time: 0.8703/9.3975
+[base_201_v2]	epoch/iter [0/500][0/2558] ||	Loss: 0.7643, Top1_err: 100.0000, Top5_err: 99.0000 ||	Data/batch time: 1.5062/11.1500
