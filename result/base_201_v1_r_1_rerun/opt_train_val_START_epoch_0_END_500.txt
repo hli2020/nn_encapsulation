@@ -1,4 +1,4 @@
-Experiment: base_201_v1
+Experiment: base_201_v1_r_1_rerun
 ------------ Test Options -----------------
 KL_factor: 0.1
 KL_manner: 1
@@ -18,9 +18,9 @@ depth: 14
 do_squash: False
 draw_hist: False
 dropout_p: 0.2
-experiment_name: base_201_v1
+experiment_name: base_201_v1_r_1_rerun
 fc_time: 0
-file_name: result/base_201_v1/opt_train_val_START_epoch_0_END_500.txt
+file_name: result/base_201_v1_r_1_rerun/opt_train_val_START_epoch_0_END_500.txt
 fix_m: False
 gamma: 0.1
 look_into_details: False
@@ -32,16 +32,16 @@ momentum: 0.9
 multi_crop_test: False
 no_visdom: False
 non_target_j: False
-num_workers: 24
+num_workers: 32
 optim: adam
 phase: train_val
 port_id: 8000
 pre_ch_num: 256
 primary_cap_num: 32
-random_seed: 8321
-route_num: 2
+random_seed: 204
+route_num: 1
 save_epoch: 25
-save_folder: result/base_201_v1
+save_folder: result/base_201_v1_r_1_rerun
 schedule: [200, 300, 400]
 scheduler: None
 setting: top1
@@ -73,4 +73,4 @@ Total param num # 6.008789 Mb
 
 init learning rate 0.0001000000 at iter 0
 
-[base_201_v1]	epoch/iter [0/500][0/2558] ||	Loss: 0.7631, Top1_err: 100.0000, Top5_err: 97.0000 ||	Data/batch time: 2.4375/15.2889
+[base_201_v1_r_1_rerun]	epoch/iter [0/500][0/2558] ||	Loss: 0.7659, Top1_err: 100.0000, Top5_err: 98.0000 ||	Data/batch time: 2.5319/15.1897

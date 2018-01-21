@@ -10,6 +10,7 @@ CUDA_VISIBLE_DEVICES=4 python holly_capsule.py \
 --dataset=tiny_imagenet \
 --setting=top1 \
 --cap_model=v0 \
+--num_workers=24 \
 --route_num=2 \
 --max_epoch=500 \
 --loss_form=margin \

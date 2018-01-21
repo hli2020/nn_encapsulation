@@ -38,7 +38,11 @@ phase: train_val
 port_id: 8000
 pre_ch_num: 32
 primary_cap_num: 32
+<<<<<<< HEAD
 random_seed: 70
+=======
+random_seed: 3769
+>>>>>>> b5f76b35b86ccfedee60e68c9ad1f1ca3cfec706
 route_num: 3
 save_epoch: 25
 save_folder: result/base_200_v1_rerun
@@ -124,4 +128,8 @@ Total param num # 0.862152 Mb
 
 init learning rate 0.0001000000 at iter 0
 
+<<<<<<< HEAD
 [base_200_v1_rerun]	epoch/iter [0/500][0/500] ||	Loss: 5.5644, Top1_err: 99.8047, Top5_err: 98.2422 ||	Data/batch time: 139.1578/193.0423
+=======
+[base_200_v1_rerun]	epoch/iter [0/500][0/500] ||	Loss: 5.5179, Top1_err: 98.8281, Top5_err: 95.5078 ||	Data/batch time: 13.2524/32.6952
+>>>>>>> b5f76b35b86ccfedee60e68c9ad1f1ca3cfec706
