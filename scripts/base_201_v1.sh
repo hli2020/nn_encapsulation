@@ -14,8 +14,10 @@ CUDA_VISIBLE_DEVICES=4,5 python holly_capsule.py \
 --loss_form=margin \
 --optim=adam \
 --schedule 200 300 400 \
---batch_size_train=512 \
---batch_size_test=256 \
+--batch_size_train=64 \
+--batch_size_test=64 \
+--primary_cap_num=32 \
+--pre_ch_num=256 \
 --lr=0.0001
 
 
