@@ -221,7 +221,7 @@ class CapLayer(nn.Module):
             if self.add_cap_dropout:
                 NotImplementedError()
                 # v = self.cap_droput(v)
-            print('cap W time: {:.4f}'.format(time.time() - start))
+            # print('cap W time: {:.4f}'.format(time.time() - start))
 
             # 2. routing
             start = time.time()
@@ -245,7 +245,7 @@ class CapLayer(nn.Module):
                     pred_list.extend(curr_pred.data)
                 b = torch.add(b, delta_b)
             # routing ends
-            print('cap Route (r={:d}) time: {:.4f}'.format(self.route_num, time.time() - start))
+            # print('cap Route (r={:d}) time: {:.4f}'.format(self.route_num, time.time() - start))
 
             if vis is not None:
                 batch_cos_dist, batch_i_length, batch_cos_v, avg_len = \
