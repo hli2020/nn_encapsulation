@@ -60,17 +60,23 @@ def create_dataset(opts, phase=None):
 
         normalize = T.Normalize(mean=[0.485, 0.456, 0.406],
                                 std=[0.229, 0.224, 0.225])
+        if opts.bigger_input:
+            resize_size, crop_size = 256, 224
+        else:
+            resize_size, crop_size = 156, 128
         if phase == 'train':
             transform = T.Compose([
-                T.Resize(156),
-                T.CenterCrop(128),
+                T.Resize(resize_size),
+                T.CenterCrop(crop_size),
+                T.RandomHorizontalFlip(),
+                T.ColorJitter(brightness=.2, contrast=.2, saturation=.2, hue=.2),
                 T.ToTensor(),
                 normalize
             ])
         elif phase == 'val':
             transform = T.Compose([
-                T.Resize(156),
-                T.CenterCrop(128),
+                T.Resize(resize_size),
+                T.CenterCrop(crop_size),
                 T.ToTensor(),
                 normalize
             ])

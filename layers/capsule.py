@@ -13,6 +13,7 @@ class CapsNet(nn.Module):
     def __init__(self, opts, num_classes=100):
         super(CapsNet, self).__init__()
 
+        self.use_imagenet = True if opts.dataset == 'tiny_imagenet' else False
         self.cap_model = opts.cap_model
         self.use_multiple = opts.use_multiple
         input_ch = 1 if opts.dataset == 'fmnist' else 3
@@ -34,9 +35,12 @@ class CapsNet(nn.Module):
             block = Bottleneck if depth >= 44 else BasicBlock
 
             if opts.dataset == 'tiny_imagenet':
-                stride_num, fc_num, pool_stride, pool_input = 2, 64*4, 8, 16
+                if opts.bigger_input:
+                    stride_num, fc_num, pool_stride, pool_kernel = 2, 64*4*4, 7, 7
+                else:
+                    stride_num, fc_num, pool_stride, pool_kernel = 2, 64*2*2, 8, 8
             else:
-                stride_num, fc_num, pool_stride, pool_input = 1, 64, 1, 8
+                stride_num, fc_num, pool_stride, pool_kernel = 1, 64, 1, 8
 
             self.conv1 = nn.Conv2d(input_ch, 16, kernel_size=3, padding=1, bias=False, stride=stride_num)
             self.bn1 = nn.BatchNorm2d(16)
@@ -44,7 +48,7 @@ class CapsNet(nn.Module):
             self.layer1 = self._make_layer(block, 16, n)
             self.layer2 = self._make_layer(block, 32, n, stride=2)
             self.layer3 = self._make_layer(block, 64, n, stride=2)
-            self.avgpool = nn.AvgPool2d(pool_input, stride=pool_stride)          # TODO: which number
+            self.avgpool = nn.AvgPool2d(pool_kernel, stride=pool_stride)
             self.fc = nn.Linear(fc_num, num_classes)
 
         elif self.cap_model == 'v0':
@@ -54,6 +58,7 @@ class CapsNet(nn.Module):
             self.tranfer_bn = nn.InstanceNorm2d(opts.pre_ch_num, affine=True) \
                 if opts.use_instanceBN else nn.BatchNorm2d(opts.pre_ch_num)
             self.tranfer_relu = nn.ReLU(True)
+
             # second conv
             factor = 8 if opts.w_version is 'v2' else 1
             send_to_cap_ch_num = self.primary_cap_num * factor
@@ -61,6 +66,13 @@ class CapsNet(nn.Module):
             self.tranfer_bn1 = nn.InstanceNorm2d(send_to_cap_ch_num, affine=True) \
                 if opts.use_instanceBN else nn.BatchNorm2d(send_to_cap_ch_num)
             self.tranfer_relu1 = nn.ReLU(True)
+
+            # needed for large spatial input on imagenet
+            if opts.bigger_input:
+                self.max_pool = nn.MaxPool2d(9, stride=9)  # input 224, before cap, 54 x 54
+            else:
+                self.max_pool = nn.MaxPool2d(5, stride=5)  # input 128, before cap, 30 x 30
+
             # capsLayer
             self.cap_layer = CapLayer(opts, num_in_caps=self.primary_cap_num*6*6, num_out_caps=num_classes,
                                       out_dim=16, num_shared=self.primary_cap_num, in_dim=8)
@@ -124,7 +136,7 @@ class CapsNet(nn.Module):
     def forward(self, x, target=None, curr_iter=0, vis=None):
         stats = []
         multi_cap_stats = []
-        # start = time.time()
+        start = time.time()
 
         # TODO: merge the resnet part out of the capsule part
         # THE FOLLOWING ARE PARALLEL TO EACH OTHER
@@ -148,6 +160,8 @@ class CapsNet(nn.Module):
             x = self.tranfer_relu1(x)
             # print('conv time: {:.4f}'.format(time.time() - start))
             start = time.time()
+            if self.use_imagenet:
+                x = self.max_pool(x)
             x, stats = self.cap_layer(x, target, curr_iter, vis)
             # print('last cap total time: {:.4f}'.format(time.time() - start))
 

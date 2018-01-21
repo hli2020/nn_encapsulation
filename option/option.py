@@ -11,6 +11,7 @@ class Options(object):
         self.parser.add_argument('--experiment_name', default='base')
         self.parser.add_argument('--dataset', default='tiny_imagenet', help='[ cifar10|tiny_imagenet ]')
         self.parser.add_argument('--setting', default='obj_det', type=str)
+        self.parser.add_argument('--bigger_input', action='store_true', help='only valid for imagenet')
         self.parser.add_argument('--debug_mode', default=True, type=str2bool)
         self.parser.add_argument('--base_save_folder', default='result')
 
@@ -21,15 +22,16 @@ class Options(object):
 
         # model params
         self.parser.add_argument('--depth', default=14, type=int)  # for now, only valid for v_base
-        # network, v0 is the structure in the paper
+        # network, v0 is the structure in the paper, v_base is resnet
         self.parser.add_argument('--cap_model', default='v0', type=str,
-                                 help='v_base, v0, v1, v2, v3, ...')    # v_base is resnet
+                                 help='v_base, v0, v1, v2, v3, ...')
         self.parser.add_argument('--cap_N', default=3, type=int, help='multiple capLayers')
         self.parser.add_argument('--route_num', default=3, type=int)
 
         # FOR cap_model=v0 only:
         self.parser.add_argument('--primary_cap_num', default=32, type=int)
         self.parser.add_argument('--pre_ch_num', default=32, type=int)
+
         self.parser.add_argument('--add_cap_dropout', action='store_true')
         self.parser.add_argument('--dropout_p', default=0.2, type=float)
         self.parser.add_argument('--add_cap_BN_relu', action='store_true')

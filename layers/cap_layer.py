@@ -200,7 +200,7 @@ class CapLayer(nn.Module):
         if self.w_version == 'v2':
 
             # 1. pred_i_j_d2
-            # start = time.time()
+            start = time.time()
             raw_output = self.W(input)
             # pred: bs, 5120, 6, 6
             # -> bs, 32, 10, 16, 6, 6
@@ -224,7 +224,7 @@ class CapLayer(nn.Module):
             # print('cap W time: {:.4f}'.format(time.time() - start))
 
             # 2. routing
-            # start = time.time()
+            start = time.time()
             for i in range(self.route_num):
 
                 c = softmax_dim(b, axis=1)              # 128 x 10 x 1152, c_nji, \sum_j = 1

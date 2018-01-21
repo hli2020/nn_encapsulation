@@ -6,9 +6,16 @@ add_cap_BN_relu: False
 add_cap_dropout: False
 b_init: zero
 base_save_folder: result
+<<<<<<< HEAD
 batch_size_test: 64
 batch_size_train: 64
 beta1: 0.9
+=======
+batch_size_test: 256
+batch_size_train: 512
+beta1: 0.9
+bigger_input: False
+>>>>>>> f236d0c55c070db2e8b4f136b395f2936cf4c6c5
 cap_N: 3
 cap_model: v_base
 dataset: tiny_imagenet
@@ -37,7 +44,11 @@ phase: train_val
 port_id: 8000
 pre_ch_num: 32
 primary_cap_num: 32
+<<<<<<< HEAD
 random_seed: 5579
+=======
+random_seed: 2904
+>>>>>>> f236d0c55c070db2e8b4f136b395f2936cf4c6c5
 route_num: 3
 save_epoch: 25
 save_folder: result/base_200_v1
@@ -115,7 +126,11 @@ DataParallel (
         (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
       )
     )
+<<<<<<< HEAD
     (avgpool): AvgPool2d (size=16, stride=8, padding=0, ceil_mode=False, count_include_pad=True)
+=======
+    (avgpool): AvgPool2d (size=8, stride=8, padding=0, ceil_mode=False, count_include_pad=True)
+>>>>>>> f236d0c55c070db2e8b4f136b395f2936cf4c6c5
     (fc): Linear (256 -> 200)
   ), weights=((16, 3, 3, 3), (16,), (16,), (16, 16, 3, 3), (16,), (16,), (16, 16, 3, 3), (16,), (16,), (16, 16, 3, 3), (16,), (16,), (16, 16, 3, 3), (16,), (16,), (32, 16, 3, 3), (32,), (32,), (32, 32, 3, 3), (32,), (32,), (32, 16, 1, 1), (32,), (32,), (32, 32, 3, 3), (32,), (32,), (32, 32, 3, 3), (32,), (32,), (64, 32, 3, 3), (64,), (64,), (64, 64, 3, 3), (64,), (64,), (64, 32, 1, 1), (64,), (64,), (64, 64, 3, 3), (64,), (64,), (64, 64, 3, 3), (64,), (64,), (200, 256), (200,)), parameters=226008
 )
@@ -123,3 +138,42 @@ Total param num # 0.862152 Mb
 
 init learning rate 0.0001000000 at iter 0
 
+<<<<<<< HEAD
+=======
+[base_200_v1]	epoch/iter [0/500][0/500] ||	Loss: 5.5138, Top1_err: 99.0234, Top5_err: 97.2656 ||	Data/batch time: 3.0248/8.5220
+[base_200_v1]	epoch/iter [0/500][100/500] ||	Loss: 5.0370, Top1_err: 97.2482, Top5_err: 89.8573 ||	Data/batch time: 1.1927/1.3238
+[base_200_v1]	epoch/iter [0/500][200/500] ||	Loss: 4.8147, Top1_err: 95.4816, Top5_err: 84.8502 ||	Data/batch time: 1.1998/1.3029
+[base_200_v1]	epoch/iter [0/500][300/500] ||	Loss: 4.6452, Top1_err: 93.7850, Top5_err: 80.7614 ||	Data/batch time: 1.2032/1.2982
+[base_200_v1]	epoch/iter [0/500][400/500] ||	Loss: 4.5168, Top1_err: 92.3711, Top5_err: 77.5858 ||	Data/batch time: 1.2074/1.2977
+[base_200_v1]	epoch/iter [0/500][499/500] ||	Loss: 4.4156, Top1_err: 91.1741, Top5_err: 75.0936 ||	Data/batch time: 1.2075/1.2976
+Summary	epoch/iter [0/500] ||	TRAIN, Top1_err: 91.1741, Top5_err: 75.0936 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+model saved at result/base_200_v1/epoch_1.pth
+[base_200_v1]	epoch/iter [1/500][0/500] ||	Loss: 3.9413, Top1_err: 84.9609, Top5_err: 64.4531 ||	Data/batch time: 3.1565/3.2896
+[base_200_v1]	epoch/iter [1/500][100/500] ||	Loss: 3.8746, Top1_err: 84.4543, Top5_err: 62.0533 ||	Data/batch time: 1.2382/1.3150
+[base_200_v1]	epoch/iter [1/500][200/500] ||	Loss: 3.8221, Top1_err: 83.5996, Top5_err: 60.8073 ||	Data/batch time: 1.2278/1.3050
+[base_200_v1]	epoch/iter [1/500][300/500] ||	Loss: 3.7780, Top1_err: 82.9767, Top5_err: 59.7332 ||	Data/batch time: 1.2286/1.3059
+[base_200_v1]	epoch/iter [1/500][400/500] ||	Loss: 3.7370, Top1_err: 82.3513, Top5_err: 58.7871 ||	Data/batch time: 1.2285/1.3060
+[base_200_v1]	epoch/iter [1/500][499/500] ||	Loss: 3.6998, Top1_err: 81.7437, Top5_err: 57.8688 ||	Data/batch time: 1.2219/1.2994
+Summary	epoch/iter [1/500] ||	TRAIN, Top1_err: 81.7437, Top5_err: 57.8688 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+[base_200_v1]	epoch/iter [2/500][0/500] ||	Loss: 3.4516, Top1_err: 78.5156, Top5_err: 53.1250 ||	Data/batch time: 2.9658/3.0494
+[base_200_v1]	epoch/iter [2/500][100/500] ||	Loss: 3.4679, Top1_err: 78.1772, Top5_err: 52.5526 ||	Data/batch time: 1.2334/1.3116
+[base_200_v1]	epoch/iter [2/500][200/500] ||	Loss: 3.4483, Top1_err: 77.8694, Top5_err: 51.9211 ||	Data/batch time: 1.2236/1.3002
+[base_200_v1]	epoch/iter [2/500][300/500] ||	Loss: 3.4266, Top1_err: 77.5040, Top5_err: 51.4275 ||	Data/batch time: 1.2147/1.2909
+[base_200_v1]	epoch/iter [2/500][400/500] ||	Loss: 3.4025, Top1_err: 77.0851, Top5_err: 50.8889 ||	Data/batch time: 1.2181/1.2955
+[base_200_v1]	epoch/iter [2/500][499/500] ||	Loss: 3.3799, Top1_err: 76.7457, Top5_err: 50.3650 ||	Data/batch time: 1.2196/1.2969
+Summary	epoch/iter [2/500] ||	TRAIN, Top1_err: 76.7457, Top5_err: 50.3650 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+[base_200_v1]	epoch/iter [3/500][0/500] ||	Loss: 3.3570, Top1_err: 75.3906, Top5_err: 47.0703 ||	Data/batch time: 3.2767/3.3600
+[base_200_v1]	epoch/iter [3/500][100/500] ||	Loss: 3.2363, Top1_err: 74.2458, Top5_err: 47.0626 ||	Data/batch time: 1.2798/1.3576
+[base_200_v1]	epoch/iter [3/500][200/500] ||	Loss: 3.2230, Top1_err: 74.1575, Top5_err: 46.7487 ||	Data/batch time: 1.2688/1.3463
+[base_200_v1]	epoch/iter [3/500][300/500] ||	Loss: 3.2047, Top1_err: 73.9222, Top5_err: 46.4046 ||	Data/batch time: 1.2596/1.3372
+[base_200_v1]	epoch/iter [3/500][400/500] ||	Loss: 3.1869, Top1_err: 73.6455, Top5_err: 46.0597 ||	Data/batch time: 1.2514/1.3289
+[base_200_v1]	epoch/iter [3/500][499/500] ||	Loss: 3.1751, Top1_err: 73.4312, Top5_err: 45.7312 ||	Data/batch time: 1.2490/1.3266
+Summary	epoch/iter [3/500] ||	TRAIN, Top1_err: 73.4312, Top5_err: 45.7312 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+[base_200_v1]	epoch/iter [4/500][0/500] ||	Loss: 3.1515, Top1_err: 72.0703, Top5_err: 44.1406 ||	Data/batch time: 3.4632/3.5369
+[base_200_v1]	epoch/iter [4/500][100/500] ||	Loss: 3.0740, Top1_err: 71.8383, Top5_err: 43.3168 ||	Data/batch time: 1.2694/1.3495
+[base_200_v1]	epoch/iter [4/500][200/500] ||	Loss: 3.0612, Top1_err: 71.5631, Top5_err: 43.1437 ||	Data/batch time: 1.2527/1.3302
+>>>>>>> f236d0c55c070db2e8b4f136b395f2936cf4c6c5
