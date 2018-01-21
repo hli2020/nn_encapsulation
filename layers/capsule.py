@@ -136,7 +136,7 @@ class CapsNet(nn.Module):
     def forward(self, x, target=None, curr_iter=0, vis=None):
         stats = []
         multi_cap_stats = []
-        # start = time.time()
+        start = time.time()
 
         # TODO: merge the resnet part out of the capsule part
         # THE FOLLOWING ARE PARALLEL TO EACH OTHER
@@ -158,12 +158,12 @@ class CapsNet(nn.Module):
             x = self.tranfer_conv1(x)
             x = self.tranfer_bn1(x)
             x = self.tranfer_relu1(x)
-            # print('conv time: {:.4f}'.format(time.time() - start))
+            print('conv time: {:.4f}'.format(time.time() - start))
             start = time.time()
             if self.use_imagenet:
                 x = self.max_pool(x)
             x, stats = self.cap_layer(x, target, curr_iter, vis)
-            # print('last cap total time: {:.4f}'.format(time.time() - start))
+            print('last cap total time: {:.4f}'.format(time.time() - start))
 
         elif self.cap_model == 'v1':
             x = self.buffer(x)
