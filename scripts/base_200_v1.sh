@@ -12,8 +12,8 @@ CUDA_VISIBLE_DEVICES=0,1 python holly_capsule.py \
 --depth=14 \
 --max_epoch=500 \
 --schedule 200 300 400 \
---batch_size_train=64 \
---batch_size_test=64 \
+--batch_size_train=512 \
+--batch_size_test=256 \
 --lr=0.0001 \
 
 
