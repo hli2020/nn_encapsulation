@@ -34,7 +34,10 @@ class CapsNet(nn.Module):
             block = Bottleneck if depth >= 44 else BasicBlock
 
             if opts.dataset == 'tiny_imagenet':
-                stride_num, fc_num, pool_stride, pool_kernel = 2, 64*4, 8, 8
+                if opts.bigger_input:
+                    stride_num, fc_num, pool_stride, pool_kernel = 2, 64*4*4, 7, 7
+                else:
+                    stride_num, fc_num, pool_stride, pool_kernel = 2, 64*2*2, 8, 8
             else:
                 stride_num, fc_num, pool_stride, pool_kernel = 1, 64, 1, 8
 
@@ -44,7 +47,7 @@ class CapsNet(nn.Module):
             self.layer1 = self._make_layer(block, 16, n)
             self.layer2 = self._make_layer(block, 32, n, stride=2)
             self.layer3 = self._make_layer(block, 64, n, stride=2)
-            self.avgpool = nn.AvgPool2d(pool_kernel, stride=pool_stride)          # TODO: which number
+            self.avgpool = nn.AvgPool2d(pool_kernel, stride=pool_stride)
             self.fc = nn.Linear(fc_num, num_classes)
 
         elif self.cap_model == 'v0':

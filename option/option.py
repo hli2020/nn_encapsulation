@@ -11,6 +11,7 @@ class Options(object):
         self.parser.add_argument('--experiment_name', default='base')
         self.parser.add_argument('--dataset', default='tiny_imagenet', help='[ cifar10|tiny_imagenet ]')
         self.parser.add_argument('--setting', default='obj_det', type=str)
+        self.parser.add_argument('--bigger_input', action='store_true', help='only valid for imagenet')
         self.parser.add_argument('--debug_mode', default=True, type=str2bool)
         self.parser.add_argument('--base_save_folder', default='result')
 
