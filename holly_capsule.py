@@ -75,7 +75,6 @@ best_acc, best_epoch = 100, 0
 epoch_size = len(train_loader)
 
 for epoch in range(args.max_epoch):
-# for epoch in range(1):
 
     t = time.time()
     old_lr = optimizer.param_groups[0]['lr']
