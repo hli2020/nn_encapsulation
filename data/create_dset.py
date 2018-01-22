@@ -15,7 +15,8 @@ def create_dataset(opts, phase=None):
                       T.RandomHorizontalFlip()]
         if not opts.less_data_aug:
             trans_list.append(T.ColorJitter(brightness=.2, contrast=.2, saturation=.2, hue=.2))
-        transform = T.Compose(trans_list.append(T.ToTensor()))
+        trans_list.append(T.ToTensor())
+        transform = T.Compose(trans_list)
 
     elif phase == 'test':
         if opts.multi_crop_test:
