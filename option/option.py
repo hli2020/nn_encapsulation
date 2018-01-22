@@ -14,6 +14,7 @@ class Options(object):
         # only valid for imagenet
         self.parser.add_argument('--setting', default='top1', type=str, help='[ top1 | top5 | obj_det ]')
         self.parser.add_argument('--bigger_input', action='store_true', help='only valid for imagenet')
+        self.parser.add_argument('--less_data_aug', action='store_true', help='see create_dset.py')
 
         self.parser.add_argument('--debug_mode', default=True, type=str2bool)
         self.parser.add_argument('--measure_time', action='store_true')
