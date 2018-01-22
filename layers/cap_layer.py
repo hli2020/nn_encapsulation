@@ -219,7 +219,7 @@ class CapLayer(nn.Module):
             # pred = pred.view(bs, self.num_out_caps, self.out_dim, self.num_shared,
             #                  spatial_size, spatial_size)
             # pred = pred.view(bs, self.num_out_caps, self.out_dim, -1)
-            _pred = pred.permute(0, 1, 3, 2)
+            # _pred = pred.permute(0, 1, 3, 2)
 
             if self.add_cap_BN_relu:
                 NotImplementedError()
@@ -246,7 +246,6 @@ class CapLayer(nn.Module):
                     t1 = time.perf_counter()
                 # print(pred.size())
                 # print(c.size())
-
                 # print('pred id')
                 # print(pred.get_device())
                 # print('c id')
@@ -272,12 +271,12 @@ class CapLayer(nn.Module):
                         permute_t = time.perf_counter() - t3
                         t4 = time.perf_counter()
 
-                    delta_b = torch.matmul(_pred, v.unsqueeze(3)).squeeze()  # TODO: super-time-consuming (0.1557s)
+                    # delta_b = torch.matmul(_pred, v.unsqueeze(3)).squeeze()  # TODO: super-time-consuming (0.1557s)
+                    delta_b = torch.matmul(v.unsqueeze(2), pred).squeeze()
                     if self.measure_time:
                         torch.cuda.synchronize()
                         delta_matmul_t = time.perf_counter() - t4
                         t5 = time.perf_counter()
-
                     # if self.FIND_DIFF:
                     #     v_all_classes = v.norm(dim=2)
                     #     _, curr_pred = torch.max(v_all_classes, 1)

@@ -57,8 +57,8 @@ class Options(object):
         self.parser.add_argument('--gamma', default=0.1, type=float)
         self.parser.add_argument('--beta1', type=float, default=0.9, help='momentum term of adam')
 
-        self.parser.add_argument('--batch_size_train', default=128, type=int)
-        self.parser.add_argument('--batch_size_test', default=128, type=int)
+        self.parser.add_argument('--batch_size_train', default=100, type=int)
+        self.parser.add_argument('--batch_size_test', default=100, type=int)
         # self.parser.add_argument('--resume', default=None, type=str, help='Resume from checkpoint')
         self.parser.add_argument('--max_epoch', default=300, type=int, help='Number of training epoches')
         self.parser.add_argument('--schedule', default=[150, 225], nargs='+', type=int)
