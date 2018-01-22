@@ -9,10 +9,13 @@ class Options(object):
 
         self.parser = argparse.ArgumentParser(description='Capsule Network')
         self.parser.add_argument('--experiment_name', default='base')
-        self.parser.add_argument('--dataset', default='tiny_imagenet', help='[ cifar10|tiny_imagenet ]')
-        self.parser.add_argument('--setting', default='obj_det', type=str)
+        self.parser.add_argument('--dataset', default='tiny_imagenet', help='[ cifar10 | tiny_imagenet ]')
+
+        self.parser.add_argument('--setting', default='top1', type=str, help='[ top1 | top5 | obj_det ]')
         self.parser.add_argument('--bigger_input', action='store_true', help='only valid for imagenet')
+
         self.parser.add_argument('--debug_mode', default=True, type=str2bool)
+        self.parser.add_argument('--measure_time', action='store_true')
         self.parser.add_argument('--base_save_folder', default='result')
 
         self.parser.add_argument('--manual_seed', default=-1, type=int)
@@ -21,10 +24,10 @@ class Options(object):
         self.parser.add_argument('--port_id', default=8000, type=int)
 
         # model params
-        self.parser.add_argument('--depth', default=14, type=int)  # for now, only valid for v_base
         # network, v0 is the structure in the paper, v_base is resnet
         self.parser.add_argument('--cap_model', default='v0', type=str,
-                                 help='v_base, v0, v1, v2, v3, ...')
+                                 help='v_base, v0, ...')
+        self.parser.add_argument('--depth', default=14, type=int)  # for now, only valid for v_base
         self.parser.add_argument('--cap_N', default=3, type=int, help='multiple capLayers')
         self.parser.add_argument('--route_num', default=3, type=int)
 

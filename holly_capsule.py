@@ -34,6 +34,7 @@ visual = Visualizer(args)
 # model
 model = CapsNet(num_classes=train_loader.dataset.num_classes, opts=args)
 if args.dataset == 'tiny_imagenet':
+    # model = model.cuda()
     model = torch.nn.DataParallel(model).cuda()
 else:
     model = model.cuda()

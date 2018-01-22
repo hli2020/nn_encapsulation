@@ -4,9 +4,9 @@ start=`date +%s`
 
 #--experiment_name=base_101_v4_rerun \
 # train and test
-CUDA_VISIBLE_DEVICES=6 python holly_capsule.py \
+CUDA_VISIBLE_DEVICES=5 python holly_capsule.py \
 --experiment_name=base_201_v1_r_1_rerun \
---num_workers=32 \
+--num_workers=8 \
 --debug_mode=False \
 --dataset=tiny_imagenet \
 --setting=top1 \

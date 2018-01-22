@@ -5,13 +5,13 @@ start=`date +%s`
 #--experiment_name=base_101_v4_rerun \
 # train and test
 CUDA_VISIBLE_DEVICES=4 python holly_capsule.py \
---experiment_name=base_201_v1 \
+--experiment_name=base_201_v1_rerun \
 --debug_mode=False \
 --dataset=tiny_imagenet \
 --setting=top1 \
 --cap_model=v0 \
---num_workers=24 \
---route_num=2 \
+--num_workers=8 \
+--route_num=3 \
 --max_epoch=500 \
 --loss_form=margin \
 --optim=adam \

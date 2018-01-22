@@ -136,6 +136,7 @@ class CapLayer(nn.Module):
                  out_dim, in_dim, num_shared):
         super(CapLayer, self).__init__()
 
+        self.measure_time = opts.measure_time
         self.FIND_DIFF = False    # for finding different prediction during routing
         self.look_into_details = opts.look_into_details
         self.which_sample, self.which_j = 0, 0
@@ -146,6 +147,7 @@ class CapLayer(nn.Module):
         self.route_num = opts.route_num
         self.w_version = opts.w_version
         self.num_out_caps = num_out_caps
+        self.num_in_caps = num_in_caps
 
         self.use_KL = opts.use_KL
         self.KL_manner = opts.KL_manner
@@ -167,12 +169,12 @@ class CapLayer(nn.Module):
             # self.do_squash = opts.do_squash  # DEPRECATED
             self.fc_time = opts.fc_time
 
-        if opts.b_init == 'rand':
-            self.b = Variable(torch.rand(num_out_caps, num_in_caps), requires_grad=False)
-        elif opts.b_init == 'zero':
-            self.b = Variable(torch.zeros(num_out_caps, num_in_caps), requires_grad=False)
-        elif opts.b_init == 'learn':
-            self.b = Variable(torch.zeros(num_out_caps, num_in_caps), requires_grad=True)
+        # if opts.b_init == 'rand':
+        #     self.b = Variable(torch.rand(num_out_caps, num_in_caps), requires_grad=False)
+        # elif opts.b_init == 'zero':
+        #     self.b = Variable(torch.zeros(num_out_caps, num_in_caps), requires_grad=False)
+        # elif opts.b_init == 'learn':
+        #     self.b = Variable(torch.zeros(num_out_caps, num_in_caps), requires_grad=True)
 
         if self.add_cap_dropout:
             self.cap_droput = nn.Dropout2d(p=opts.dropout_p)
@@ -190,7 +192,9 @@ class CapLayer(nn.Module):
         mean, std = [], []   # for KL loss
         bs, in_channels, h, w = input.size()
         # expand b_ji along batch dim
-        b = self.b.expand(bs, self.b.size(0), self.b.size(1))
+        # b = self.b.expand(bs, self.b.size(0), self.b.size(1))
+        b = Variable(torch.zeros(bs, self.num_out_caps, self.num_in_caps),
+                     requires_grad=False)
 
         if self.FIND_DIFF:
             pred_list = []
@@ -200,52 +204,112 @@ class CapLayer(nn.Module):
         if self.w_version == 'v2':
 
             # 1. pred_i_j_d2
-            start = time.time()
-            raw_output = self.W(input)
+            if self.measure_time:
+                torch.cuda.synchronize()
+                start = time.perf_counter()
+
+            pred = self.W(input)
             # pred: bs, 5120, 6, 6
-            # -> bs, 32, 10, 16, 6, 6
-            # -> bs, 32, 6, 6, 10, 16
-            # pred: -> bs, 1152, 10, 16
-            spatial_size = raw_output.size(2)
-            raw_output_1 = raw_output.resize(bs,
-                                             self.num_shared, self.num_out_caps, self.out_dim,
-                                             spatial_size, spatial_size).permute(0, 1, 4, 5, 2, 3)
-            pred = raw_output_1.resize(bs,
-                                       self.num_shared*spatial_size*spatial_size,
-                                       self.num_out_caps, self.out_dim)
+            # -> bs, 10, 16, 32x6x6 (view)
+            spatial_size = pred.size(2)
+            # manner 1
+            pred = pred.view(bs, self.num_out_caps, self.out_dim,
+                             spatial_size*spatial_size*self.num_shared)
+            # # manner 2
+            # pred = pred.view(bs, self.num_out_caps, self.out_dim, self.num_shared,
+            #                  spatial_size, spatial_size)
+            # pred = pred.view(bs, self.num_out_caps, self.out_dim, -1)
+            _pred = pred.permute(0, 1, 3, 2)
+
             if self.add_cap_BN_relu:
-                pred = self.cap_BN(pred.permute(0, 3, 1, 2).contiguous())
-                pred = pred.permute(0, 2, 3, 1)
-                pred = self.cap_relu(pred)
+                NotImplementedError()
+                # pred = self.cap_BN(pred.permute(0, 3, 1, 2).contiguous())
+                # pred = pred.permute(0, 2, 3, 1)
+                # pred = self.cap_relu(pred)
 
             if self.add_cap_dropout:
                 NotImplementedError()
                 # v = self.cap_droput(v)
-            # print('cap W time: {:.4f}'.format(time.time() - start))
+            if self.measure_time:
+                torch.cuda.synchronize()
+                print('\tcap W time: {:.4f}'.format(time.perf_counter() - start))
 
             # 2. routing
-            start = time.time()
+            start = time.perf_counter()
             for i in range(self.route_num):
 
-                c = softmax_dim(b, axis=1)              # 128 x 10 x 1152, c_nji, \sum_j = 1
-                temp_ = [torch.matmul(c[:, zz, :].unsqueeze(dim=1), pred[:, :, zz, :].squeeze()).squeeze()
-                         for zz in range(self.num_out_caps)]
-                s = torch.stack(temp_, dim=1)
+                internal_start = time.perf_counter()
+                c = softmax_dim(b, axis=1)              # c: 128 x 10 x 1152, c_nji, \sum_j = 1
+                if self.measure_time:
+                    torch.cuda.synchronize()
+                    b_sftmax_t = time.perf_counter() - internal_start
+                    t1 = time.perf_counter()
+                # print(pred.size())
+                # print(c.size())
+
+                # print('pred id')
+                # print(pred.get_device())
+                # print('c id')
+                # print(c.get_device())
+
+                s = torch.matmul(pred, c.unsqueeze(3)).squeeze()   # TODO: (0.0238)
+                if self.measure_time:
+                    torch.cuda.synchronize()
+                    s_matmul_t = time.perf_counter() - t1
+                    t2 = time.perf_counter()
                 # Here 'squash' has an additional argument, 'squash_manner'
-                # final output: v, bs x 10 x 16
+                # final output: v: bs x 10 x 16
                 v = squash(s, self.squash_manner)
+                if self.measure_time:
+                    torch.cuda.synchronize()
+                    squash_t = time.perf_counter() - t2
+                    t3 = time.perf_counter()
 
                 # update b/c
-                temp_ = [torch.matmul(v[:, zz, :].unsqueeze(dim=1), pred[:, :, zz, :].permute(0, 2, 1)).squeeze()
-                         for zz in range(self.num_out_caps)]
-                delta_b = torch.stack(temp_, dim=1).detach()
-                if self.FIND_DIFF:
-                    v_all_classes = v.norm(dim=2)
-                    _, curr_pred = torch.max(v_all_classes, 1)
-                    pred_list.extend(curr_pred.data)
-                b = torch.add(b, delta_b)
+                if i < self.route_num - 1:
+                    if self.measure_time:
+                        torch.cuda.synchronize()
+                        permute_t = time.perf_counter() - t3
+                        t4 = time.perf_counter()
+
+                    delta_b = torch.matmul(_pred, v.unsqueeze(3)).squeeze()  # TODO: super-time-consuming (0.1557s)
+                    if self.measure_time:
+                        torch.cuda.synchronize()
+                        delta_matmul_t = time.perf_counter() - t4
+                        t5 = time.perf_counter()
+
+                    # if self.FIND_DIFF:
+                    #     v_all_classes = v.norm(dim=2)
+                    #     _, curr_pred = torch.max(v_all_classes, 1)
+                    #     pred_list.extend(curr_pred.data)
+
+                    b = torch.add(b, delta_b)
+                    if self.measure_time:
+                        torch.cuda.synchronize()
+                        add_t = time.perf_counter() - t5
+
+                    if self.measure_time:
+                        torch.cuda.synchronize()
+                        torch.cuda.synchronize()
+                        update_t = time.perf_counter() - t3
+                else:
+                    update_t, add_t, delta_matmul_t, permute_t = 0, 0, 0, 0
+
+                if self.measure_time:
+                    torch.cuda.synchronize()
+                    print('\t\tRoute r={:d} time: {:.4f}'.format(i, time.perf_counter() - internal_start))
+                    print('\t\t\tb_sftmax_t time: {:.4f}'.format(b_sftmax_t))
+                    print('\t\t\ts_matmul_t time: {:.4f}'.format(s_matmul_t))
+                    print('\t\t\tsquash_t time: {:.4f}'.format(squash_t))
+                    print('\t\t\tupdate_t time: {:.4f}'.format(update_t))
+                    print('\t\t\t\tpermute: {:.4f}'.format(permute_t))
+                    print('\t\t\t\tdelta_matmul: {:.4f}'.format(delta_matmul_t))
+                    print('\t\t\t\tadd: {:.4f}'.format(add_t))
+
             # routing ends
-            # print('cap Route (r={:d}) time: {:.4f}'.format(self.route_num, time.time() - start))
+            if self.measure_time:
+                torch.cuda.synchronize()
+                print('\tcap Route (r={:d}) time: {:.4f}'.format(self.route_num, time.perf_counter() - start))
 
             if vis is not None:
                 batch_cos_dist, batch_i_length, batch_cos_v, avg_len = \
