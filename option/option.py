@@ -35,7 +35,7 @@ class Options(object):
 
         # FOR cap_model=v0 only:
         self.parser.add_argument('--primary_cap_num', default=32, type=int)
-        self.parser.add_argument('--pre_ch_num', default=32, type=int)
+        self.parser.add_argument('--pre_ch_num', default=256, type=int)
 
         self.parser.add_argument('--add_cap_dropout', action='store_true')
         self.parser.add_argument('--dropout_p', default=0.2, type=float)
