@@ -1,0 +1,91 @@
+Experiment: base_201_v1_rerun_compare
+------------ Test Options -----------------
+KL_factor: 0.1
+KL_manner: 1
+add_cap_BN_relu: False
+add_cap_dropout: False
+b_init: zero
+base_save_folder: result
+batch_size_test: 100
+batch_size_train: 100
+beta1: 0.9
+bigger_input: False
+cap_N: 3
+cap_model: v0
+dataset: tiny_imagenet
+debug_mode: False
+depth: 14
+do_squash: False
+draw_hist: False
+dropout_p: 0.2
+experiment_name: base_201_v1_rerun_compare
+fc_time: 0
+file_name: result/base_201_v1_rerun_compare/opt_train_val_START_epoch_0_END_500.txt
+fix_m: False
+gamma: 0.1
+look_into_details: False
+loss_form: margin
+lr: 0.0001
+manual_seed: -1
+max_epoch: 500
+measure_time: False
+momentum: 0.9
+multi_crop_test: False
+no_visdom: False
+non_target_j: False
+num_workers: 8
+optim: adam
+phase: train_val
+port_id: 8000
+pre_ch_num: 256
+primary_cap_num: 32
+random_seed: 7502
+route_num: 3
+save_epoch: 25
+save_folder: result/base_201_v1_rerun_compare
+schedule: [200, 300, 400]
+scheduler: None
+setting: top1
+show_freq: 100
+show_test_after_epoch: 100
+squash_manner: paper
+use_KL: False
+use_cuda: True
+use_instanceBN: False
+use_multiple: False
+w_version: v2
+weight_decay: 0.0005
+------------------ End --------------------
+DataParallel (
+  (module): CapsNet (
+    (tranfer_conv): Conv2d(3, 256, kernel_size=(9, 9), stride=(2, 2), padding=(1, 1))
+    (tranfer_bn): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+    (tranfer_relu): ReLU (inplace)
+    (tranfer_conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(2, 2))
+    (tranfer_bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+    (tranfer_relu1): ReLU (inplace)
+    (max_pool): MaxPool2d (size=(5, 5), stride=(5, 5), dilation=(1, 1))
+    (cap_layer): CapLayer (
+      (W): Conv2d(256, 102400, kernel_size=(1, 1), stride=(1, 1), groups=32)
+    )
+  ), weights=((256, 3, 9, 9), (256,), (256,), (256,), (256, 256, 3, 3), (256,), (256,), (256,), (102400, 8, 1, 1), (102400,)), parameters=1575168
+)
+Total param num # 6.008789 Mb
+
+init learning rate 0.0001000000 at iter 0
+
+[base_201_v1_rerun_compare]	epoch/iter [0/500][0/2558] ||	Loss: 0.7671, Top1_err: 100.0000, Top5_err: 99.0000 ||	Data/batch time: 3.2213/8.0441
+[base_201_v1_rerun_compare]	epoch/iter [0/500][100/2558] ||	Loss: 0.6682, Top1_err: 98.8020, Top5_err: 94.4158 ||	Data/batch time: 0.0410/0.7056
+[base_201_v1_rerun_compare]	epoch/iter [0/500][200/2558] ||	Loss: 0.6539, Top1_err: 98.3682, Top5_err: 93.1393 ||	Data/batch time: 0.0255/0.6722
+[base_201_v1_rerun_compare]	epoch/iter [0/500][300/2558] ||	Loss: 0.6481, Top1_err: 98.1429, Top5_err: 92.4651 ||	Data/batch time: 0.0199/0.6609
+[base_201_v1_rerun_compare]	epoch/iter [0/500][400/2558] ||	Loss: 0.6447, Top1_err: 97.8703, Top5_err: 91.7681 ||	Data/batch time: 0.0176/0.6545
+[base_201_v1_rerun_compare]	epoch/iter [0/500][500/2558] ||	Loss: 0.6426, Top1_err: 97.6467, Top5_err: 91.1916 ||	Data/batch time: 0.0162/0.6511
+[base_201_v1_rerun_compare]	epoch/iter [0/500][600/2558] ||	Loss: 0.6410, Top1_err: 97.4509, Top5_err: 90.7088 ||	Data/batch time: 0.0151/0.6477
+[base_201_v1_rerun_compare]	epoch/iter [0/500][700/2558] ||	Loss: 0.6397, Top1_err: 97.3252, Top5_err: 90.2882 ||	Data/batch time: 0.0146/0.6458
+[base_201_v1_rerun_compare]	epoch/iter [0/500][800/2558] ||	Loss: 0.6387, Top1_err: 97.1698, Top5_err: 89.9139 ||	Data/batch time: 0.0140/0.6447
+[base_201_v1_rerun_compare]	epoch/iter [0/500][900/2558] ||	Loss: 0.6378, Top1_err: 97.0055, Top5_err: 89.5738 ||	Data/batch time: 0.0138/0.6438
+[base_201_v1_rerun_compare]	epoch/iter [0/500][1000/2558] ||	Loss: 0.6370, Top1_err: 96.8781, Top5_err: 89.2388 ||	Data/batch time: 0.0135/0.6428
+[base_201_v1_rerun_compare]	epoch/iter [0/500][1100/2558] ||	Loss: 0.6363, Top1_err: 96.7675, Top5_err: 88.9337 ||	Data/batch time: 0.0132/0.6422
+[base_201_v1_rerun_compare]	epoch/iter [0/500][1200/2558] ||	Loss: 0.6358, Top1_err: 96.6644, Top5_err: 88.6528 ||	Data/batch time: 0.0130/0.6415
+[base_201_v1_rerun_compare]	epoch/iter [0/500][1300/2558] ||	Loss: 0.6352, Top1_err: 96.5503, Top5_err: 88.3344 ||	Data/batch time: 0.0128/0.6411
+[base_201_v1_rerun_compare]	epoch/iter [0/500][1400/2558] ||	Loss: 0.6347, Top1_err: 96.4404, Top5_err: 88.0714 ||	Data/batch time: 0.0124/0.6406
