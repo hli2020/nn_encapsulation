@@ -368,3 +368,15 @@ Summary	epoch/iter [9/500] ||	TRAIN, Top1_err: 88.9029, Top5_err: 70.6509 ||	TES
 [base_201_v1_r_1_rerun]	epoch/iter [10/500][0/2558] ||	Loss: 0.6099, Top1_err: 90.0000, Top5_err: 73.0000 ||	Data/batch time: 2.6933/2.8668
 [base_201_v1_r_1_rerun]	epoch/iter [10/500][100/2558] ||	Loss: 0.6052, Top1_err: 89.4653, Top5_err: 70.4257 ||	Data/batch time: 0.0308/0.3311
 [base_201_v1_r_1_rerun]	epoch/iter [10/500][200/2558] ||	Loss: 0.6050, Top1_err: 89.0199, Top5_err: 70.2985 ||	Data/batch time: 0.0190/0.3179
+[base_201_v1_r_1_rerun]	epoch/iter [10/500][300/2558] ||	Loss: 0.6050, Top1_err: 88.8704, Top5_err: 70.3156 ||	Data/batch time: 0.0144/0.3128
+[base_201_v1_r_1_rerun]	epoch/iter [10/500][400/2558] ||	Loss: 0.6052, Top1_err: 88.8678, Top5_err: 70.4190 ||	Data/batch time: 0.0127/0.3113
+[base_201_v1_r_1_rerun]	epoch/iter [10/500][500/2558] ||	Loss: 0.6053, Top1_err: 88.8403, Top5_err: 70.4731 ||	Data/batch time: 0.0106/0.3104
+[base_201_v1_r_1_rerun]	epoch/iter [10/500][600/2558] ||	Loss: 0.6052, Top1_err: 88.8286, Top5_err: 70.4027 ||	Data/batch time: 0.0095/0.3093
+[base_201_v1_r_1_rerun]	epoch/iter [10/500][700/2558] ||	Loss: 0.6053, Top1_err: 88.8702, Top5_err: 70.4308 ||	Data/batch time: 0.0090/0.3091
+[base_201_v1_r_1_rerun]	epoch/iter [10/500][800/2558] ||	Loss: 0.6054, Top1_err: 88.9263, Top5_err: 70.4494 ||	Data/batch time: 0.0080/0.3089
+[base_201_v1_r_1_rerun]	epoch/iter [10/500][900/2558] ||	Loss: 0.6054, Top1_err: 88.8968, Top5_err: 70.4084 ||	Data/batch time: 0.0103/0.3103
+[base_201_v1_r_1_rerun]	epoch/iter [10/500][1000/2558] ||	Loss: 0.6053, Top1_err: 88.8571, Top5_err: 70.3996 ||	Data/batch time: 0.0099/0.3094
+[base_201_v1_r_1_rerun]	epoch/iter [10/500][1100/2558] ||	Loss: 0.6054, Top1_err: 88.8583, Top5_err: 70.4178 ||	Data/batch time: 0.0116/0.3101
+[base_201_v1_r_1_rerun]	epoch/iter [10/500][1200/2558] ||	Loss: 0.6053, Top1_err: 88.8268, Top5_err: 70.4022 ||	Data/batch time: 0.0186/0.3147
+[base_201_v1_r_1_rerun]	epoch/iter [10/500][1300/2558] ||	Loss: 0.6053, Top1_err: 88.8063, Top5_err: 70.3897 ||	Data/batch time: 0.0176/0.3142
+[base_201_v1_r_1_rerun]	epoch/iter [10/500][1400/2558] ||	Loss: 0.6053, Top1_err: 88.7844, Top5_err: 70.3476 ||	Data/batch time: 0.0188/0.3152

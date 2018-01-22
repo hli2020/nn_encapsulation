@@ -89,3 +89,10 @@ init learning rate 0.0001000000 at iter 0
 [base_201_v1_rerun_compare]	epoch/iter [0/500][1200/2558] ||	Loss: 0.6358, Top1_err: 96.6644, Top5_err: 88.6528 ||	Data/batch time: 0.0130/0.6415
 [base_201_v1_rerun_compare]	epoch/iter [0/500][1300/2558] ||	Loss: 0.6352, Top1_err: 96.5503, Top5_err: 88.3344 ||	Data/batch time: 0.0128/0.6411
 [base_201_v1_rerun_compare]	epoch/iter [0/500][1400/2558] ||	Loss: 0.6347, Top1_err: 96.4404, Top5_err: 88.0714 ||	Data/batch time: 0.0124/0.6406
+[base_201_v1_rerun_compare]	epoch/iter [0/500][1500/2558] ||	Loss: 0.6342, Top1_err: 96.3664, Top5_err: 87.8254 ||	Data/batch time: 0.0123/0.6405
+[base_201_v1_rerun_compare]	epoch/iter [0/500][1600/2558] ||	Loss: 0.6338, Top1_err: 96.2742, Top5_err: 87.6040 ||	Data/batch time: 0.0123/0.6403
+[base_201_v1_rerun_compare]	epoch/iter [0/500][1700/2558] ||	Loss: 0.6334, Top1_err: 96.1905, Top5_err: 87.3551 ||	Data/batch time: 0.0122/0.6400
+[base_201_v1_rerun_compare]	epoch/iter [0/500][1800/2558] ||	Loss: 0.6330, Top1_err: 96.1105, Top5_err: 87.1499 ||	Data/batch time: 0.0122/0.6400
+[base_201_v1_rerun_compare]	epoch/iter [0/500][1900/2558] ||	Loss: 0.6327, Top1_err: 96.0258, Top5_err: 86.9106 ||	Data/batch time: 0.0121/0.6399
+[base_201_v1_rerun_compare]	epoch/iter [0/500][2000/2558] ||	Loss: 0.6323, Top1_err: 95.9510, Top5_err: 86.7041 ||	Data/batch time: 0.0120/0.6400
+[base_201_v1_rerun_compare]	epoch/iter [0/500][2100/2558] ||	Loss: 0.6320, Top1_err: 95.8920, Top5_err: 86.5155 ||	Data/batch time: 0.0120/0.6400
