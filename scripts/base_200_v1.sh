@@ -9,6 +9,7 @@ CUDA_VISIBLE_DEVICES=0,1 python holly_capsule.py \
 --debug_mode=False \
 --dataset=tiny_imagenet \
 --setting=top1 \
+--num_workers=32 \
 --cap_model=v_base \
 --depth=14 \
 --max_epoch=500 \

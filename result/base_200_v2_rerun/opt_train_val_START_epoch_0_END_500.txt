@@ -1913,3 +1913,4 @@ Summary	epoch/iter [219/500] ||	TRAIN, Top1_err: 40.4900, Top5_err: 15.5573 ||	T
 [base_200_v2_rerun]	epoch/iter [220/500][100/500] ||	Loss: 1.5556, Top1_err: 40.2208, Top5_err: 15.3813 ||	Data/batch time: 0.4745/0.8910
 [base_200_v2_rerun]	epoch/iter [220/500][200/500] ||	Loss: 1.5501, Top1_err: 40.1226, Top5_err: 15.3520 ||	Data/batch time: 0.3121/0.7320
 [base_200_v2_rerun]	epoch/iter [220/500][300/500] ||	Loss: 1.5560, Top1_err: 40.1721, Top5_err: 15.4543 ||	Data/batch time: 0.2750/0.6891
+[base_200_v2_rerun]	epoch/iter [220/500][400/500] ||	Loss: 1.5598, Top1_err: 40.2841, Top5_err: 15.4842 ||	Data/batch time: 0.2557/0.6624

@@ -38,7 +38,11 @@ phase: train_val
 port_id: 8000
 pre_ch_num: 32
 primary_cap_num: 32
+<<<<<<< HEAD
+random_seed: 70
+=======
 random_seed: 3769
+>>>>>>> b5f76b35b86ccfedee60e68c9ad1f1ca3cfec706
 route_num: 3
 save_epoch: 25
 save_folder: result/base_200_v1_rerun
@@ -124,7 +128,11 @@ Total param num # 0.862152 Mb
 
 init learning rate 0.0001000000 at iter 0
 
+<<<<<<< HEAD
+[base_200_v1_rerun]	epoch/iter [0/500][0/500] ||	Loss: 5.5644, Top1_err: 99.8047, Top5_err: 98.2422 ||	Data/batch time: 139.1578/193.0423
+=======
 [base_200_v1_rerun]	epoch/iter [0/500][0/500] ||	Loss: 5.5179, Top1_err: 98.8281, Top5_err: 95.5078 ||	Data/batch time: 13.2524/32.6952
+<<<<<<< HEAD
 [base_200_v1_rerun]	epoch/iter [0/500][100/500] ||	Loss: 5.0337, Top1_err: 97.3352, Top5_err: 89.8496 ||	Data/batch time: 0.2249/0.5962
 [base_200_v1_rerun]	epoch/iter [0/500][200/500] ||	Loss: 4.8268, Top1_err: 95.5933, Top5_err: 85.0814 ||	Data/batch time: 0.2017/0.4752
 [base_200_v1_rerun]	epoch/iter [0/500][300/500] ||	Loss: 4.6769, Top1_err: 94.1153, Top5_err: 81.5050 ||	Data/batch time: 0.1969/0.4328
@@ -3333,3 +3341,7 @@ Summary	epoch/iter [394/500] ||	TRAIN, Top1_err: 44.8646, Top5_err: 17.6369 ||	T
 [base_200_v1_rerun]	epoch/iter [395/500][200/500] ||	Loss: 1.7182, Top1_err: 44.5934, Top5_err: 17.6491 ||	Data/batch time: 0.2244/0.3985
 [base_200_v1_rerun]	epoch/iter [395/500][300/500] ||	Loss: 1.7179, Top1_err: 44.6299, Top5_err: 17.5749 ||	Data/batch time: 0.1987/0.3721
 [base_200_v1_rerun]	epoch/iter [395/500][400/500] ||	Loss: 1.7198, Top1_err: 44.6861, Top5_err: 17.6405 ||	Data/batch time: 0.1874/0.3605
+=======
+>>>>>>> b5f76b35b86ccfedee60e68c9ad1f1ca3cfec706
+>>>>>>> f353b8635c8589cbe4435a98003edba313bf1578
+[base_200_v1_rerun]	epoch/iter [395/500][499/500] ||	Loss: 1.7219, Top1_err: 44.7203, Top5_err: 17.6553 ||	Data/batch time: 0.1664/0.3384

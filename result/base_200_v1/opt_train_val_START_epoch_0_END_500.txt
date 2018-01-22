@@ -6,10 +6,16 @@ add_cap_BN_relu: False
 add_cap_dropout: False
 b_init: zero
 base_save_folder: result
+<<<<<<< HEAD
+batch_size_test: 64
+batch_size_train: 64
+beta1: 0.9
+=======
 batch_size_test: 256
 batch_size_train: 512
 beta1: 0.9
 bigger_input: False
+>>>>>>> f236d0c55c070db2e8b4f136b395f2936cf4c6c5
 cap_N: 3
 cap_model: v_base
 dataset: tiny_imagenet
@@ -38,7 +44,11 @@ phase: train_val
 port_id: 8000
 pre_ch_num: 32
 primary_cap_num: 32
+<<<<<<< HEAD
+random_seed: 5579
+=======
 random_seed: 2904
+>>>>>>> f236d0c55c070db2e8b4f136b395f2936cf4c6c5
 route_num: 3
 save_epoch: 25
 save_folder: result/base_200_v1
@@ -116,7 +126,11 @@ DataParallel (
         (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
       )
     )
+<<<<<<< HEAD
+    (avgpool): AvgPool2d (size=16, stride=8, padding=0, ceil_mode=False, count_include_pad=True)
+=======
     (avgpool): AvgPool2d (size=8, stride=8, padding=0, ceil_mode=False, count_include_pad=True)
+>>>>>>> f236d0c55c070db2e8b4f136b395f2936cf4c6c5
     (fc): Linear (256 -> 200)
   ), weights=((16, 3, 3, 3), (16,), (16,), (16, 16, 3, 3), (16,), (16,), (16, 16, 3, 3), (16,), (16,), (16, 16, 3, 3), (16,), (16,), (16, 16, 3, 3), (16,), (16,), (32, 16, 3, 3), (32,), (32,), (32, 32, 3, 3), (32,), (32,), (32, 16, 1, 1), (32,), (32,), (32, 32, 3, 3), (32,), (32,), (32, 32, 3, 3), (32,), (32,), (64, 32, 3, 3), (64,), (64,), (64, 64, 3, 3), (64,), (64,), (64, 32, 1, 1), (64,), (64,), (64, 64, 3, 3), (64,), (64,), (64, 64, 3, 3), (64,), (64,), (200, 256), (200,)), parameters=226008
 )
@@ -124,6 +138,8 @@ Total param num # 0.862152 Mb
 
 init learning rate 0.0001000000 at iter 0
 
+<<<<<<< HEAD
+=======
 [base_200_v1]	epoch/iter [0/500][0/500] ||	Loss: 5.5138, Top1_err: 99.0234, Top5_err: 97.2656 ||	Data/batch time: 3.0248/8.5220
 [base_200_v1]	epoch/iter [0/500][100/500] ||	Loss: 5.0370, Top1_err: 97.2482, Top5_err: 89.8573 ||	Data/batch time: 1.1927/1.3238
 [base_200_v1]	epoch/iter [0/500][200/500] ||	Loss: 4.8147, Top1_err: 95.4816, Top5_err: 84.8502 ||	Data/batch time: 1.1998/1.3029
@@ -160,6 +176,9 @@ Summary	epoch/iter [3/500] ||	TRAIN, Top1_err: 73.4312, Top5_err: 45.7312 ||	TES
 [base_200_v1]	epoch/iter [4/500][0/500] ||	Loss: 3.1515, Top1_err: 72.0703, Top5_err: 44.1406 ||	Data/batch time: 3.4632/3.5369
 [base_200_v1]	epoch/iter [4/500][100/500] ||	Loss: 3.0740, Top1_err: 71.8383, Top5_err: 43.3168 ||	Data/batch time: 1.2694/1.3495
 [base_200_v1]	epoch/iter [4/500][200/500] ||	Loss: 3.0612, Top1_err: 71.5631, Top5_err: 43.1437 ||	Data/batch time: 1.2527/1.3302
+<<<<<<< HEAD
+>>>>>>> f236d0c55c070db2e8b4f136b395f2936cf4c6c5
+=======
 [base_200_v1]	epoch/iter [4/500][300/500] ||	Loss: 3.0510, Top1_err: 71.2702, Top5_err: 42.9954 ||	Data/batch time: 1.2515/1.3284
 [base_200_v1]	epoch/iter [4/500][400/500] ||	Loss: 3.0382, Top1_err: 70.9827, Top5_err: 42.7291 ||	Data/batch time: 1.2555/1.3329
 [base_200_v1]	epoch/iter [4/500][499/500] ||	Loss: 3.0314, Top1_err: 70.8233, Top5_err: 42.5809 ||	Data/batch time: 1.2550/1.3323
@@ -604,3 +623,4 @@ Summary	epoch/iter [58/500] ||	TRAIN, Top1_err: 56.0215, Top5_err: 26.6877 ||	TE
 [base_200_v1]	epoch/iter [59/500][200/500] ||	Loss: 2.2270, Top1_err: 55.9293, Top5_err: 26.5227 ||	Data/batch time: 1.9493/2.0365
 [base_200_v1]	epoch/iter [59/500][300/500] ||	Loss: 2.2328, Top1_err: 56.0826, Top5_err: 26.6267 ||	Data/batch time: 2.0212/2.1101
 [base_200_v1]	epoch/iter [59/500][400/500] ||	Loss: 2.2391, Top1_err: 56.1716, Top5_err: 26.7744 ||	Data/batch time: 2.0748/2.1640
+>>>>>>> b5f76b35b86ccfedee60e68c9ad1f1ca3cfec706
