@@ -743,3 +743,4 @@ Summary	epoch/iter [21/500] ||	TRAIN, Top1_err: 86.7725, Top5_err: 67.2594 ||	TE
 Summary	epoch/iter [22/500] ||	TRAIN, Top1_err: 86.5887, Top5_err: 67.1757 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
 
 [base_201_v2_rerun]	epoch/iter [23/500][0/2558] ||	Loss: 0.6138, Top1_err: 90.0000, Top5_err: 70.0000 ||	Data/batch time: 3.8897/4.2509
+[base_201_v2_rerun]	epoch/iter [23/500][100/2558] ||	Loss: 0.5965, Top1_err: 86.8911, Top5_err: 67.5446 ||	Data/batch time: 0.0438/0.9613

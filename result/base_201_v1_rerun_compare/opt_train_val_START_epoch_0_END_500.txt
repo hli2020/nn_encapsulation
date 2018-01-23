@@ -1081,3 +1081,5 @@ Summary	epoch/iter [33/500] ||	TRAIN, Top1_err: 86.2078, Top5_err: 66.3572 ||	TE
 [base_201_v1_rerun_compare]	epoch/iter [34/500][1600/2558] ||	Loss: 0.5945, Top1_err: 86.0818, Top5_err: 66.1824 ||	Data/batch time: 0.0053/0.6295
 [base_201_v1_rerun_compare]	epoch/iter [34/500][1700/2558] ||	Loss: 0.5946, Top1_err: 86.0911, Top5_err: 66.1793 ||	Data/batch time: 0.0057/0.6298
 [base_201_v1_rerun_compare]	epoch/iter [34/500][1800/2558] ||	Loss: 0.5946, Top1_err: 86.1044, Top5_err: 66.2332 ||	Data/batch time: 0.0056/0.6299
+[base_201_v1_rerun_compare]	epoch/iter [34/500][1900/2558] ||	Loss: 0.5947, Top1_err: 86.1015, Top5_err: 66.2425 ||	Data/batch time: 0.0055/0.6299
+[base_201_v1_rerun_compare]	epoch/iter [34/500][2000/2558] ||	Loss: 0.5948, Top1_err: 86.1234, Top5_err: 66.2654 ||	Data/batch time: 0.0054/0.6298
