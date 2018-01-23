@@ -19,7 +19,7 @@ CUDA_VISIBLE_DEVICES=4 python holly_capsule.py \
 --schedule 150 200 250 \
 --lr=0.001 \
 --batch_size_train=128 \
---batch_size_train=128 \
+--batch_size_test=128 \
 --s35
 
 
