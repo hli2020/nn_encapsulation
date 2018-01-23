@@ -381,3 +381,7 @@ Summary	epoch/iter [74/600] ||	TRAIN, Top1_err: 25.8240, Top5_err: 2.1380 ||	TES
 
 model saved at result/base_101_v4_less_aug_rerun_1/epoch_75.pth
 [base_101_v4_less_aug_rerun_1]	epoch/iter [75/600][0/98] ||	Loss: 0.2126, Top1_err: 27.1484, Top5_err: 1.5625 ||	Data/batch time: 0.2363/0.3578
+[base_101_v4_less_aug_rerun_1]	epoch/iter [75/600][97/98] ||	Loss: 0.2079, Top1_err: 25.9320, Top5_err: 2.0540 ||	Data/batch time: 0.0058/0.3079
+Summary	epoch/iter [75/600] ||	TRAIN, Top1_err: 25.9320, Top5_err: 2.0540 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+[base_101_v4_less_aug_rerun_1]	epoch/iter [76/600][0/98] ||	Loss: 0.2033, Top1_err: 25.9766, Top5_err: 2.5391 ||	Data/batch time: 0.2201/0.3396
