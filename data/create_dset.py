@@ -7,30 +7,28 @@ from data.imagenet import ImageNet
 def create_dataset(opts, phase=None):
     name = opts.dataset
 
+    small_dset_resize_size = 34 if opts.less_data_aug else 40
     if phase == 'train':
         # T.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        # T.Resize(40),
-        # T.RandomCrop(32),
-        # T.RandomHorizontalFlip(),
-        # T.ColorJitter(brightness=.2, contrast=.2, saturation=.2, hue=.2),
-        transform = T.Compose([
-            T.Resize(40),
-            T.RandomCrop(32),
-            T.RandomHorizontalFlip(),
-            T.ColorJitter(brightness=.2, contrast=.2, saturation=.2, hue=.2),
-            T.ToTensor(),
-        ])
+        trans_list = [T.Resize(small_dset_resize_size),
+                      T.RandomCrop(32),
+                      T.RandomHorizontalFlip()]
+        if not opts.less_data_aug:
+            trans_list.append(T.ColorJitter(brightness=.2, contrast=.2, saturation=.2, hue=.2))
+        trans_list.append(T.ToTensor())
+        transform = T.Compose(trans_list)
+
     elif phase == 'test':
         if opts.multi_crop_test:
             transform = T.Compose([
-                T.Resize(40),
+                T.Resize(small_dset_resize_size),
                 T.TenCrop(32),
                 T.Lambda(lambda crops:
                          torch.stack([T.ToTensor()(crop) for crop in crops]))  # returns a 4D tensor
             ])
         else:
             transform = T.Compose([
-                T.Resize(40),
+                T.Resize(small_dset_resize_size),
                 T.RandomCrop(32),
                 T.ToTensor(),
             ])

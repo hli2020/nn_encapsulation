@@ -9,15 +9,17 @@ class Options(object):
 
         self.parser = argparse.ArgumentParser(description='Capsule Network')
         self.parser.add_argument('--experiment_name', default='base')
+        self.parser.add_argument('--base_save_folder', default='result')
         self.parser.add_argument('--dataset', default='tiny_imagenet', help='[ cifar10 | tiny_imagenet ]')
-
+        # only valid for imagenet
         self.parser.add_argument('--setting', default='top1', type=str, help='[ top1 | top5 | obj_det ]')
         self.parser.add_argument('--bigger_input', action='store_true', help='only valid for imagenet')
+        self.parser.add_argument('--less_data_aug', action='store_true', help='see create_dset.py')
 
         self.parser.add_argument('--debug_mode', default=True, type=str2bool)
         self.parser.add_argument('--measure_time', action='store_true')
-        self.parser.add_argument('--base_save_folder', default='result')
 
+        self.parser.add_argument('--s35', action='store_true', help='run on server 2035')
         self.parser.add_argument('--manual_seed', default=-1, type=int)
         self.parser.add_argument('--num_workers', default=2, type=int, help='Number of workers used in dataloading')
         self.parser.add_argument('--no_visdom', action='store_true')
@@ -27,13 +29,14 @@ class Options(object):
         # network, v0 is the structure in the paper, v_base is resnet
         self.parser.add_argument('--cap_model', default='v0', type=str,
                                  help='v_base, v0, ...')
-        self.parser.add_argument('--depth', default=14, type=int)  # for now, only valid for v_base
+        # for now, only valid for v_base
+        self.parser.add_argument('--depth', default=14, type=int)
         self.parser.add_argument('--cap_N', default=3, type=int, help='multiple capLayers')
         self.parser.add_argument('--route_num', default=3, type=int)
 
         # FOR cap_model=v0 only:
         self.parser.add_argument('--primary_cap_num', default=32, type=int)
-        self.parser.add_argument('--pre_ch_num', default=32, type=int)
+        self.parser.add_argument('--pre_ch_num', default=256, type=int)
 
         self.parser.add_argument('--add_cap_dropout', action='store_true')
         self.parser.add_argument('--dropout_p', default=0.2, type=float)
@@ -44,13 +47,13 @@ class Options(object):
         self.parser.add_argument('--squash_manner', default='paper', type=str, help='[sigmoid|paper]')
         # v2 is the caps module; v3 is to replace the single cap layer to FC or other alternative
         self.parser.add_argument('--w_version', default='v2', type=str, help='[v2, v3]')
-        # DEPRECATED. squash is much better
-        self.parser.add_argument('--do_squash', action='store_true', help='for w_v3 alone')
         self.parser.add_argument('--fc_time', type=int, default=0, help='for w_v3 alone')
+        # DEPRECATED. (old note):squash is much better
+        self.parser.add_argument('--do_squash', action='store_true')
 
         # train
         self.parser.add_argument('--lr', default=0.0001, type=float, help='initial learning rate')
-        self.parser.add_argument('--scheduler', default=None, help='plateau, multi_step')
+        self.parser.add_argument('--scheduler', default=None, help='plateau, multi_step')   # todo (low)
         self.parser.add_argument('--optim', default='rmsprop', type=str)
         self.parser.add_argument('--momentum', default=0.9, type=float, help='momentum')
         self.parser.add_argument('--weight_decay', default=5e-4, type=float)
@@ -59,12 +62,11 @@ class Options(object):
 
         self.parser.add_argument('--batch_size_train', default=100, type=int)
         self.parser.add_argument('--batch_size_test', default=100, type=int)
-        # self.parser.add_argument('--resume', default=None, type=str, help='Resume from checkpoint')
         self.parser.add_argument('--max_epoch', default=300, type=int, help='Number of training epoches')
         self.parser.add_argument('--schedule', default=[150, 225], nargs='+', type=int)
 
         # loss
-        self.parser.add_argument('--loss_form', default='CE', type=str)
+        self.parser.add_argument('--loss_form', default='CE', type=str, help='[ CE | spread | margin ]')
         self.parser.add_argument('--use_KL', action='store_true')
         self.parser.add_argument('--KL_manner', default=1, type=int)
         self.parser.add_argument('--KL_factor', default=.1, type=float)
@@ -92,6 +94,9 @@ class Options(object):
         self.opt.random_seed = seed
         random.seed(seed)
         torch.manual_seed(seed)
+
+        if self.opt.s35:
+            self.opt.port_id = 9000
 
         if torch.cuda.is_available():
             self.opt.use_cuda = True

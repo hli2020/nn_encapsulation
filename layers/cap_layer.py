@@ -136,9 +136,10 @@ class CapLayer(nn.Module):
                  out_dim, in_dim, num_shared):
         super(CapLayer, self).__init__()
 
+        # for finding different prediction during routing
+        self.FIND_DIFF = False
+        self.look_into_details = opts.look_into_details  # TODO here
         self.measure_time = opts.measure_time
-        self.FIND_DIFF = False    # for finding different prediction during routing
-        self.look_into_details = opts.look_into_details
         self.which_sample, self.which_j = 0, 0
         self.non_target_j = opts.non_target_j
 
@@ -191,8 +192,6 @@ class CapLayer(nn.Module):
         avg_len = []
         mean, std = [], []   # for KL loss
         bs, in_channels, h, w = input.size()
-        # expand b_ji along batch dim
-        # b = self.b.expand(bs, self.b.size(0), self.b.size(1))
         b = Variable(torch.zeros(bs, self.num_out_caps, self.num_in_caps),
                      requires_grad=False)
 
@@ -239,7 +238,7 @@ class CapLayer(nn.Module):
             for i in range(self.route_num):
 
                 internal_start = time.perf_counter()
-                c = softmax_dim(b, axis=1)              # c: 128 x 10 x 1152, c_nji, \sum_j = 1
+                c = softmax_dim(b, axis=1)              # c: 128(bs) x 10(j) x 1152(i), \sum_j = 1
                 if self.measure_time:
                     torch.cuda.synchronize()
                     b_sftmax_t = time.perf_counter() - internal_start

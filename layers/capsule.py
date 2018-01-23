@@ -120,7 +120,7 @@ class CapsNet(nn.Module):
             ])
 
         # init the network
-        # TODO: merge with basic toolkit
+        # TODO (low): merge with basic toolkit
         for m in self.modules():
             if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
                 n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
@@ -141,8 +141,6 @@ class CapsNet(nn.Module):
             torch.cuda.synchronize()
             start = time.perf_counter()
 
-        # TODO: merge the resnet part out of the capsule part
-        # THE FOLLOWING ARE PARALLEL TO EACH OTHER
         if self.cap_model == 'v_base':
             x = self.conv1(x)
             x = self.bn1(x)

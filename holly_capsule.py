@@ -33,11 +33,10 @@ visual = Visualizer(args)
 
 # model
 model = CapsNet(num_classes=train_loader.dataset.num_classes, opts=args)
-if args.dataset == 'tiny_imagenet':
-    # model = model.cuda()
-    model = model.cuda() if args.debug_mode else torch.nn.DataParallel(model).cuda()
-else:
+if args.debug_mode:
     model = model.cuda()
+else:
+    model = torch.nn.DataParallel(model).cuda()
 
 model_summary, param_num = torch_summarize(model)
 print_log(model_summary, args.file_name)
@@ -75,7 +74,6 @@ best_acc, best_epoch = 100, 0
 epoch_size = len(train_loader)
 
 for epoch in range(args.max_epoch):
-# for epoch in range(1):
 
     t = time.time()
     old_lr = optimizer.param_groups[0]['lr']
