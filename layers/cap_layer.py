@@ -138,8 +138,8 @@ class CapLayer(nn.Module):
 
         # for finding different prediction during routing
         self.FIND_DIFF = False
+        self.look_into_details = opts.look_into_details  # TODO here
         self.measure_time = opts.measure_time
-        self.look_into_details = opts.look_into_details
         self.which_sample, self.which_j = 0, 0
         self.non_target_j = opts.non_target_j
 
