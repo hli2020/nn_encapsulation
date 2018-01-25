@@ -15,7 +15,7 @@ CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
 --loss_form=margin \
 --optim=adam \
 --schedule 200 300 400 \
---lr=0.01 \
+--lr=0.0001 \
 --batch_size_train=128 \
 --batch_size_test=128 \
 --s35
