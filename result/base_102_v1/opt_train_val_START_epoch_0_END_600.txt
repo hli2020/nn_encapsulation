@@ -1,0 +1,110 @@
+Experiment: base_102_v1
+------------ Train and Test Options -----------------
+KL_factor: 0.1
+KL_manner: 1
+add_cap_BN_relu: False
+add_cap_dropout: False
+b_init: zero
+base_save_folder: result
+batch_size_test: 128
+batch_size_train: 128
+beta1: 0.9
+bigger_input: False
+cap_N: 3
+cap_model: v1
+dataset: cifar10
+debug_mode: False
+depth: 14
+device_id: 0,1
+do_squash: False
+draw_hist: False
+dropout_p: 0.2
+experiment_name: base_102_v1
+fc_time: 0
+file_name: result/base_102_v1/opt_train_val_START_epoch_0_END_600.txt
+fix_m: False
+gamma: 0.1
+less_data_aug: True
+look_into_details: False
+loss_form: margin
+lr: 0.0001
+manual_seed: -1
+max_epoch: 600
+measure_time: False
+momentum: 0.9
+multi_crop_test: False
+no_visdom: False
+non_target_j: False
+num_workers: 2
+optim: adam
+phase: train_val
+port_id: 9000
+pre_ch_num: 256
+primary_cap_num: 32
+random_seed: 6845
+route_num: 3
+s35: True
+save_epoch: 25
+save_folder: result/base_102_v1
+schedule: [200, 300, 400]
+scheduler: None
+setting: top1
+show_freq: 100
+show_test_after_epoch: 100
+squash_manner: paper
+use_KL: False
+use_cuda: True
+use_instanceBN: False
+use_multiple: False
+w_version: v2
+weight_decay: 0.0005
+------------------ End --------------------
+DataParallel (
+  (module): CapsNet (
+    (layer1): Sequential (
+      (0): Conv2d(3, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU (inplace)
+    )
+    (cap1_conv): Sequential (
+      (0): Conv2d(32, 64, kernel_size=(1, 1), stride=(1, 1), groups=32)
+      (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU (inplace)
+    )
+    (cap1_conv_sub): Sequential (
+      (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1), groups=32)
+      (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU (inplace)
+    )
+    (cap2_conv): Sequential (
+      (0): Conv2d(64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=32)
+      (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU (inplace)
+    )
+    (cap2_conv_sub): Sequential (
+      (0): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1), groups=32)
+      (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU (inplace)
+    )
+    (cap3_conv): Sequential (
+      (0): Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=32)
+      (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU (inplace)
+    )
+    (cap3_conv_sub): Sequential (
+      (0): Conv2d(256, 256, kernel_size=(1, 1), stride=(1, 1), groups=32)
+      (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU (inplace)
+    )
+    (cap_layer): CapLayer (
+      (W): Conv2d(256, 5120, kernel_size=(1, 1), stride=(1, 1), groups=32)
+    )
+  ), weights=((32, 3, 3, 3), (32,), (32,), (32,), (64, 1, 1, 1), (64,), (64,), (64,), (64, 2, 1, 1), (64,), (64,), (64,), (128, 2, 3, 3), (128,), (128,), (128,), (128, 4, 1, 1), (128,), (128,), (128,), (256, 4, 3, 3), (256,), (256,), (256,), (256, 8, 1, 1), (256,), (256,), (256,), (5120, 8, 1, 1), (5120,)), parameters=64000
+)
+Total param num # 0.244141 Mb
+
+init learning rate 0.0001000000 at iter 0
+
+[base_102_v1]	epoch/iter [0/600][0/391] ||	Loss: 3.4077, Top1_err: 93.7500, Top5_err: 44.5312 ||	Data/batch time: 0.0605/2.4855
+[base_102_v1]	epoch/iter [0/600][100/391] ||	Loss: 1.4157, Top1_err: 86.7033, Top5_err: 41.4991 ||	Data/batch time: 0.0015/0.2118
+[base_102_v1]	epoch/iter [0/600][200/391] ||	Loss: 0.9508, Top1_err: 81.6387, Top5_err: 33.7764 ||	Data/batch time: 0.0009/0.2064

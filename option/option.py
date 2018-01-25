@@ -10,7 +10,7 @@ class Options(object):
         self.parser = argparse.ArgumentParser(description='Capsule Network')
         self.parser.add_argument('--experiment_name', default='base')
         self.parser.add_argument('--base_save_folder', default='result')
-        self.parser.add_argument('--dataset', default='tiny_imagenet', help='[ cifar10 | tiny_imagenet ]')
+        self.parser.add_argument('--dataset', default='cifar10', help='[ cifar10 | tiny_imagenet ]')
         # only valid for imagenet
         self.parser.add_argument('--setting', default='top1', type=str, help='[ top1 | top5 | obj_det ]')
         self.parser.add_argument('--bigger_input', action='store_true', help='only valid for imagenet')
@@ -24,13 +24,15 @@ class Options(object):
         self.parser.add_argument('--num_workers', default=2, type=int, help='Number of workers used in dataloading')
         self.parser.add_argument('--no_visdom', action='store_true')
         self.parser.add_argument('--port_id', default=8000, type=int)
+        self.parser.add_argument('--device_id', default='0', type=str)
 
         # model params
         # network, v0 is the structure in the paper, v_base is resnet
-        self.parser.add_argument('--cap_model', default='v0', type=str,
-                                 help='v_base, v0, ...')
+        self.parser.add_argument('--cap_model', default='v1', type=str,
+                                 help='v_base, v0, v1, ...')
         # for now, only valid for v_base
         self.parser.add_argument('--depth', default=14, type=int)
+        # for now, only valid for v1
         self.parser.add_argument('--cap_N', default=3, type=int, help='multiple capLayers')
         self.parser.add_argument('--route_num', default=3, type=int)
 
@@ -101,6 +103,7 @@ class Options(object):
         if torch.cuda.is_available():
             self.opt.use_cuda = True
             torch.set_default_tensor_type('torch.cuda.FloatTensor')
+            # self.opt.device_id = torch.cuda.current_device()
         else:
             self.opt.use_cuda = False
             torch.set_default_tensor_type('torch.FloatTensor')

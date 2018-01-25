@@ -22,13 +22,15 @@ def softmax_dim(input, axis=1):
 
 
 def squash(vec, manner='paper'):
+    EPS = 1e-20
+    # vec: bs, num_cap, dim_cap
     assert len(vec.size()) == 3
     # vec: 128 x 10 x 16
     norm = vec.norm(dim=2)
     if manner == 'paper':
         norm_squared = norm ** 2
         coeff = norm_squared / (1 + norm_squared)
-        coeff2 = torch.unsqueeze((coeff/norm), dim=2)
+        coeff2 = torch.unsqueeze((coeff/(norm+EPS)), dim=2)
     elif manner == 'sigmoid':
         try:
             mean = (norm.max() - norm.min()) / 2.0
@@ -138,7 +140,8 @@ class CapLayer(nn.Module):
 
         # for finding different prediction during routing
         self.FIND_DIFF = False
-        self.look_into_details = opts.look_into_details  # TODO here
+        self.CHECK_DETAILS = opts.look_into_details  # TODO here
+        self.look_into_details = opts.look_into_details
         self.measure_time = opts.measure_time
         self.which_sample, self.which_j = 0, 0
         self.non_target_j = opts.non_target_j
@@ -185,7 +188,7 @@ class CapLayer(nn.Module):
             self.cap_relu = nn.ReLU(True)
 
     def forward(self, input, target, curr_iter, vis):
-
+        "target, curr_iter, vis are verbose"
         batch_cos_dist = []
         batch_i_length = []
         batch_cos_v = []
@@ -202,7 +205,7 @@ class CapLayer(nn.Module):
 
         if self.w_version == 'v2':
 
-            # 1. pred_i_j_d2
+            # 1. pred
             if self.measure_time:
                 torch.cuda.synchronize()
                 start = time.perf_counter()
@@ -225,10 +228,10 @@ class CapLayer(nn.Module):
                 # pred = self.cap_BN(pred.permute(0, 3, 1, 2).contiguous())
                 # pred = pred.permute(0, 2, 3, 1)
                 # pred = self.cap_relu(pred)
-
             if self.add_cap_dropout:
                 NotImplementedError()
                 # v = self.cap_droput(v)
+
             if self.measure_time:
                 torch.cuda.synchronize()
                 print('\tcap W time: {:.4f}'.format(time.perf_counter() - start))
@@ -434,6 +437,7 @@ class CapLayer2(nn.Module):
         else:
             assert spatial_size_1 % shared_size == 0
             self.num_conv_groups = int((spatial_size_1/shared_size) ** 2)
+
         if shared_group > 1:
             self.learnable_b = Variable(
                 torch.normal(means=torch.zeros(shared_group), std=torch.ones(shared_group)),
@@ -444,6 +448,7 @@ class CapLayer2(nn.Module):
         self.W = nn.Conv2d(IN, OUT, groups=self.num_conv_groups, kernel_size=1, stride=1)
 
     def forward(self, x):
+        # TODO: unoptimized
         mean, std = [], []   # for KL loss
         bs = x.size(0)
         # generate random b on-the-fly

@@ -47,6 +47,7 @@ class CapsNet(nn.Module):
             self.layer3 = self._make_layer(block, 64, n, stride=2)
             self.avgpool = nn.AvgPool2d(pool_kernel, stride=pool_stride)
             self.fc = nn.Linear(fc_num, num_classes)
+
         elif self.cap_model == 'v0':
             # update Jan 17: original capsule idea in the paper
             # first conv
@@ -72,49 +73,47 @@ class CapsNet(nn.Module):
             # capsLayer
             self.cap_layer = CapLayer(opts, num_in_caps=opts.primary_cap_num*6*6, num_out_caps=num_classes,
                                       out_dim=16, num_shared=opts.primary_cap_num, in_dim=8)
-        elif self.cap_model == 'v1':
-
-            self.layer1 = nn.Sequential(*[
-                nn.Conv2d(3, 32, kernel_size=3, padding=1),
-                nn.BatchNorm2d(32),
-                nn.ReLU(True)
-            ])  # 32 output
-            self.cap1_conv = nn.Sequential(*[
-                nn.Conv2d(32*1, 32*2, kernel_size=1, stride=1, groups=32),
-                nn.BatchNorm2d(32*2),
+        else:
+            # different structures below
+            ############ v1 ############
+            self.buffer = nn.Sequential(*[
+                nn.Conv2d(64, 64, kernel_size=3, padding=1),
                 nn.ReLU(True)
             ])
-            self.cap1_conv_sub = nn.Sequential(*[
-                nn.Conv2d(32*2, 32*2, kernel_size=1, stride=1, groups=32),
-                nn.BatchNorm2d(32*2),
-                nn.ReLU(True)
-            ])  # 32 output
+            # then do squash in the forward pass
+            # the new convolution capsule idea
+            self.basic_cap = CapLayer2(opts, 64, 64, 8, 8, route_num=opts.route_num)
+            self.cls_cap = CapLayer2(opts, 64, 64, 8, 10, as_final_output=True, route_num=opts.route_num)
 
-            self.cap2_conv = nn.Sequential(*[
-                nn.Conv2d(32*2, 32*4, kernel_size=3, stride=2, padding=1, groups=32),
-                nn.BatchNorm2d(32*4),
+            ############ v2,v3,v4,v5 ############
+            # increase the spatial size x2 and channel number x1/2 (TOO SLOW)
+            cap_dim = 128
+            # self.buffer2 = nn.Sequential(*[
+            #     nn.ConvTranspose2d(64, cap_dim, stride=2, kernel_size=1, output_padding=1),
+            #     nn.ReLU(True)
+            # ])
+            self.buffer2 = nn.Sequential(*[
+                nn.Conv2d(64, cap_dim, kernel_size=3, padding=1),
                 nn.ReLU(True)
             ])
-            self.cap2_conv_sub = nn.Sequential(*[
-                nn.Conv2d(32*4, 32*4, kernel_size=1, stride=1, groups=32),
-                nn.BatchNorm2d(32*4),
-                nn.ReLU(True)
-            ])  # 16 output
+            self.cap_smaller_in_share = CapLayer2(
+                opts, cap_dim, cap_dim, 8, 8, shared_size=4,
+                route_num=opts.route_num)
 
-            self.cap3_conv = nn.Sequential(*[
-                nn.Conv2d(32*4, 32*8, kernel_size=3, stride=2, padding=1, groups=32),
-                nn.BatchNorm2d(32*8),
+            self.cap_smaller_in_out_share = CapLayer2(
+                opts, cap_dim, cap_dim, 8, 8, shared_size=4,
+                shared_group=2, route_num=opts.route_num)
+
+            self.cls_smaller_in_share = CapLayer2(
+                opts, cap_dim, cap_dim, 8, 10, shared_size=2,
+                as_final_output=True, route_num=opts.route_num)
+
+            # misc utilites and toys
+            self.dropout = nn.Dropout2d(p=0.1)
+            self.bummer = nn.Sequential(*[
+                nn.BatchNorm2d(128),
                 nn.ReLU(True)
             ])
-            self.cap3_conv_sub = nn.Sequential(*[
-                nn.Conv2d(32*8, 32*8, kernel_size=1, stride=1, groups=32),
-                nn.BatchNorm2d(32*8),
-                nn.ReLU(True)
-            ])  # 8 output
-
-            self.cap_layer = CapLayer(
-                opts, num_in_caps=opts.primary_cap_num*8*8, num_out_caps=num_classes,
-                out_dim=16, in_dim=8, num_shared=opts.primary_cap_num)
 
         # init the network
         for m in self.modules():
@@ -157,26 +156,138 @@ class CapsNet(nn.Module):
                 print('last cap total time: {:.4f}'.format(time.perf_counter() - start))
 
         elif self.cap_model == 'v1':
-            x = self.layer1(x)
-
-            x = self.cap1_conv(x)
-            x = self._do_squash2(x, num_shared=32)
+            x = self.buffer(x)
+            x = self._do_squash(x)
             for i in range(self.cap_N):
-                x = self.cap1_conv_sub(x)
-                x = self._do_squash2(x, num_shared=32)
+                x, _ = self.basic_cap(x)
+            x, stats = self.cls_cap(x)
 
-            x = self.cap2_conv(x)
-            x = self._do_squash2(x, num_shared=32)
+        elif self.cap_model == 'v2':
+            x = self.buffer2(x)
+            x = self._do_squash(x)
             for i in range(self.cap_N):
-                x = self.cap2_conv_sub(x)
-                x = self._do_squash2(x, num_shared=32)
+                x, curr_stats = self.cap_smaller_in_share(x)
+                multi_cap_stats.append(curr_stats)
+            x, stats = self.cls_smaller_in_share(x)
+            multi_cap_stats.append(stats)
 
-            x = self.cap3_conv(x)
-            x = self._do_squash2(x, num_shared=32)
+        elif self.cap_model == 'v3':
+            x = self.buffer2(x)
+            x = self._do_squash(x)
             for i in range(self.cap_N):
-                x = self.cap3_conv_sub(x)
-                x = self._do_squash2(x, num_shared=32)
-            x, stats = self.cap_layer(x, target, curr_iter, vis)
+                x, curr_stats = self.cap_smaller_in_out_share(x)
+                multi_cap_stats.append(curr_stats)
+            x, stats = self.cls_smaller_in_share(x)
+            multi_cap_stats.append(stats)
+
+        elif self.cap_model == 'v4_1':
+            x = self.buffer2(x)
+            x = self._do_squash(x)
+            for i in range(self.cap_N):
+                residual = x
+                x, curr_stats = self.cap_smaller_in_share(x)
+                multi_cap_stats.append(curr_stats)
+                x += residual
+            x, stats = self.cls_smaller_in_share(x)
+            multi_cap_stats.append(stats)
+
+        elif self.cap_model == 'v4_2':
+            x = self.buffer2(x)
+            x = self._do_squash(x)
+            for i in range(self.cap_N):
+                residual = x
+                x = self.cap_smaller_in_share(x)
+                x += residual
+                x = self._do_squash(x)
+            x = self.cls_smaller_in_share(x)
+
+        elif self.cap_model == 'v4_3':
+            x = self.buffer2(x)
+            x = self._do_squash(x)
+            for i in range(self.cap_N):
+                residual = x
+                x = self.cap_smaller_in_share(x)
+                x = self.dropout(x)
+                x += residual
+            x = self.cls_smaller_in_share(x)
+
+        elif self.cap_model == 'v4_4':
+            x = self.buffer2(x)
+            x = self._do_squash(x)
+            for i in range(self.cap_N):
+                residual = x
+                x = self.cap_smaller_in_share(x)
+                x = self.dropout(x)
+                x += residual
+                x = self._do_squash(x)
+            x = self.cls_smaller_in_share(x)
+
+        elif self.cap_model == 'v4_5':
+            x = self.buffer2(x)
+            x = self._do_squash(x)
+            for i in range(self.cap_N):
+                residual = x
+                residual = self.dropout(residual)
+                x = self.cap_smaller_in_share(x)
+                x += residual
+            x = self.cls_smaller_in_share(x)
+
+        elif self.cap_model == 'v4_6':
+            x = self.buffer2(x)
+            x = self._do_squash(x)
+            for i in range(self.cap_N):
+                residual = x
+                residual = self.dropout(residual)
+                x = self.cap_smaller_in_share(x)
+                x += residual
+                x = self._do_squash(x)
+            x = self.cls_smaller_in_share(x)
+
+        elif self.cap_model == 'v4_7':
+            x = self.buffer2(x)
+            x = self._do_squash(x)
+            for i in range(self.cap_N):
+                residual = x
+                residual = self.dropout(residual)
+                x = self.cap_smaller_in_share(x)
+                x = self.dropout(x)
+                x += residual
+            x = self.cls_smaller_in_share(x)
+
+        elif self.cap_model == 'v4_8':
+            x = self.buffer2(x)
+            x = self._do_squash(x)
+            for i in range(self.cap_N):
+                residual = x
+                residual = self.dropout(residual)
+                x = self.cap_smaller_in_share(x)
+                x = self.dropout(x)
+                x += residual
+                x = self._do_squash(x)
+            x = self.cls_smaller_in_share(x)
+        elif self.cap_model == 'v5_1':
+            x = self.buffer2(x)
+            x = self._do_squash(x)
+            for i in range(self.cap_N):
+                residual, x1, x2 = x, x, x
+                x1, curr_stats = self.cap_smaller_in_share(x1)
+                multi_cap_stats.append(curr_stats)
+                x2, curr_stats = self.cap_smaller_in_out_share(x2)
+                multi_cap_stats.append(curr_stats)
+                x = residual + x1 + x2
+            x, stats = self.cls_smaller_in_share(x)
+            multi_cap_stats.append(stats)
+
+        elif self.cap_model == 'v5_2':
+            x = self.buffer2(x)
+            x = self._do_squash(x)
+            for i in range(self.cap_N):
+                residual, x1, x2 = x, x, x
+                x1, _ = self.cap_smaller_in_share(x1)
+                x2, _ = self.cap_smaller_in_out_share(x2)
+                x = residual + x1 + x2
+                x = self._do_squash(x)
+            x, stats = self.cls_smaller_in_share(x)
         else:
             raise NameError('Unknown structure or capsule model type.')
 
@@ -198,16 +309,6 @@ class CapsNet(nn.Module):
         x = x.resize(x.size(0), x.size(1), int(spatial_size**2)).permute(0, 2, 1)
         x = squash(x)
         x = x.permute(0, 2, 1).resize(x.size(0), input_channel, spatial_size, spatial_size)
-        return x
-
-    def _do_squash2(self, x, num_shared):
-        # do squash per capsule
-        # x: bs, num_shared*cap_dim, spatial, spatial
-        spatial_size = x.size(2)
-        batch_size = x.size(0)
-        x = x.view(batch_size, num_shared*spatial_size**2, -1).contiguous()
-        x = squash(x)
-        x = x.view(batch_size, -1, spatial_size, spatial_size).contiguous()
         return x
 
     def _make_layer(self, block, planes, blocks, stride=1):
