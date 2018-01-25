@@ -2150,3 +2150,17 @@ Summary	epoch/iter [286/600] ||	TRAIN, Top1_err: 23.9240, Top5_err: 1.3820 ||	TE
 [base_102_v1_1]	epoch/iter [287/600][0/391] ||	Loss: 0.1722, Top1_err: 21.0938, Top5_err: 2.3438 ||	Data/batch time: 0.1644/0.2627
 [base_102_v1_1]	epoch/iter [287/600][100/391] ||	Loss: 0.1976, Top1_err: 24.0099, Top5_err: 1.3382 ||	Data/batch time: 0.0022/0.1388
 [base_102_v1_1]	epoch/iter [287/600][200/391] ||	Loss: 0.1981, Top1_err: 24.0050, Top5_err: 1.3643 ||	Data/batch time: 0.0015/0.1382
+[base_102_v1_1]	epoch/iter [287/600][300/391] ||	Loss: 0.1986, Top1_err: 24.0578, Top5_err: 1.3626 ||	Data/batch time: 0.0012/0.1382
+[base_102_v1_1]	epoch/iter [287/600][390/391] ||	Loss: 0.1991, Top1_err: 24.0720, Top5_err: 1.3860 ||	Data/batch time: 0.0011/0.1381
+Summary	epoch/iter [287/600] ||	TRAIN, Top1_err: 24.0720, Top5_err: 1.3860 ||	TEST, Top1_err: 86.4400, Top5_err: 33.8300 ||
+
+[base_102_v1_1]	epoch/iter [288/600][0/391] ||	Loss: 0.2418, Top1_err: 32.0312, Top5_err: 4.6875 ||	Data/batch time: 0.1532/0.2503
+[base_102_v1_1]	epoch/iter [288/600][100/391] ||	Loss: 0.1981, Top1_err: 23.9248, Top5_err: 1.3227 ||	Data/batch time: 0.0022/0.1381
+[base_102_v1_1]	epoch/iter [288/600][200/391] ||	Loss: 0.1978, Top1_err: 23.9350, Top5_err: 1.3215 ||	Data/batch time: 0.0014/0.1369
+[base_102_v1_1]	epoch/iter [288/600][300/391] ||	Loss: 0.1977, Top1_err: 23.9670, Top5_err: 1.3341 ||	Data/batch time: 0.0012/0.1370
+[base_102_v1_1]	epoch/iter [288/600][390/391] ||	Loss: 0.1981, Top1_err: 24.0980, Top5_err: 1.3180 ||	Data/batch time: 0.0011/0.1372
+Summary	epoch/iter [288/600] ||	TRAIN, Top1_err: 24.0980, Top5_err: 1.3180 ||	TEST, Top1_err: 87.6900, Top5_err: 34.2300 ||
+
+[base_102_v1_1]	epoch/iter [289/600][0/391] ||	Loss: 0.1923, Top1_err: 18.7500, Top5_err: 3.1250 ||	Data/batch time: 0.1491/0.2460
+[base_102_v1_1]	epoch/iter [289/600][100/391] ||	Loss: 0.1961, Top1_err: 23.1977, Top5_err: 1.5316 ||	Data/batch time: 0.0023/0.1391
+[base_102_v1_1]	epoch/iter [289/600][200/391] ||	Loss: 0.1968, Top1_err: 23.6007, Top5_err: 1.3448 ||	Data/batch time: 0.0015/0.1383
