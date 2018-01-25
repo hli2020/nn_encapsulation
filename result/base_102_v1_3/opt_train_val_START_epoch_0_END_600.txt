@@ -1,0 +1,141 @@
+Experiment: base_102_v1_3
+------------ Train and Test Options -----------------
+KL_factor: 0.1
+KL_manner: 1
+add_cap_BN_relu: False
+add_cap_dropout: False
+b_init: zero
+base_save_folder: result
+batch_size_test: 128
+batch_size_train: 128
+beta1: 0.9
+bigger_input: False
+cap_N: 3
+cap_model: v1_3
+dataset: cifar10
+debug_mode: False
+depth: 14
+device_id: 0,1
+do_squash: False
+draw_hist: False
+dropout_p: 0.2
+experiment_name: base_102_v1_3
+fc_time: 0
+file_name: result/base_102_v1_3/opt_train_val_START_epoch_0_END_600.txt
+fix_m: False
+gamma: 0.1
+less_data_aug: True
+look_into_details: False
+loss_form: margin
+lr: 0.0001
+manual_seed: -1
+max_epoch: 600
+measure_time: False
+momentum: 0.9
+multi_crop_test: False
+no_visdom: False
+non_target_j: False
+num_workers: 2
+optim: adam
+phase: train_val
+port_id: 9000
+pre_ch_num: 256
+primary_cap_num: 32
+random_seed: 8646
+route_num: 3
+s35: True
+save_epoch: 25
+save_folder: result/base_102_v1_3
+schedule: [200, 300, 400]
+scheduler: None
+setting: top1
+show_freq: 100
+show_test_after_epoch: 100
+squash_manner: paper
+use_KL: False
+use_cuda: True
+use_instanceBN: False
+use_multiple: False
+w_version: v2
+weight_decay: 0.0005
+------------------ End --------------------
+DataParallel (
+  (module): CapsNet (
+    (layer1): Sequential (
+      (0): Conv2d(3, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU (inplace)
+    )
+    (cap1_conv): Sequential (
+      (0): Conv2d(32, 64, kernel_size=(1, 1), stride=(1, 1), groups=32)
+      (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU (inplace)
+    )
+    (cap1_conv_sub): Sequential (
+      (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1), groups=32)
+      (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU (inplace)
+    )
+    (cap2_conv): Sequential (
+      (0): Conv2d(64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=32)
+      (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU (inplace)
+    )
+    (cap2_conv_sub): Sequential (
+      (0): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1), groups=32)
+      (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU (inplace)
+    )
+    (cap3_conv): Sequential (
+      (0): Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=32)
+      (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU (inplace)
+    )
+    (cap3_conv_sub): Sequential (
+      (0): Conv2d(256, 256, kernel_size=(1, 1), stride=(1, 1), groups=32)
+      (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU (inplace)
+    )
+    (cap4_conv1): Sequential (
+      (0): Conv2d(256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=32)
+      (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU (inplace)
+    )
+    (cap4_conv2): Sequential (
+      (0): Conv2d(512, 160, kernel_size=(1, 1), stride=(1, 1))
+      (1): BatchNorm2d(160, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU (inplace)
+    )
+    (avgpool): AvgPool2d (size=4, stride=4, padding=0, ceil_mode=False, count_include_pad=True)
+  ), weights=((32, 3, 3, 3), (32,), (32,), (32,), (64, 1, 1, 1), (64,), (64,), (64,), (64, 2, 1, 1), (64,), (64,), (64,), (128, 2, 3, 3), (128,), (128,), (128,), (128, 4, 1, 1), (128,), (128,), (128,), (256, 4, 3, 3), (256,), (256,), (256,), (256, 8, 1, 1), (256,), (256,), (256,), (512, 8, 3, 3), (512,), (512,), (512,), (160, 512, 1, 1), (160,), (160,), (160,)), parameters=138720
+)
+Total param num # 0.529175 Mb
+
+init learning rate 0.0001000000 at iter 0
+
+[base_102_v1_3]	epoch/iter [0/600][0/391] ||	Loss: 1.9196, Top1_err: 90.6250, Top5_err: 48.4375 ||	Data/batch time: 0.0707/2.3053
+[base_102_v1_3]	epoch/iter [0/600][100/391] ||	Loss: 1.6864, Top1_err: 80.3373, Top5_err: 32.5572 ||	Data/batch time: 0.0010/0.1929
+[base_102_v1_3]	epoch/iter [0/600][200/391] ||	Loss: 1.5390, Top1_err: 78.8324, Top5_err: 28.7508 ||	Data/batch time: 0.0006/0.1805
+[base_102_v1_3]	epoch/iter [0/600][300/391] ||	Loss: 1.4398, Top1_err: 77.8862, Top5_err: 26.7053 ||	Data/batch time: 0.0005/0.1791
+[base_102_v1_3]	epoch/iter [0/600][390/391] ||	Loss: 1.3743, Top1_err: 77.0360, Top5_err: 25.4620 ||	Data/batch time: 0.0004/0.1797
+Summary	epoch/iter [0/600] ||	TRAIN, Top1_err: 77.0360, Top5_err: 25.4620 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+model saved at result/base_102_v1_3/epoch_1.pth
+[base_102_v1_3]	epoch/iter [1/600][0/391] ||	Loss: 1.1522, Top1_err: 78.9062, Top5_err: 22.6562 ||	Data/batch time: 0.0740/0.2851
+[base_102_v1_3]	epoch/iter [1/600][100/391] ||	Loss: 1.0831, Top1_err: 74.4663, Top5_err: 20.3976 ||	Data/batch time: 0.0010/0.1830
+[base_102_v1_3]	epoch/iter [1/600][200/391] ||	Loss: 1.0532, Top1_err: 73.7912, Top5_err: 19.8850 ||	Data/batch time: 0.0006/0.1807
+[base_102_v1_3]	epoch/iter [1/600][300/391] ||	Loss: 1.0248, Top1_err: 73.4764, Top5_err: 19.4145 ||	Data/batch time: 0.0005/0.1804
+[base_102_v1_3]	epoch/iter [1/600][390/391] ||	Loss: 1.0019, Top1_err: 73.0620, Top5_err: 18.9820 ||	Data/batch time: 0.0005/0.1807
+Summary	epoch/iter [1/600] ||	TRAIN, Top1_err: 73.0620, Top5_err: 18.9820 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+[base_102_v1_3]	epoch/iter [2/600][0/391] ||	Loss: 0.9006, Top1_err: 66.4062, Top5_err: 16.4062 ||	Data/batch time: 0.0790/0.2276
+[base_102_v1_3]	epoch/iter [2/600][100/391] ||	Loss: 0.8844, Top1_err: 71.6429, Top5_err: 17.5897 ||	Data/batch time: 0.0011/0.1830
+[base_102_v1_3]	epoch/iter [2/600][200/391] ||	Loss: 0.8637, Top1_err: 70.4563, Top5_err: 17.3235 ||	Data/batch time: 0.0007/0.1818
+[base_102_v1_3]	epoch/iter [2/600][300/391] ||	Loss: 0.8431, Top1_err: 69.9050, Top5_err: 16.8864 ||	Data/batch time: 0.0005/0.1814
+[base_102_v1_3]	epoch/iter [2/600][390/391] ||	Loss: 0.8266, Top1_err: 69.4020, Top5_err: 16.5460 ||	Data/batch time: 0.0005/0.1820
+Summary	epoch/iter [2/600] ||	TRAIN, Top1_err: 69.4020, Top5_err: 16.5460 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+[base_102_v1_3]	epoch/iter [3/600][0/391] ||	Loss: 0.7446, Top1_err: 69.5312, Top5_err: 15.6250 ||	Data/batch time: 0.0752/0.2263
+[base_102_v1_3]	epoch/iter [3/600][100/391] ||	Loss: 0.7366, Top1_err: 66.3134, Top5_err: 15.0139 ||	Data/batch time: 0.0010/0.1832
+[base_102_v1_3]	epoch/iter [3/600][200/391] ||	Loss: 0.7216, Top1_err: 65.9437, Top5_err: 14.7271 ||	Data/batch time: 0.0006/0.1827
+[base_102_v1_3]	epoch/iter [3/600][300/391] ||	Loss: 0.7056, Top1_err: 65.3758, Top5_err: 14.5271 ||	Data/batch time: 0.0005/0.1821
