@@ -41,7 +41,7 @@ phase: train_val
 port_id: 9000
 pre_ch_num: 256
 primary_cap_num: 32
-random_seed: 5077
+random_seed: 8548
 route_num: 3
 s35: True
 save_epoch: 25
@@ -107,19 +107,14 @@ DataParallel (
       (2): ReLU (inplace)
     )
     (avgpool): AvgPool2d (size=(4, 2), stride=(1, 2), padding=0, ceil_mode=False, count_include_pad=True)
+    (avgpool2): AvgPool2d (size=(2, 4), stride=(2, 1), padding=0, ceil_mode=False, count_include_pad=True)
   ), weights=((32, 3, 3, 3), (32,), (32,), (32,), (64, 1, 1, 1), (64,), (64,), (64,), (64, 2, 1, 1), (64,), (64,), (64,), (128, 2, 3, 3), (128,), (128,), (128,), (128, 4, 1, 1), (128,), (128,), (128,), (256, 4, 3, 3), (256,), (256,), (256,), (256, 8, 1, 1), (256,), (256,), (256,), (512, 8, 3, 3), (512,), (512,), (512,), (80, 512, 1, 1), (80,), (80,), (80,)), parameters=97520
 )
 Total param num # 0.372009 Mb
 
 init learning rate 0.0001000000 at iter 0
 
-[base_102_v1_1]	epoch/iter [0/600][0/391] ||	Loss: 1.0133, Top1_err: 83.5938, Top5_err: 51.5625 ||	Data/batch time: 0.0598/2.2777
-[base_102_v1_1]	epoch/iter [0/600][100/391] ||	Loss: 0.9542, Top1_err: 83.1296, Top5_err: 38.2426 ||	Data/batch time: 0.0009/0.1750
-[base_102_v1_1]	epoch/iter [0/600][200/391] ||	Loss: 0.9194, Top1_err: 81.9069, Top5_err: 35.3933 ||	Data/batch time: 0.0006/0.1638
-[base_102_v1_1]	epoch/iter [0/600][300/391] ||	Loss: 0.8859, Top1_err: 81.0294, Top5_err: 33.1525 ||	Data/batch time: 0.0005/0.1600
-[base_102_v1_1]	epoch/iter [0/600][390/391] ||	Loss: 0.8568, Top1_err: 80.2100, Top5_err: 31.5540 ||	Data/batch time: 0.0004/0.1587
-Summary	epoch/iter [0/600] ||	TRAIN, Top1_err: 80.2100, Top5_err: 31.5540 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
-
-model saved at result/base_102_v1_1/epoch_1.pth
-[base_102_v1_1]	epoch/iter [1/600][0/391] ||	Loss: 0.7323, Top1_err: 71.8750, Top5_err: 18.7500 ||	Data/batch time: 0.0816/0.2785
-[base_102_v1_1]	epoch/iter [1/600][100/391] ||	Loss: 0.7047, Top1_err: 76.0365, Top5_err: 24.0099 ||	Data/batch time: 0.0011/0.1592
+[base_102_v1_1]	epoch/iter [0/600][0/391] ||	Loss: 1.0055, Top1_err: 89.0625, Top5_err: 48.4375 ||	Data/batch time: 0.0655/2.3437
+[base_102_v1_1]	epoch/iter [0/600][100/391] ||	Loss: 0.9513, Top1_err: 83.1528, Top5_err: 36.9585 ||	Data/batch time: 0.0010/0.1755
+[base_102_v1_1]	epoch/iter [0/600][200/391] ||	Loss: 0.9196, Top1_err: 81.6931, Top5_err: 33.6210 ||	Data/batch time: 0.0006/0.1639
+[base_102_v1_1]	epoch/iter [0/600][300/391] ||	Loss: 0.8863, Top1_err: 80.8581, Top5_err: 31.3616 ||	Data/batch time: 0.0005/0.1590

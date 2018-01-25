@@ -4,6 +4,7 @@ from layers.cap_layer import CapLayer, CapLayer2, squash
 from object_detection.utils.util import weights_init
 import time
 import torch
+import numpy as np
 
 
 class CapsNet(nn.Module):
@@ -129,6 +130,7 @@ class CapsNet(nn.Module):
                     nn.ReLU(True)
                 ])
                 self.avgpool = nn.AvgPool2d((4, 2), stride=(1, 2))
+                self.avgpool2 = nn.AvgPool2d((2, 4), stride=(2, 1))
 
         # init the network
         for m in self.modules():
@@ -198,7 +200,10 @@ class CapsNet(nn.Module):
                 x = self._do_squash2(x, num_shared=32)
                 x = self.cap4_conv2(x)
                 x = self._do_squash2(x, num_shared=5)
-                x = self.avgpool(x)
+                if np.random.random(1) >= .5:
+                    x = self.avgpool(x)
+                else:
+                    x = self.avgpool2(x)
                 x = x.view(x.size(0), -1, 16)   # for cifar-10
         else:
             raise NameError('Unknown structure or capsule model type.')
