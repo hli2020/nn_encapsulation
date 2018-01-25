@@ -3,6 +3,7 @@ from object_detection.utils.util import *
 from object_detection.utils.eval import accuracy
 
 
+# http://pytorch.org/docs/master/autograd.html?highlight=profile#torch.autograd.profiler.profile
 def _update_all_data(all_data, stats):
     all_data[0].extend(stats[0])
     all_data[1].extend(stats[1])

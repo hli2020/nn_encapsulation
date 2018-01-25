@@ -2,23 +2,21 @@
 
 start=`date +%s`
 
-#--experiment_name=base_101_v4_rerun \
-# _v4_less_aug
-# _v4_1gpu_optimized
-#
 # train and test
-CUDA_VISIBLE_DEVICES=4 python holly_capsule.py \
---experiment_name=base_101_v4_less_aug_rerun_1 \
+DEVICE_ID=0,1
+CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
+--device_id=$DEVICE_ID \
+--experiment_name=base_102_v1 \
 --debug_mode=False \
 --dataset=cifar10 \
 --less_data_aug \
---cap_model=v0 \
+--cap_model=v1 \
 --max_epoch=600 \
 --loss_form=margin \
 --optim=adam \
---schedule 150 200 250 \
---lr=0.0001 \
---batch_size_train=512 \
+--schedule 200 300 400 \
+--lr=0.01 \
+--batch_size_train=128 \
 --batch_size_test=128 \
 --s35
 

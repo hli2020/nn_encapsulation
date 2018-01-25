@@ -35,9 +35,10 @@ visual = Visualizer(args)
 model = CapsNet(num_classes=train_loader.dataset.num_classes, opts=args)
 if args.debug_mode:
     model = model.cuda()
+    # model = torch.nn.DataParallel(model).cuda()
 else:
     model = torch.nn.DataParallel(model).cuda()
-
+    # model = model.cuda()
 model_summary, param_num = torch_summarize(model)
 print_log(model_summary, args.file_name)
 print_log('Total param num # {:f} Mb'.format(param_num), args.file_name)
@@ -72,6 +73,7 @@ criterion = criterion.cuda()
 # train and test
 best_acc, best_epoch = 100, 0
 epoch_size = len(train_loader)
+grand_start_t = time.perf_counter()
 
 for epoch in range(args.max_epoch):
 
@@ -110,7 +112,7 @@ for epoch in range(args.max_epoch):
     t_one_epoch = time.time() - t
     visual.print_info((epoch, epoch_size-1, epoch_size),
                       (True, old_lr, t_one_epoch/epoch_size,
-                       test_acc, best_acc, best_epoch, param_num))
+                       test_acc, best_acc, best_epoch, param_num, 0))
 
     # ADJUST LR
     if args.scheduler is not None:
@@ -122,10 +124,12 @@ for epoch in range(args.max_epoch):
         print_log('\nchange learning rate from {:.10f} to '
                   '{:.10f} at epoch {:d}\n'.format(old_lr, new_lr, epoch), args.file_name)
 
-print_log('\nBest acc error: {:.4f} at epoch {:d}. Training done.'.format(best_acc, best_epoch), args.file_name)
+total_t = time.perf_counter() - grand_start_t
+print_log('\nBest acc error: {:.4f} at epoch {:d}. Training done. Cost total {:.4f} hours.'
+          .format(best_acc, best_epoch, total_t/3600), args.file_name)
 visual.print_info((epoch, epoch_size-1, epoch_size),
                   (False, old_lr, t_one_epoch/epoch_size,
-                   test_acc, best_acc, best_epoch, param_num))
+                   test_acc, best_acc, best_epoch, param_num, total_t/3600))
 
 
 
