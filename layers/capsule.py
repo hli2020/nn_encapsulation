@@ -72,7 +72,7 @@ class CapsNet(nn.Module):
             # capsLayer
             self.cap_layer = CapLayer(opts, num_in_caps=opts.primary_cap_num*6*6, num_out_caps=num_classes,
                                       out_dim=16, num_shared=opts.primary_cap_num, in_dim=8)
-        elif self.cap_model == 'v1':
+        elif self.cap_model[0:2] == 'v1':
 
             self.layer1 = nn.Sequential(*[
                 nn.Conv2d(3, 32, kernel_size=3, padding=1),
@@ -112,9 +112,23 @@ class CapsNet(nn.Module):
                 nn.ReLU(True)
             ])  # 8 output
 
-            self.cap_layer = CapLayer(
-                opts, num_in_caps=opts.primary_cap_num*8*8, num_out_caps=num_classes,
-                out_dim=16, in_dim=8, num_shared=opts.primary_cap_num)
+            if self.cap_model == 'v1':
+                self.cap_layer = CapLayer(
+                    opts, num_in_caps=opts.primary_cap_num*8*8, num_out_caps=num_classes,
+                    out_dim=16, in_dim=8, num_shared=opts.primary_cap_num)
+            elif self.cap_model == 'v1_1':
+                self.cap4_conv1 = nn.Sequential(*[
+                    nn.Conv2d(32*8, 32*16, kernel_size=3, stride=2, padding=1, groups=32),
+                    nn.BatchNorm2d(32*16),
+                    nn.ReLU(True)
+                ])  # output: bs, 32*16, 4, 4
+                # the following is just a mess-guess
+                self.cap4_conv2 = nn.Sequential(*[
+                    nn.Conv2d(32*16, 5*16, kernel_size=1, stride=1),
+                    nn.BatchNorm2d(5*16),
+                    nn.ReLU(True)
+                ])
+                self.avgpool = nn.AvgPool2d((4, 2), stride=(1, 2))
 
         # init the network
         for m in self.modules():
@@ -156,7 +170,7 @@ class CapsNet(nn.Module):
                 torch.cuda.synchronize()
                 print('last cap total time: {:.4f}'.format(time.perf_counter() - start))
 
-        elif self.cap_model == 'v1':
+        elif self.cap_model[0:2] == 'v1':
             x = self.layer1(x)
 
             x = self.cap1_conv(x)
@@ -176,7 +190,16 @@ class CapsNet(nn.Module):
             for i in range(self.cap_N):
                 x = self.cap3_conv_sub(x)
                 x = self._do_squash2(x, num_shared=32)
-            x, stats = self.cap_layer(x, target, curr_iter, vis)
+
+            if self.cap_model == 'v1':
+                x, stats = self.cap_layer(x, target, curr_iter, vis)
+            elif self.cap_model == 'v1_1':
+                x = self.cap4_conv1(x)
+                x = self._do_squash2(x, num_shared=32)
+                x = self.cap4_conv2(x)
+                x = self._do_squash2(x, num_shared=5)
+                x = self.avgpool(x)
+                x = x.view(x.size(0), -1, 16)   # for cifar-10
         else:
             raise NameError('Unknown structure or capsule model type.')
 
