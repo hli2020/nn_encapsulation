@@ -28,7 +28,7 @@ class Options(object):
 
         # model params
         # network, v0 is the structure in the paper, v_base is resnet
-        self.parser.add_argument('--cap_model', default='v1_1', type=str,
+        self.parser.add_argument('--cap_model', default='v1_4', type=str,
                                  help='v_base, v0, v1, ...')
         # for now, only valid for v_base
         self.parser.add_argument('--depth', default=14, type=int)
