@@ -15,7 +15,7 @@ def softmax_dim(input, axis=1):
 
     input_2d = trans_input.contiguous().view(-1, trans_size[-1])
 
-    soft_max_2d = F.softmax(input_2d)
+    soft_max_2d = F.softmax(input_2d)  # TODO: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
 
     soft_max_nd = soft_max_2d.view(*trans_size)
     return soft_max_nd.transpose(axis, len(input_size)-1)
@@ -512,6 +512,7 @@ class MarginLoss(nn.Module):
 
     def forward(self, output, target):
         # output, 128 x 10
+        # print(output.size())
         gt = Variable(torch.zeros(output.size(0), self.num_classes), requires_grad=False)
         gt = gt.scatter_(1, target.unsqueeze(1), 1)
         zero = Variable(torch.zeros(1))
