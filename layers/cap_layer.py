@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.nn.parameter import Parameter
 from torch.autograd import Variable
 import time
 import numpy as np
@@ -8,13 +9,13 @@ import math
 
 
 def softmax_dim(input, axis=1):
+    # will be DEPRECATED
     input_size = input.size()
 
     trans_input = input.transpose(axis, len(input_size)-1)
     trans_size = trans_input.size()
 
     input_2d = trans_input.contiguous().view(-1, trans_size[-1])
-
     soft_max_2d = F.softmax(input_2d)  # TODO: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
 
     soft_max_nd = soft_max_2d.view(*trans_size)
@@ -215,6 +216,7 @@ class CapLayer(nn.Module):
             # -> bs, 10, 16, 32x6x6 (view)
             spatial_size = pred.size(2)
             # manner 1
+            #TODO (Super high): WRONG
             pred = pred.view(bs, self.num_out_caps, self.out_dim,
                              spatial_size*spatial_size*self.num_shared)
             # # manner 2
@@ -241,7 +243,9 @@ class CapLayer(nn.Module):
             for i in range(self.route_num):
 
                 internal_start = time.perf_counter()
-                c = softmax_dim(b, axis=1)              # c: 128(bs) x 10(j) x 1152(i), \sum_j = 1
+                # TODO (high priority):
+                # c: 128(bs) x 10(j) x 1152(i), \sum_j = 1
+                c = softmax_dim(b, axis=1)
                 if self.measure_time:
                     torch.cuda.synchronize()
                     b_sftmax_t = time.perf_counter() - internal_start
@@ -470,7 +474,7 @@ class CapLayer2(nn.Module):
             for ind in range(1, self.shared_group):
                 pred = torch.cat((pred, raw_pred + self.learnable_b[ind]), dim=1)
         # assert pred.size(1) == self.num_out_caps
-        pred = pred.permute(0, 3, 1, 2)
+        pred = pred.permute(0, 3, 1, 2).contiguous()
         # pred_i_j_d2
         # print('cap W time: {:.4f}'.format(time.time() - start))
 
@@ -499,6 +503,31 @@ class CapLayer2(nn.Module):
             spatial_out = int(math.sqrt(self.num_out_caps))
             v = v.permute(0, 2, 1).resize(bs, self.out_dim, spatial_out, spatial_out)
         return v, [mean, std]
+
+
+class CapFC(nn.Module):
+    def __init__(self, in_cap_num, out_cap_num, cap_dim):
+        super(CapFC, self).__init__()
+        self.in_cap_num = in_cap_num
+        self.out_cap_num = out_cap_num
+        self.cap_dim = cap_dim
+        self.weight = Parameter(torch.Tensor(cap_dim, in_cap_num, out_cap_num))
+        self.reset_parameters()
+
+    def forward(self, input):
+        input = input.permute(0, 2, 1).contiguous().unsqueeze(2)
+        output = torch.matmul(input, self.weight).squeeze().permute(0, 2, 1).contiguous()
+        return output
+
+    def reset_parameters(self):
+        stdv = 1. / math.sqrt(self.weight.size(1))
+        self.weight.data.uniform_(-stdv, stdv)
+
+    def __repr__(self):
+        return self.__class__.__name__ + '(' \
+            + 'in_cap_num=' + str(self.in_cap_num) \
+            + ', out_cap_num=' + str(self.out_cap_num) \
+            + ', cap_dim=' + str(self.cap_dim) + ')'
 
 
 class MarginLoss(nn.Module):

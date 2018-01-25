@@ -58,7 +58,7 @@ def train(trainloader, model, criterion, optimizer, opt, vis, epoch):
             outputs = outputs.norm(dim=2)
         except RuntimeError:
             outputs = outputs
-
+        # print(outputs.size())
         # _, ind = outputs[4, :].max(0)
         # print('predict index: {:d}'.format(ind.data[0]))
         # one_sample = outputs[4, :]

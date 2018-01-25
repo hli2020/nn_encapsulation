@@ -1,6 +1,6 @@
 import torch.nn as nn
 from layers.models.cifar.resnet import BasicBlock, Bottleneck
-from layers.cap_layer import CapLayer, CapLayer2, squash
+from layers.cap_layer import CapLayer, CapLayer2, CapFC, squash
 from object_detection.utils.util import weights_init
 import time
 import torch
@@ -117,20 +117,34 @@ class CapsNet(nn.Module):
                 self.cap_layer = CapLayer(
                     opts, num_in_caps=opts.primary_cap_num*8*8, num_out_caps=num_classes,
                     out_dim=16, in_dim=8, num_shared=opts.primary_cap_num)
-            elif self.cap_model == 'v1_1':
+            elif self.cap_model[0:3] == 'v1_':
+                # increase cap_num and downsize spatial capsules
                 self.cap4_conv1 = nn.Sequential(*[
                     nn.Conv2d(32*8, 32*16, kernel_size=3, stride=2, padding=1, groups=32),
                     nn.BatchNorm2d(32*16),
                     nn.ReLU(True)
                 ])  # output: bs, 32*16, 4, 4
-                # the following is just a mess-guess
-                self.cap4_conv2 = nn.Sequential(*[
-                    nn.Conv2d(32*16, 5*16, kernel_size=1, stride=1),
-                    nn.BatchNorm2d(5*16),
-                    nn.ReLU(True)
-                ])
-                self.avgpool = nn.AvgPool2d((4, 2), stride=(1, 2))
-                self.avgpool2 = nn.AvgPool2d((2, 4), stride=(2, 1))
+
+                if self.cap_model == 'v1_1':
+                    # TODO: the following is just a mess-guess
+                    self.cap4_conv2 = nn.Sequential(*[
+                        nn.Conv2d(32*16, 5*16, kernel_size=1, stride=1),    # normal conv
+                        nn.BatchNorm2d(5*16),
+                        nn.ReLU(True)
+                    ])
+                    self.avgpool = nn.AvgPool2d((4, 2), stride=(1, 2))
+                    self.avgpool2 = nn.AvgPool2d((2, 4), stride=(2, 1))
+
+                elif self.cap_model == 'v1_3':
+                    self.cap4_conv2 = nn.Sequential(*[
+                        nn.Conv2d(32*16, 10*16, kernel_size=1, stride=1),   # normal conv
+                        nn.BatchNorm2d(10*16),
+                        nn.ReLU(True)
+                    ])
+                    self.avgpool = nn.AvgPool2d(4)
+
+                elif self.cap_model == 'v1_4':
+                    self.capFC = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes, cap_dim=16)
 
         # init the network
         for m in self.modules():
@@ -195,16 +209,29 @@ class CapsNet(nn.Module):
 
             if self.cap_model == 'v1':
                 x, stats = self.cap_layer(x, target, curr_iter, vis)
-            elif self.cap_model == 'v1_1':
+            elif self.cap_model[0:3] == 'v1_':
                 x = self.cap4_conv1(x)
                 x = self._do_squash2(x, num_shared=32)
-                x = self.cap4_conv2(x)
-                x = self._do_squash2(x, num_shared=5)
-                if np.random.random(1) >= .5:
+
+                if self.cap_model == 'v1_1':
+                    x = self.cap4_conv2(x)
+                    x = self._do_squash2(x, num_shared=5)
+                    if np.random.random(1) >= .5:
+                        x = self.avgpool(x)
+                    else:
+                        x = self.avgpool2(x)
+                    x = x.view(x.size(0), -1, 16)   # for cifar-10
+                elif self.cap_model == 'v1_3':
+                    x = self.cap4_conv2(x)    # bs, 160, 4x4
                     x = self.avgpool(x)
-                else:
-                    x = self.avgpool2(x)
-                x = x.view(x.size(0), -1, 16)   # for cifar-10
+                    x = x.view(x.size(0), 10, 16)
+                    x = squash(x)
+                elif self.cap_model == 'v1_4':
+                    x = x.view(x.size(0), 32, 16, x.size(2), x.size(3))
+                    x = x.permute(0, 1, 3, 4, 2).contiguous()
+                    x = x.view(x.size(0), -1, 16)
+                    x = self.capFC(x)
+                    x = squash(x)
         else:
             raise NameError('Unknown structure or capsule model type.')
 
@@ -233,9 +260,16 @@ class CapsNet(nn.Module):
         # x: bs, num_shared*cap_dim, spatial, spatial
         spatial_size = x.size(2)
         batch_size = x.size(0)
-        x = x.view(batch_size, num_shared*spatial_size**2, -1).contiguous()
+        cap_dim = int(x.size(1) / num_shared)
+        # TODO: wrong
+        x = x.view(batch_size, num_shared, cap_dim, spatial_size, spatial_size)
+        x = x.permute(0, 1, 3, 4, 2).contiguous()
+        x = x.view(batch_size, -1, cap_dim)
         x = squash(x)
-        x = x.view(batch_size, -1, spatial_size, spatial_size).contiguous()
+        # revert back to orginal shape
+        x = x.view(batch_size, num_shared, spatial_size, spatial_size, cap_dim)
+        x = x.permute(0, 1, 4, 2, 3).contiguous()
+        x = x.view(batch_size, -1, spatial_size, spatial_size)
         return x
 
     def _make_layer(self, block, planes, blocks, stride=1):
