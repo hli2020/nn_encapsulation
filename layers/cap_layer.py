@@ -519,6 +519,7 @@ class CapFC(nn.Module):
         output = torch.matmul(input, self.weight).squeeze().permute(0, 2, 1).contiguous()
         return output
 
+    # TODO: figure out the init stuff
     def reset_parameters(self):
         stdv = 1. / math.sqrt(self.weight.size(1))
         self.weight.data.uniform_(-stdv, stdv)
