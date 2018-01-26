@@ -216,7 +216,7 @@ class CapLayer(nn.Module):
             # pred: bs, 5120, 6, 6
             # -> bs, 10, 16, 32x6x6 (view)
             spatial_size = pred.size(2)
-            pred = pred.view(bs, self.num_share, self.num_out_caps, self.out_dim,
+            pred = pred.view(bs, self.num_shared, self.num_out_caps, self.out_dim,
                              spatial_size, spatial_size)
             pred = pred.permute(0, 2, 3, 1, 4, 5).contiguous()
             pred = pred.view(bs, pred.size(1), pred.size(2), -1)
