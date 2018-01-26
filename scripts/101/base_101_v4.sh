@@ -7,8 +7,10 @@ start=`date +%s`
 # _v4_1gpu_optimized
 #
 # train and test
-CUDA_VISIBLE_DEVICES=4 python holly_capsule.py \
---experiment_name=base_101_v4_less_aug_rerun_1 \
+DEVICE_ID=2,3
+CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
+--device_id=$DEVICE_ID \
+--experiment_name=base_101_v4_less_aug_rerun_2 \
 --debug_mode=False \
 --dataset=cifar10 \
 --less_data_aug \

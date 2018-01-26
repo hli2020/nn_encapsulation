@@ -148,6 +148,7 @@ class CapLayer(nn.Module):
         self.non_target_j = opts.non_target_j
 
         self.out_dim = out_dim
+        self.in_dim = in_dim
         self.num_shared = num_shared
         self.route_num = opts.route_num
         self.w_version = opts.w_version
@@ -215,15 +216,10 @@ class CapLayer(nn.Module):
             # pred: bs, 5120, 6, 6
             # -> bs, 10, 16, 32x6x6 (view)
             spatial_size = pred.size(2)
-            # manner 1
-            #TODO (Super high): WRONG
-            pred = pred.view(bs, self.num_out_caps, self.out_dim,
-                             spatial_size*spatial_size*self.num_shared)
-            # # manner 2
-            # pred = pred.view(bs, self.num_out_caps, self.out_dim, self.num_shared,
-            #                  spatial_size, spatial_size)
-            # pred = pred.view(bs, self.num_out_caps, self.out_dim, -1)
-            # _pred = pred.permute(0, 1, 3, 2)
+            pred = pred.view(bs, self.num_share, self.num_out_caps, self.out_dim,
+                             spatial_size, spatial_size)
+            pred = pred.permute(0, 2, 3, 1, 4, 5).contiguous()
+            pred = pred.view(bs, pred.size(1), pred.size(2), -1)
 
             if self.add_cap_BN_relu:
                 NotImplementedError()
@@ -243,9 +239,9 @@ class CapLayer(nn.Module):
             for i in range(self.route_num):
 
                 internal_start = time.perf_counter()
-                # TODO (high priority):
-                # c: 128(bs) x 10(j) x 1152(i), \sum_j = 1
-                c = softmax_dim(b, axis=1)
+                c = F.softmax(b, dim=2)
+                # old note (WRONG): c: 128(bs) x 10(j) x 1152(i), \sum_j = 1
+                # c = softmax_dim(b, axis=1)
                 if self.measure_time:
                     torch.cuda.synchronize()
                     b_sftmax_t = time.perf_counter() - internal_start
@@ -349,52 +345,52 @@ class CapLayer(nn.Module):
             #     v = squash(v)
 
         # FOR debug, see the detailed values of b, c, v, delta_b
-        if self.FIND_DIFF and HAS_DIFF:
-            self.which_sample = diff_ind[0]
-        if self.FIND_DIFF or self.look_into_details:
-            print('sample index is: {:d}'.format(self.which_sample))
-        if target is not None:
-            self.which_j = target[self.which_sample].data[0]
-            if self.look_into_details:
-                print('target is: {:d} (also which_j)'.format(self.which_j))
-        else:
-            if self.look_into_details:
-                print('no target input, just pick up a random j, which_j is: {:d}'.format(self.which_j))
-
-        if self.look_into_details:
-            print('u_hat:')
-            print(pred[self.which_sample, :, self.which_j, :])
-        # start all over again
-        if self.look_into_details:
-            b = Variable(torch.zeros(b.size()), requires_grad=False)
-            for i in range(self.route_num):
-
-                c = softmax_dim(b, axis=1)              # 128 x 10 x 1152, c_nji, \sum_j = 1
-                temp_ = [torch.matmul(c[:, zz, :].unsqueeze(dim=1), pred[:, :, zz, :].squeeze()).squeeze()
-                         for zz in range(self.num_out_caps)]
-                s = torch.stack(temp_, dim=1)
-                v = squash(s, self.squash_manner)       # 128 x 10 x 16
-                temp_ = [torch.matmul(v[:, zz, :].unsqueeze(dim=1), pred[:, :, zz, :].permute(0, 2, 1)).squeeze()
-                         for zz in range(self.num_out_caps)]
-                delta_b = torch.stack(temp_, dim=1).detach()
-                if self.FIND_DIFF:
-                    v_all_classes = v.norm(dim=2)
-                    _, curr_pred = torch.max(v_all_classes, 1)
-                    pred_list.extend(curr_pred.data)
-                b = torch.add(b, delta_b)
-                print('[{:d}/{:d}] b:'.format(i, self.route_num))
-                print(b[self.which_sample, self.which_j, :])
-                print('[{:d}/{:d}] c:'.format(i, self.route_num))
-                print(c[self.which_sample, self.which_j, :])
-                print('[{:d}/{:d}] v:'.format(i, self.route_num))
-                print(v[self.which_sample, self.which_j, :])
-
-                print('[{:d}/{:d}] v all classes:'.format(i, self.route_num))
-                print(v[self.which_sample, :, :].norm(dim=1))
-
-                print('[{:d}/{:d}] delta_b:'.format(i, self.route_num))
-                print(delta_b[self.which_sample, self.which_j, :])
-                print('\n')
+        # if self.FIND_DIFF and HAS_DIFF:
+        #     self.which_sample = diff_ind[0]
+        # if self.FIND_DIFF or self.look_into_details:
+        #     print('sample index is: {:d}'.format(self.which_sample))
+        # if target is not None:
+        #     self.which_j = target[self.which_sample].data[0]
+        #     if self.look_into_details:
+        #         print('target is: {:d} (also which_j)'.format(self.which_j))
+        # else:
+        #     if self.look_into_details:
+        #         print('no target input, just pick up a random j, which_j is: {:d}'.format(self.which_j))
+        #
+        # if self.look_into_details:
+        #     print('u_hat:')
+        #     print(pred[self.which_sample, :, self.which_j, :])
+        # # start all over again
+        # if self.look_into_details:
+        #     b = Variable(torch.zeros(b.size()), requires_grad=False)
+        #     for i in range(self.route_num):
+        #
+        #         c = softmax_dim(b, axis=1)              # 128 x 10 x 1152, c_nji, \sum_j = 1
+        #         temp_ = [torch.matmul(c[:, zz, :].unsqueeze(dim=1), pred[:, :, zz, :].squeeze()).squeeze()
+        #                  for zz in range(self.num_out_caps)]
+        #         s = torch.stack(temp_, dim=1)
+        #         v = squash(s, self.squash_manner)       # 128 x 10 x 16
+        #         temp_ = [torch.matmul(v[:, zz, :].unsqueeze(dim=1), pred[:, :, zz, :].permute(0, 2, 1)).squeeze()
+        #                  for zz in range(self.num_out_caps)]
+        #         delta_b = torch.stack(temp_, dim=1).detach()
+        #         if self.FIND_DIFF:
+        #             v_all_classes = v.norm(dim=2)
+        #             _, curr_pred = torch.max(v_all_classes, 1)
+        #             pred_list.extend(curr_pred.data)
+        #         b = torch.add(b, delta_b)
+        #         print('[{:d}/{:d}] b:'.format(i, self.route_num))
+        #         print(b[self.which_sample, self.which_j, :])
+        #         print('[{:d}/{:d}] c:'.format(i, self.route_num))
+        #         print(c[self.which_sample, self.which_j, :])
+        #         print('[{:d}/{:d}] v:'.format(i, self.route_num))
+        #         print(v[self.which_sample, self.which_j, :])
+        #
+        #         print('[{:d}/{:d}] v all classes:'.format(i, self.route_num))
+        #         print(v[self.which_sample, :, :].norm(dim=1))
+        #
+        #         print('[{:d}/{:d}] delta_b:'.format(i, self.route_num))
+        #         print(delta_b[self.which_sample, self.which_j, :])
+        #         print('\n')
         # END of debug
 
         return v, [batch_cos_dist, batch_i_length,

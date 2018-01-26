@@ -209,11 +209,12 @@ class CapsNet(nn.Module):
 
             if self.cap_model == 'v1':
                 x, stats = self.cap_layer(x, target, curr_iter, vis)
+
             elif self.cap_model[0:3] == 'v1_':
                 x = self.cap4_conv1(x)
                 x = self._do_squash2(x, num_shared=32)
 
-                if self.cap_model == 'v1_1':
+                if self.cap_model == 'v1_1':  # also being 'v1_2'
                     x = self.cap4_conv2(x)
                     x = self._do_squash2(x, num_shared=5)
                     if np.random.random(1) >= .5:
@@ -221,6 +222,7 @@ class CapsNet(nn.Module):
                     else:
                         x = self.avgpool2(x)
                     x = x.view(x.size(0), -1, 16)   # for cifar-10
+
                 elif self.cap_model == 'v1_3':
                     x = self.cap4_conv2(x)    # bs, 160, 4x4
                     x = self.avgpool(x)
