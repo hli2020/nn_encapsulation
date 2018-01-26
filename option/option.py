@@ -78,6 +78,7 @@ class Options(object):
         self.parser.add_argument('--multi_crop_test', action='store_true')
         self.parser.add_argument('--draw_hist', action='store_true')
         self.parser.add_argument('--non_target_j', action='store_true')
+        self.parser.add_argument('--show_test_after_epoch', type=int, default=-1)
         # show stats
         self.parser.add_argument('--look_into_details', action='store_true')
         self.parser.add_argument('--use_multiple', action='store_true', help='valid for N > 1')
@@ -113,6 +114,7 @@ class Options(object):
             self.opt.show_freq = 1
             self.opt.save_epoch = 1
         else:
-            self.opt.show_test_after_epoch = 100
+            if self.opt.show_test_after_epoch == -1:
+                self.opt.show_test_after_epoch = 100
             self.opt.show_freq = 100
             self.opt.save_epoch = 25
