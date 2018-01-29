@@ -5,6 +5,55 @@ from object_detection.utils.util import weights_init
 import time
 import torch
 
+# FOR debug, see the detailed values of b, c, v, delta_b
+        # if self.FIND_DIFF and HAS_DIFF:
+        #     self.which_sample = diff_ind[0]
+        # if self.FIND_DIFF or self.look_into_details:
+        #     print('sample index is: {:d}'.format(self.which_sample))
+        # if target is not None:
+        #     self.which_j = target[self.which_sample].data[0]
+        #     if self.look_into_details:
+        #         print('target is: {:d} (also which_j)'.format(self.which_j))
+        # else:
+        #     if self.look_into_details:
+        #         print('no target input, just pick up a random j, which_j is: {:d}'.format(self.which_j))
+        #
+        # if self.look_into_details:
+        #     print('u_hat:')
+        #     print(pred[self.which_sample, :, self.which_j, :])
+        # # start all over again
+        # if self.look_into_details:
+        #     b = Variable(torch.zeros(b.size()), requires_grad=False)
+        #     for i in range(self.route_num):
+        #
+        #         c = softmax_dim(b, axis=1)              # 128 x 10 x 1152, c_nji, \sum_j = 1
+        #         temp_ = [torch.matmul(c[:, zz, :].unsqueeze(dim=1), pred[:, :, zz, :].squeeze()).squeeze()
+        #                  for zz in range(self.num_out_caps)]
+        #         s = torch.stack(temp_, dim=1)
+        #         v = squash(s, self.squash_manner)       # 128 x 10 x 16
+        #         temp_ = [torch.matmul(v[:, zz, :].unsqueeze(dim=1), pred[:, :, zz, :].permute(0, 2, 1)).squeeze()
+        #                  for zz in range(self.num_out_caps)]
+        #         delta_b = torch.stack(temp_, dim=1).detach()
+        #         if self.FIND_DIFF:
+        #             v_all_classes = v.norm(dim=2)
+        #             _, curr_pred = torch.max(v_all_classes, 1)
+        #             pred_list.extend(curr_pred.data)
+        #         b = torch.add(b, delta_b)
+        #         print('[{:d}/{:d}] b:'.format(i, self.route_num))
+        #         print(b[self.which_sample, self.which_j, :])
+        #         print('[{:d}/{:d}] c:'.format(i, self.route_num))
+        #         print(c[self.which_sample, self.which_j, :])
+        #         print('[{:d}/{:d}] v:'.format(i, self.route_num))
+        #         print(v[self.which_sample, self.which_j, :])
+        #
+        #         print('[{:d}/{:d}] v all classes:'.format(i, self.route_num))
+        #         print(v[self.which_sample, :, :].norm(dim=1))
+        #
+        #         print('[{:d}/{:d}] delta_b:'.format(i, self.route_num))
+        #         print(delta_b[self.which_sample, self.which_j, :])
+        #         print('\n')
+        # END of debug
+
 
 class CapsNet(nn.Module):
     """
@@ -327,3 +376,121 @@ class CapsNet(nn.Module):
             layers.append(block(self.inplanes, planes))
 
         return nn.Sequential(*layers)
+
+
+def softmax_dim(input, axis=1):
+    # DEPRECATED
+    input_size = input.size()
+
+    trans_input = input.transpose(axis, len(input_size)-1)
+    trans_size = trans_input.size()
+
+    input_2d = trans_input.contiguous().view(-1, trans_size[-1])
+    # UserWarning: Implicit dimension choice for softmax has been deprecated.
+    # Change the call to include dim=X as an argument.
+    soft_max_2d = F.softmax(input_2d)
+
+    soft_max_nd = soft_max_2d.view(*trans_size)
+    return soft_max_nd.transpose(axis, len(input_size)-1)
+
+
+class CapLayer2(nn.Module):
+    """
+        Convolution Capsule Layer
+        input:      [bs, in_dim (d1), spatial_size_1, spatial_size_1]
+        output:     [bs, out_dim (d2), spatial_size_2, spatial_size_2]
+                    or [bs, out_dim (d2), spatial_size_2] if as_final_output=True
+        Args:
+                    in_dim:             dim of input capsules, d1
+                    out_dim:            dim of output capsules, d2
+                    spatial_size_1:     spatial_size_1 ** 2 = num_in_caps, total # of input caps
+                    spatial_size_2:     spatial_size_2 ** 2 = num_out_caps, total # of output caps
+                    as_final_output:    if True, spatial_size_2 = num_out_caps
+        Convolution parameters (W): nn.Conv2d(IN, OUT, kernel_size=1)
+        Propagation coefficients (b or c): bs_j_i
+    """
+    def __init__(self,
+                 opts, in_dim, out_dim, spatial_size_1, spatial_size_2,
+                 route_num, as_final_output=False,
+                 shared_size=-1, shared_group=1):
+        super(CapLayer2, self).__init__()
+        self.num_in_caps = int(spatial_size_1 ** 2)
+        if as_final_output:
+            self.num_out_caps = spatial_size_2
+        else:
+            self.num_out_caps = int(spatial_size_2 ** 2)
+        self.use_KL = opts.use_KL
+        self.KL_manner = opts.KL_manner
+        self.in_dim = in_dim
+        self.out_dim = out_dim
+        self.route_num = route_num
+        self.as_final_output = as_final_output
+        self.shared_size = shared_size
+        self.shared_group = shared_group
+        if shared_size == -1:
+            self.num_conv_groups = 1
+        else:
+            assert spatial_size_1 % shared_size == 0
+            self.num_conv_groups = int((spatial_size_1/shared_size) ** 2)
+
+        if shared_group > 1:
+            self.learnable_b = Variable(
+                torch.normal(means=torch.zeros(shared_group), std=torch.ones(shared_group)),
+                requires_grad=True)
+
+        IN = int(self.in_dim * self.num_conv_groups)
+        OUT = int(self.out_dim * self.num_out_caps * self.num_conv_groups / self.shared_group)
+        self.W = nn.Conv2d(IN, OUT, groups=self.num_conv_groups, kernel_size=1, stride=1)
+
+    def forward(self, x):
+        # TODO: unoptimized
+        mean, std = [], []   # for KL loss
+        bs = x.size(0)
+        # generate random b on-the-fly
+        b = Variable(torch.rand(bs, self.num_out_caps, self.num_in_caps), requires_grad=False)
+
+        start = time.time()
+        # x: bs, d1, 32 (spatial_size_1), 32
+        # -> W(x): bs, d2x16x16, 32 (spatial_size_1), 32
+        if self.num_conv_groups != 1:
+            # reshape the input x first
+            x = x.resize(bs, self.in_dim * self.num_conv_groups, self.shared_size, self.shared_size)
+
+        pred = self.W(x)
+        pred = pred.resize(bs, int(self.num_out_caps / self.shared_group), self.out_dim, self.num_in_caps)
+
+        if self.shared_group != 1:
+            raw_pred = pred
+            pred = raw_pred + self.learnable_b[0]
+            for ind in range(1, self.shared_group):
+                pred = torch.cat((pred, raw_pred + self.learnable_b[ind]), dim=1)
+        # assert pred.size(1) == self.num_out_caps
+        pred = pred.permute(0, 3, 1, 2).contiguous()
+        # pred_i_j_d2
+        # print('cap W time: {:.4f}'.format(time.time() - start))
+
+        # routing starts
+        start = time.time()
+        for i in range(self.route_num):
+
+            c = softmax_dim(b, axis=1)              # bs x j x i, c_nji, \sum_j = 1
+            s = [torch.matmul(c[:, zz, :].unsqueeze(dim=1), pred[:, :, zz, :].squeeze()).squeeze()
+                 for zz in range(self.num_out_caps)]
+            s = torch.stack(s, dim=1)
+            v = squash(s)                           # do squashing along the last dim, bs x j x d2
+            delta_b = [torch.matmul(v[:, zz, :].unsqueeze(dim=1), pred[:, :, zz, :].permute(0, 2, 1)).squeeze()
+                       for zz in range(self.num_out_caps)]
+            delta_b = torch.stack(delta_b, dim=1).detach()
+            b = torch.add(b, delta_b)
+        # print('cap Route (r={:d}) time: {:.4f}'.format(self.route_num, time.time() - start))
+        # routing ends
+        # v: bs, num_out_caps, out_dim
+
+        if self.use_KL:
+            mean, std = compute_stats(None, pred, v, KL_manner=self.KL_manner)
+
+        if not self.as_final_output:
+            # v: eg., 64, 256(16x16), 20 -> 64, 20, 16, 16
+            spatial_out = int(math.sqrt(self.num_out_caps))
+            v = v.permute(0, 2, 1).resize(bs, self.out_dim, spatial_out, spatial_out)
+        return v, [mean, std]

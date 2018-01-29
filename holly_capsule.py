@@ -4,7 +4,7 @@ import torch.backends.cudnn as cudnn
 import torch.optim as optim
 import torch.utils.data as data
 from data.create_dset import create_dataset
-from layers.capsule import CapsNet
+from layers.network import CapsNet
 from layers.cap_layer import MarginLoss, SpreadLoss
 from layers.train_val import *
 
@@ -35,10 +35,8 @@ visual = Visualizer(args)
 model = CapsNet(num_classes=train_loader.dataset.num_classes, opts=args)
 if args.debug_mode:
     model = model.cuda()
-    # model = torch.nn.DataParallel(model).cuda()
 else:
     model = torch.nn.DataParallel(model).cuda()
-    # model = model.cuda()
 model_summary, param_num = torch_summarize(model)
 print_log(model_summary, args.file_name)
 print_log('Total param num # {:f} Mb'.format(param_num), args.file_name)
@@ -55,8 +53,8 @@ elif args.optim == 'rmsprop':
     optimizer = optim.RMSprop(model.parameters(), lr=args.lr,
                               weight_decay=args.weight_decay, momentum=args.momentum,
                               alpha=0.9, centered=True)
-if args.scheduler is not None:
-    scheduler = set_lr_schedule(optimizer, args.scheduler)
+# if args.scheduler is not None:
+#     scheduler = set_lr_schedule(optimizer, args.scheduler)
 # loss
 if args.loss_form == 'CE':
     criterion = nn.CrossEntropyLoss()
@@ -85,9 +83,9 @@ for epoch in range(args.max_epoch):
 
     # TRAIN
     info = train(train_loader, model, criterion, optimizer, args, visual, epoch)
-    # TEST
     if epoch >= args.show_test_after_epoch:
-        extra_info = test(test_loader, model, criterion, args, visual, epoch)
+        # TEST
+        extra_info = test(test_loader, model, args, visual, epoch, criterion)
     else:
         extra_info = dict()
         extra_info['test_loss'], extra_info['test_acc_error'], extra_info['test_acc5_error'] = 0, 100, 100
@@ -115,10 +113,11 @@ for epoch in range(args.max_epoch):
                        test_acc, best_acc, best_epoch, param_num, 0))
 
     # ADJUST LR
-    if args.scheduler is not None:
-        scheduler.step(extra_info['test_acc_error'])
-    else:
-        adjust_learning_rate(optimizer, epoch, args)
+    # if args.scheduler is not None:
+    #     scheduler.step(extra_info['test_acc_error'])
+    # else:
+    adjust_learning_rate(optimizer, epoch, args)
+
     new_lr = optimizer.param_groups[0]['lr']
     if old_lr != new_lr:
         print_log('\nchange learning rate from {:.10f} to '

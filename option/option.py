@@ -27,16 +27,15 @@ class Options(object):
         self.parser.add_argument('--device_id', default='0', type=str)
 
         # model params
-        # network, v0 is the structure in the paper, v_base is resnet
-        self.parser.add_argument('--cap_model', default='v1_4', type=str,
-                                 help='v_base, v0, v1, ...')
-        # for now, only valid for v_base
-        self.parser.add_argument('--depth', default=14, type=int)
-        # for now, only valid for v1
-        self.parser.add_argument('--cap_N', default=3, type=int, help='multiple capLayers')
-        self.parser.add_argument('--route_num', default=3, type=int)
+        self.parser.add_argument('--cap_model', default='v_base', type=str, help='v_base, v0, ...')
 
-        # FOR cap_model=v0 only:
+        # only valid for cap_model=v_base
+        self.parser.add_argument('--depth', default=14, type=int)
+        # only valid for cap_model=v1_x
+        self.parser.add_argument('--cap_N', default=3, type=int, help='multiple capLayers')
+
+        # only valid for cap_model=v0:
+        self.parser.add_argument('--route_num', default=3, type=int)
         self.parser.add_argument('--primary_cap_num', default=32, type=int)
         self.parser.add_argument('--pre_ch_num', default=256, type=int)
 
@@ -47,41 +46,39 @@ class Options(object):
 
         self.parser.add_argument('--b_init', default='zero', type=str, help='[zero | rand | learn]')
         self.parser.add_argument('--squash_manner', default='paper', type=str, help='[sigmoid|paper]')
-        # v2 is the caps module; v3 is to replace the single cap layer to FC or other alternative
-        self.parser.add_argument('--w_version', default='v2', type=str, help='[v2, v3]')
-        self.parser.add_argument('--fc_time', type=int, default=0, help='for w_v3 alone')
-        # DEPRECATED. (old note):squash is much better
-        self.parser.add_argument('--do_squash', action='store_true')
+        # if comp_cap=True, replace the capLayer with FC layer
+        self.parser.add_argument('--comp_cap', action='store_true')
 
         # train
         self.parser.add_argument('--lr', default=0.0001, type=float, help='initial learning rate')
-        self.parser.add_argument('--scheduler', default=None, help='plateau, multi_step')   # todo (low)
+        # TODO(low): add lr scheme
+        # self.parser.add_argument('--scheduler', default=None, help='plateau, multi_step')
         self.parser.add_argument('--optim', default='rmsprop', type=str)
         self.parser.add_argument('--momentum', default=0.9, type=float, help='momentum')
         self.parser.add_argument('--weight_decay', default=5e-4, type=float)
-        self.parser.add_argument('--gamma', default=0.1, type=float)
+        self.parser.add_argument('--gamma', default=0.1, type=float)  # for step lr scheme
         self.parser.add_argument('--beta1', type=float, default=0.9, help='momentum term of adam')
 
         self.parser.add_argument('--batch_size_train', default=100, type=int)
         self.parser.add_argument('--batch_size_test', default=100, type=int)
         self.parser.add_argument('--max_epoch', default=300, type=int, help='Number of training epoches')
         self.parser.add_argument('--schedule', default=[150, 225], nargs='+', type=int)
-
         # loss
         self.parser.add_argument('--loss_form', default='CE', type=str, help='[ CE | spread | margin ]')
+        # preserved for legacy reason (no more KL loss)
         self.parser.add_argument('--use_KL', action='store_true')
         self.parser.add_argument('--KL_manner', default=1, type=int)
         self.parser.add_argument('--KL_factor', default=.1, type=float)
+        # stacking std, mean info of multiple capLayers (in CapLayer2 class), to compute KL loss
+        self.parser.add_argument('--use_multiple', action='store_true', help='valid for N > 1')
         self.parser.add_argument('--fix_m', action='store_true', help='valid for use_spread_loss only')
 
         # test
+        self.parser.add_argument('--show_test_after_epoch', type=int, default=-1)
         self.parser.add_argument('--multi_crop_test', action='store_true')
+        # show stats
         self.parser.add_argument('--draw_hist', action='store_true')
         self.parser.add_argument('--non_target_j', action='store_true')
-        self.parser.add_argument('--show_test_after_epoch', type=int, default=-1)
-        # show stats
-        self.parser.add_argument('--look_into_details', action='store_true')
-        self.parser.add_argument('--use_multiple', action='store_true', help='valid for N > 1')
 
         self.opt = self.parser.parse_args()
         self.opt.phase = 'train_val'
