@@ -10,7 +10,7 @@ start=`date +%s`
 DEVICE_ID=2,3
 CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
 --device_id=$DEVICE_ID \
---experiment_name=base_101_v4_less_aug_rerun_2 \
+--experiment_name=base_101_v4_less_aug_rerun_3 \
 --debug_mode=False \
 --dataset=cifar10 \
 --less_data_aug \
@@ -21,7 +21,7 @@ CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
 --schedule 150 200 250 \
 --lr=0.0001 \
 --batch_size_train=512 \
---batch_size_test=128 \
+--batch_size_test=512 \
 --show_test_after_epoch=10 \
 --s35
 
