@@ -7,10 +7,10 @@ start=`date +%s`
 # _v4_1gpu_optimized
 #
 # train and test
-DEVICE_ID=0,1
+DEVICE_ID=2,3
 CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
 --device_id=$DEVICE_ID \
---experiment_name=base_101_v4 \
+--experiment_name=base_101_v4_large_bs \
 --debug_mode=False \
 --dataset=cifar10 \
 --less_data_aug \
@@ -19,8 +19,8 @@ CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
 --loss_form=margin \
 --optim=adam \
 --schedule 150 200 250 \
---lr=0.0001 \
---batch_size_train=128 \
+--lr=0.0005 \
+--batch_size_train=512 \
 --batch_size_test=128 \
 --s35
 

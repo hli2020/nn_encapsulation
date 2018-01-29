@@ -1,39 +1,25 @@
 # from utils.from_wyang import AverageMeter, accuracy
 from object_detection.utils.util import *
 from object_detection.utils.eval import accuracy
+from layers.misc import compute_KL, update_all_data
 
 
+# To compute time, use profiler:
 # http://pytorch.org/docs/master/autograd.html?highlight=profile#torch.autograd.profiler.profile
-def _update_all_data(all_data, stats):
-    all_data[0].extend(stats[0])
-    all_data[1].extend(stats[1])
-    all_data[2].extend(stats[2])
-    for i in range(21):
-        all_data[3]['Y'][i].extend(stats[3]['Y'][i])
-    return all_data
-
-
-def compute_KL(mean, std):
-    loss = -0.5 * torch.sum(1 + torch.log(std**2) - mean**2 - std**2)
-    return loss / std.size(0)
+FIX_INPUT = False
 
 
 def train(trainloader, model, criterion, optimizer, opt, vis, epoch):
-
-    FIX_INPUT = False       # for quick debug
 
     model.train()
     has_data = False
     use_cuda = opt.use_cuda
     show_freq = opt.show_freq
+    FIX_INPUTS, FIX_TARGETS = [], []
 
-    batch_time = AverageMeter()
-    data_time = AverageMeter()
-    losses = AverageMeter()
-    KL_losses = AverageMeter()
-    normal_losses = AverageMeter()
-    top1 = AverageMeter()
-    top5 = AverageMeter()
+    batch_time, data_time = AverageMeter(), AverageMeter()
+    losses, KL_losses, normal_losses = AverageMeter(), AverageMeter(), AverageMeter()
+    top1, top5 = AverageMeter(), AverageMeter()
     end = time.time()
     epoch_size = len(trainloader)
 
@@ -43,16 +29,15 @@ def train(trainloader, model, criterion, optimizer, opt, vis, epoch):
 
         if FIX_INPUT:
             if has_data:
-                inputs, targets = fix_inputs, fix_targets
+                inputs, targets = FIX_INPUTS, FIX_TARGETS
             else:
-                fix_inputs, fix_targets = inputs, targets
+                FIX_INPUTS, FIX_TARGETS = inputs, targets
                 has_data = True
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda(async=True)
         inputs, targets = torch.autograd.Variable(inputs), torch.autograd.Variable(targets)
 
-        # compute output
-        # update: last two entries have mean, std for KL loss
+        # Last two entries in 'stats' have mean, std for KL loss
         outputs, stats = model(inputs, targets)  # 128 x 10 x 16
         try:
             outputs = outputs.norm(dim=2)
@@ -94,7 +79,7 @@ def train(trainloader, model, criterion, optimizer, opt, vis, epoch):
         end = time.time()
         if batch_idx % show_freq == 0 or batch_idx == len(trainloader)-1:
             if opt.use_KL:
-                # TODO (low): merge the case w or w/o KL
+                NotImplementedError()
                 curr_info = {
                     'loss': losses.avg,
                     'KL_loss': KL_losses.avg,
@@ -118,13 +103,15 @@ def train(trainloader, model, criterion, optimizer, opt, vis, epoch):
     }
 
 
-def test(testloader, model, criterion, opt, vis, epoch=0):
+def test(testloader, model, opt, visual, epoch=0, criterion=None):
+    """criterion is verbose"""
+    if opt.draw_hist is False:
+        assert criterion is not None
+    else:
+        assert opt.multi_crop_test is False
 
     use_cuda = opt.use_cuda
-    losses = AverageMeter()
-    top1 = AverageMeter()
-    top5 = AverageMeter()
-
+    test_losses, top1, top5 = AverageMeter(), AverageMeter(), AverageMeter()
     model.eval()
 
     stats_all_data = [[] for _ in range(4)]
@@ -135,49 +122,24 @@ def test(testloader, model, criterion, opt, vis, epoch=0):
 
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
-        inputs, targets = torch.autograd.Variable(inputs, volatile=True), \
-                          torch.autograd.Variable(targets)
+        inputs = torch.autograd.Variable(inputs, volatile=True)
+        targets = torch.autograd.Variable(targets)
 
-        # SHOW histogram here
-        if opt.draw_hist:
-            if opt.which_batch_idx == batch_idx:
-                input_vis = vis
-            elif opt.which_batch_idx == -1:
-                input_vis = vis   # draw all samples in the test
-            else:
-                input_vis = None
-        else:
-            input_vis = None
-
-        # compute output
         if opt.multi_crop_test:
             bs, ncrops, c, h, w = inputs.size()
             inputs_ = inputs.view(-1, c, h, w)
         else:
             inputs_ = inputs
+
         # the computation of stats is in 'cap_layer.py'
-        # 'stats' is the result of ONE mini-batch
-        outputs, stats = model(inputs_, targets, batch_idx, input_vis)
+        # 'stats' is from the mini-batch in ONE iteration
+        outputs, stats = model(inputs_, targets, batch_idx, opt.draw_hist)
 
-        if input_vis is not None:
-            if opt.which_batch_idx == -1:
-                stats_all_data = _update_all_data(stats_all_data, stats)
-            else:
-                # TODO: for now if input_vis is True, no multi_crop_test is allowed
-                for i in range(21):
-                    stats[3]['Y'][i] = 0. \
-                        if stats[3]['Y'][i] == [] else \
-                        np.mean(stats[3]['Y'][i])
-                plot_info = {
-                    'd2_num': outputs.size(2),
-                    'curr_iter': batch_idx,
-                    'model': os.path.basename(opt.cifar_model),
-                    'target': not opt.non_target_j
-                }
-                vis.plot_hist(stats, plot_info)
-
-        if opt.draw_hist is False:
-            # Do evaluation: the normal, rest testing procedure
+        if opt.draw_hist:
+            # skip test evaluation
+            stats_all_data = update_all_data(stats_all_data, stats)
+        else:
+            # do evaluation as in the normal train/test procedure
             try:
                 outputs = outputs.norm(dim=2)
             except RuntimeError:
@@ -187,17 +149,17 @@ def test(testloader, model, criterion, opt, vis, epoch=0):
                 outputs = outputs.view(bs, ncrops, -1).mean(1)
 
             if opt.loss_form == 'spread':
-                loss = criterion(outputs, targets, epoch)
+                test_loss = criterion(outputs, targets, epoch)
             else:
-                loss = criterion(outputs, targets)
-            # measure accuracy and record loss
+                test_loss = criterion(outputs, targets)
+            # measure accuracy and record test loss
             [prec1, prec5], _ = accuracy(outputs.data, targets.data, topk=(1, 5))
-            losses.update(loss.data[0], inputs.size(0))
+            test_losses.update(test_loss.data[0], inputs.size(0))
             top1.update(prec1[0], inputs.size(0))
             top5.update(prec5[0], inputs.size(0))
 
-    # draw stats for all data here
-    if opt.draw_hist and opt.which_batch_idx == -1:
+    # ONE epoch ends
+    if opt.draw_hist:
         for i in range(21):
             stats_all_data[3]['Y'][i] = 0. \
                 if stats_all_data[3]['Y'][i] == [] else \
@@ -206,10 +168,10 @@ def test(testloader, model, criterion, opt, vis, epoch=0):
             'model': os.path.basename(opt.cifar_model),
             'target': not opt.non_target_j
         }
-        vis.plot_hist(stats_all_data, plot_info, all_sample=True)
+        visual.plot_hist(stats_all_data, plot_info, all_sample=True)
 
     return {
-        'test_loss': losses.avg,
+        'test_loss': test_losses.avg,
         'test_acc_error': 100.0 - top1.avg,
         'test_acc5_error': 100.0 - top5.avg,
     }

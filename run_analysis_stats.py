@@ -2,7 +2,7 @@ from __future__ import print_function
 import torch.utils.data as data
 import torch.backends.cudnn as cudnn
 
-from layers.capsule import CapsNet
+from layers.network import CapsNet
 from layers.train_val import test
 
 from data.create_dset import create_dataset
@@ -25,8 +25,6 @@ args.test_model_list = [1, 50, 100, 200, 300, 247]
 args.draw_hist = True
 args.test_only = True
 args.non_target_j = False
-
-args.look_into_details = False
 # ==============================
 
 # init
@@ -47,10 +45,8 @@ for i in args.test_model_list:
     model_file = \
         os.path.join(args.save_folder, 'epoch_{:d}.pth'.format(i))
     print('loading weights of model [{:s}]'.format(os.path.basename(model_file)))
-    model = (model_file, model)
-    args.cifar_model = model_file
-    info = test(test_loader, model, criterion, args, vis)
-    print('test acc is {:.4f}'.format(info['test_acc']))
+    info = test(test_loader, model, args, visual)
+    print('test error is {:.4f}'.format(info['test_acc_error']))
 
 
 
