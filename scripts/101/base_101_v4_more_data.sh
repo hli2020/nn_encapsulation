@@ -7,13 +7,12 @@ start=`date +%s`
 # _v4_1gpu_optimized
 #
 # train and test
-DEVICE_ID=0,1
+DEVICE_ID=4,5
 CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
 --device_id=$DEVICE_ID \
---experiment_name=base_101_v4 \
+--experiment_name=base_101_v4_more_data \
 --debug_mode=False \
 --dataset=cifar10 \
---less_data_aug \
 --cap_model=v0 \
 --max_epoch=600 \
 --loss_form=margin \
