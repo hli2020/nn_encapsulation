@@ -3,14 +3,14 @@
 start=`date +%s`
 
 # train and test
-DEVICE_ID=2,3
+DEVICE_ID=4,5
 CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
 --device_id=$DEVICE_ID \
 --experiment_name=base_102_v1_2 \
 --debug_mode=False \
 --dataset=cifar10 \
 --less_data_aug \
---cap_model=v1_1 \
+--cap_model=v1_2 \
 --max_epoch=600 \
 --loss_form=margin \
 --optim=adam \
