@@ -3,7 +3,7 @@
 start=`date +%s`
 
 # train and test
-DEVICE_ID=4,5
+DEVICE_ID=6,7
 CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
 --device_id=$DEVICE_ID \
 --experiment_name=base_102_v1_1 \
