@@ -222,28 +222,48 @@ class CapLayer(nn.Module):
 class CapConv(nn.Module):
     def __init__(self, ch_num, groups,
                  N=1, ch_out=-1, manner='0',
-                 kernel_size=1, stride=1, pad=0):
+                 kernel_size=1, stride=1, pad=0, residual=False):
         super(CapConv, self).__init__()
         self.ch_num_in = ch_num
         self.ch_num_out = ch_num if ch_out == -1 else ch_out
         self.groups = groups
         self.iter_N = N
+        self.residual = residual
+
+        if self.residual and self.ch_num_in != self.ch_num_out:
+            self.conv_adjust_blob_shape = \
+                nn.Conv2d(self.ch_num_in, self.ch_num_out,
+                          kernel_size=3, padding=1, stride=stride)
 
         if manner == '0':
             layers = []
+
             for i in range(self.iter_N):
                 layers.append(nn.Conv2d(self.ch_num_in, self.ch_num_out,
                                         kernel_size=kernel_size, stride=stride,
                                         groups=self.groups, padding=pad))
                 # TODO: change BN per capsule, along the channel
-                layers.append(nn.BatchNorm2d(self.ch_num_out))
-                layers.append(nn.ReLU(True))
-                layers.append(conv_squash(self.groups))
+                if i < self.iter_N-1:
+                    layers.append(nn.BatchNorm2d(self.ch_num_out))
+                    layers.append(nn.ReLU(True))
+                    layers.append(conv_squash(self.groups))
 
-        self.sub_layer = nn.Sequential(*layers)
+            self.sub_layer = nn.Sequential(*layers)
+            self.last_relu = nn.ReLU()
+            self.last_bn = nn.BatchNorm2d(self.ch_num_out)
+            self.last_squash = conv_squash(self.groups)
 
     def forward(self, input):
-        return self.sub_layer(input)
+
+        out = self.sub_layer(input)
+        if self.residual:
+            if hasattr(self, 'conv_adjust_blob_shape'):
+                input = self.conv_adjust_blob_shape(input)
+            out += input
+        out = self.last_bn(out)
+        out = self.last_relu(out)
+        out = self.last_squash(out)
+        return out
 
 
 class CapFC(nn.Module):
@@ -325,6 +345,10 @@ class conv_squash(nn.Module):
         x = x.permute(0, 1, 4, 2, 3).contiguous()
         x = x.view(batch_size, -1, spatial_size, spatial_size)
         return x
+
+    def __repr__(self):
+        return self.__class__.__name__ + '(' \
+            + 'num_shared=' + str(self.num_shared) + ')'
 
 
 def squash(vec, manner='paper'):

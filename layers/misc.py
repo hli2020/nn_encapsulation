@@ -2,6 +2,14 @@ import torch
 import numpy as np
 
 
+# residual connections for cap_model=v1_x
+connect_list = {
+    'only_sub':     [False, True, False, True, False, True, False],
+    'all':          [True, True, True, True, True, True, True],
+    'default':      [False, False, False, False, False, False, False],
+}
+
+
 def _update(x, y, a):
     for i in range(len(x)):
         a[int(x[i])].append(y[i])
