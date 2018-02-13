@@ -2532,3 +2532,6 @@ Summary	epoch/iter [333/600] ||	TRAIN, Top1_err: 0.0440, Top5_err: 0.0000 ||	TES
 [base_102_v1_2_all_paper]	epoch/iter [334/600][200/391] ||	Loss: 0.0109, Top1_err: 0.0272, Top5_err: 0.0000 ||	Data/batch time: 0.0010/0.2649
 [base_102_v1_2_all_paper]	epoch/iter [334/600][300/391] ||	Loss: 0.0108, Top1_err: 0.0337, Top5_err: 0.0000 ||	Data/batch time: 0.0009/0.2651
 [base_102_v1_2_all_paper]	epoch/iter [334/600][390/391] ||	Loss: 0.0108, Top1_err: 0.0280, Top5_err: 0.0000 ||	Data/batch time: 0.0008/0.2649
+Summary	epoch/iter [334/600] ||	TRAIN, Top1_err: 0.0280, Top5_err: 0.0000 ||	TEST, Top1_err: 14.3300, Top5_err: 2.3100 ||
+
+[base_102_v1_2_all_paper]	epoch/iter [335/600][0/391] ||	Loss: 0.0113, Top1_err: 0.0000, Top5_err: 0.0000 ||	Data/batch time: 0.0686/0.2601
