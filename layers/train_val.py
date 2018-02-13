@@ -9,7 +9,7 @@ from layers.misc import compute_KL, update_all_data
 FIX_INPUT = False
 
 
-def train(trainloader, model, criterion, optimizer, opt, vis, epoch):
+def train(trainloader, model, criterion, optimizer, opt, visual, epoch):
 
     model.train()
     has_data = False
@@ -90,10 +90,10 @@ def train(trainloader, model, criterion, optimizer, opt, vis, epoch):
                     'batch': batch_time.avg,
                 }
 
-            vis.print_loss((losses.avg, top1.avg, top5.avg),
+            visual.print_loss((losses.avg, top1.avg, top5.avg),
                            (epoch, batch_idx, epoch_size),
                            (data_time.avg, batch_time.avg))
-            vis.plot_loss((losses.avg, top1.avg, top5.avg),
+            visual.plot_loss((losses.avg, top1.avg, top5.avg),
                           (epoch, batch_idx, epoch_size))
     return {
         # [dict], this is the result for one epoch

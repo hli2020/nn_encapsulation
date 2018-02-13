@@ -103,7 +103,8 @@ class CapsNet(nn.Module):
                 # increase cap_num and downsize spatial capsules
                 self.cap4_conv = CapConv(ch_num=32*8, ch_out=32*16, groups=32, kernel_size=3, stride=2, pad=1)
                 # output: bs, 32*16, 4, 4
-                self.final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes, cap_dim=16)
+                self.final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes,
+                                       cap_dim=16, fc_manner=opts.fc_manner)
 
         # init the network
         for m in self.modules():

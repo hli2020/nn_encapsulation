@@ -27,12 +27,10 @@ class Options(object):
         self.parser.add_argument('--device_id', default='0', type=str)
 
         # model params
-        self.parser.add_argument('--cap_model', default='v_base', type=str, help='v_base, v0, ...')
+        self.parser.add_argument('--cap_model', default='v1_2', type=str, help='v_base, v0, ...')
 
         # only valid for cap_model=v_base
         self.parser.add_argument('--depth', default=14, type=int)
-        # only valid for cap_model=v1_x
-        self.parser.add_argument('--cap_N', default=3, type=int, help='multiple capLayers')
 
         # only valid for cap_model=v0:
         self.parser.add_argument('--route_num', default=3, type=int)
@@ -48,6 +46,11 @@ class Options(object):
         self.parser.add_argument('--squash_manner', default='paper', type=str, help='[sigmoid|paper]')
         # if comp_cap=True, replace the capLayer with FC layer
         self.parser.add_argument('--comp_cap', action='store_true')
+
+        # only valid for cap_model=v1_x
+        self.parser.add_argument('--cap_N', default=3, type=int, help='multiple capLayers')
+        # only valid for cap_model=v1_2_x
+        self.parser.add_argument('--fc_manner', default='default', type=str)
 
         # train
         self.parser.add_argument('--lr', default=0.0001, type=float, help='initial learning rate')
