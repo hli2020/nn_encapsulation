@@ -49,6 +49,8 @@ class Options(object):
 
         # only valid for cap_model=v1_x
         self.parser.add_argument('--cap_N', default=3, type=int, help='multiple capLayers')
+        self.parser.add_argument('--connect_detail', default='default', type=str,
+                                 help='residual connections, [default | only_sub | all]')
         # only valid for cap_model=v1_2_x
         self.parser.add_argument('--fc_manner', default='default', type=str)
 

@@ -1,4 +1,5 @@
 import torch.nn as nn
+from layers.misc import connect_list
 from layers.models.cifar.resnet import BasicBlock, Bottleneck
 from layers.cap_layer import CapLayer, CapConv, CapFC
 from object_detection.utils.util import weights_init
@@ -76,22 +77,25 @@ class CapsNet(nn.Module):
 
         elif self.cap_model[0:2] == 'v1':
 
+            connect_detail = connect_list[opts.connect_detail]
+
             self.layer1 = nn.Sequential(*[
                 nn.Conv2d(3, 32, kernel_size=3, padding=1),
                 nn.BatchNorm2d(32),
                 nn.ReLU(True)
             ])  # 32 spatial output
-
-            self.cap1_conv = CapConv(ch_num=32*1, ch_out=32*2, groups=32)
-            self.cap1_conv_sub = CapConv(ch_num=32*2, groups=32, N=self.cap_N)
+            self.cap1_conv = CapConv(ch_num=32*1, ch_out=32*2, groups=32, residual=connect_detail[0])
+            self.cap1_conv_sub = CapConv(ch_num=32*2, groups=32, N=self.cap_N, residual=connect_detail[1])
             # 32 spatial output
 
-            self.cap2_conv = CapConv(ch_num=32*2, ch_out=32*4, groups=32, kernel_size=3, stride=2, pad=1)
-            self.cap2_conv_sub = CapConv(ch_num=32*4, groups=32, N=self.cap_N)
+            self.cap2_conv = CapConv(ch_num=32*2, ch_out=32*4, groups=32,
+                                     kernel_size=3, stride=2, pad=1, residual=connect_detail[2])
+            self.cap2_conv_sub = CapConv(ch_num=32*4, groups=32, N=self.cap_N, residual=connect_detail[3])
             # 16 spatial output
 
-            self.cap3_conv = CapConv(ch_num=32*4, ch_out=32*8, groups=32, kernel_size=3, stride=2, pad=1)
-            self.cap3_conv_sub = CapConv(ch_num=32*8, groups=32, N=self.cap_N)
+            self.cap3_conv = CapConv(ch_num=32*4, ch_out=32*8, groups=32,
+                                     kernel_size=3, stride=2, pad=1, residual=connect_detail[4])
+            self.cap3_conv_sub = CapConv(ch_num=32*8, groups=32, N=self.cap_N, residual=connect_detail[5])
             # 8 spatial output
 
             if self.cap_model == 'v1_1':
@@ -101,7 +105,8 @@ class CapsNet(nn.Module):
 
             elif self.cap_model == 'v1_2':
                 # increase cap_num and downsize spatial capsules
-                self.cap4_conv = CapConv(ch_num=32*8, ch_out=32*16, groups=32, kernel_size=3, stride=2, pad=1)
+                self.cap4_conv = CapConv(ch_num=32*8, ch_out=32*16, groups=32,
+                                         kernel_size=3, stride=2, pad=1, residual=connect_detail[6])
                 # output: bs, 32*16, 4, 4
                 self.final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes,
                                        cap_dim=16, fc_manner=opts.fc_manner)
