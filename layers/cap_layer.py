@@ -214,8 +214,8 @@ class CapLayer(nn.Module):
                     print(temp[diff_ind, :])
                     print('\n')
 
-        stats = [batch_cos_dist, batch_i_length, batch_cos_v,
-                 avg_len, mean, std]
+        stats = [batch_cos_dist, batch_i_length, batch_cos_v, avg_len,
+                 mean, std]
         return v, stats
 
 
@@ -251,32 +251,60 @@ class CapFC(nn.Module):
         given an input 4-D blob, generate the FC output;
         this layer assumes the input capsule's dim is the same as that of the output's capsule
     """
-    def __init__(self, in_cap_num, out_cap_num, cap_dim):
+    def __init__(self, in_cap_num, out_cap_num, cap_dim, fc_manner='default'):
         super(CapFC, self).__init__()
         self.in_cap_num = in_cap_num
         self.out_cap_num = out_cap_num
         self.cap_dim = cap_dim
-        self.weight = Parameter(torch.Tensor(cap_dim, in_cap_num, out_cap_num))
-        self.reset_parameters()
+        self.fc_manner = fc_manner
+        if fc_manner == 'default':
+            self.weight = Parameter(torch.Tensor(cap_dim, in_cap_num, out_cap_num))
+            self.reset_parameters()
+        elif fc_manner == 'fc':
+            self.fc_layer = nn.Linear(self.in_cap_num*self.cap_dim,
+                                      self.out_cap_num*self.cap_dim)
+        elif fc_manner == 'paper':
+            self.W1 = Parameter(torch.Tensor(cap_dim, cap_dim*out_cap_num))
+            self.W2 = Parameter(torch.Tensor(out_cap_num, in_cap_num, 1))
+            self.reset_parameters()
 
     def forward(self, x):
-        x = x.view(x.size(0), -1, self.cap_dim, x.size(2), x.size(3))
-        x = x.permute(0, 1, 3, 4, 2).contiguous()
-        x = x.view(x.size(0), -1, self.cap_dim)
-        input = x.permute(0, 2, 1).contiguous().unsqueeze(2)
-        input = torch.matmul(input, self.weight).squeeze().permute(0, 2, 1).contiguous()
+        if self.fc_manner == 'default':
+            x = x.view(x.size(0), -1, self.cap_dim, x.size(2), x.size(3))
+            x = x.permute(0, 1, 3, 4, 2).contiguous()
+            x = x.view(x.size(0), -1, self.cap_dim)
+            input = x.permute(0, 2, 1).contiguous().unsqueeze(2)
+            input = torch.matmul(input, self.weight).squeeze().permute(0, 2, 1).contiguous()
+        elif self.fc_manner == 'fc':
+            x = x.view(x.size(0), -1)
+            input = self.fc_layer(x)
+            input = input.view(input.size(0), self.out_cap_num, self.cap_dim)
+        elif self.fc_manner == 'paper':
+            x = x.view(x.size(0), -1, self.cap_dim, x.size(2), x.size(3))
+            x = x.permute(0, 1, 3, 4, 2).contiguous()
+            x = x.view(x.size(0), -1, self.cap_dim)
+            input = torch.matmul(x, self.W1)
+            input = input.view(input.size(0), self.in_cap_num, self.cap_dim, self.out_cap_num)
+            input = input.permute(0, 3, 2, 1).contiguous()
+            input = torch.matmul(input, self.W2).squeeze()
         return squash(input)
 
-    # TODO: figure out the init stuff
     def reset_parameters(self):
-        stdv = 1. / math.sqrt(self.weight.size(1))
-        self.weight.data.uniform_(-stdv, stdv)
+        if self.fc_manner == 'default':
+            stdv = 1. / math.sqrt(self.weight.size(1))
+            self.weight.data.uniform_(-stdv, stdv)
+        elif self.fc_manner == 'paper':
+            stdv = 1. / math.sqrt(self.W1.size(1))
+            self.W1.data.uniform_(-stdv, stdv)
+            stdv = 1. / math.sqrt(self.W2.size(1))
+            self.W2.data.uniform_(-stdv, stdv)
 
     def __repr__(self):
         return self.__class__.__name__ + '(' \
             + 'in_cap_num=' + str(self.in_cap_num) \
             + ', out_cap_num=' + str(self.out_cap_num) \
-            + ', cap_dim=' + str(self.cap_dim) + ')'
+            + ', cap_dim=' + str(self.cap_dim) \
+            + ', fc_manner=' + self.fc_manner + ')'
 
 
 class conv_squash(nn.Module):
