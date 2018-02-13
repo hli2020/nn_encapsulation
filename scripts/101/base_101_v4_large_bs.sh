@@ -7,7 +7,7 @@ start=`date +%s`
 # _v4_1gpu_optimized
 #
 # train and test
-DEVICE_ID=2,3
+DEVICE_ID=2
 CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
 --device_id=$DEVICE_ID \
 --experiment_name=base_101_v4_large_bs \
