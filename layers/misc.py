@@ -4,9 +4,9 @@ import numpy as np
 
 # residual connections for cap_model=v1_x
 connect_list = {
-    'only_sub':     [False, True, False, True, False, True, False],
-    'all':          [True, True, True, True, True, True, True],
-    'default':      [False, False, False, False, False, False, False],
+    'only_sub':     [False, True, False, True, False, True, False, True],
+    'all':          [True, True, True, True, True, True, True, True],
+    'default':      [False, False, False, False, False, False, False, False],
 }
 
 

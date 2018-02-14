@@ -110,6 +110,13 @@ class CapsNet(nn.Module):
                 # output: bs, 32*16, 4, 4
                 self.final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes,
                                        cap_dim=16, fc_manner=opts.fc_manner)
+            elif self.cap_model == 'v1_3':
+                self.cap4_conv = CapConv(ch_num=32*8, ch_out=32*16, groups=32,
+                                         kernel_size=3, stride=2, pad=1, residual=connect_detail[6])
+                self.cap4_conv_sub = CapConv(ch_num=32*16, groups=32, N=self.cap_N, residual=connect_detail[7])
+                # output: bs, 32*16, 4, 4
+                self.final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes,
+                                       cap_dim=16, fc_manner=opts.fc_manner)
 
         # init the network
         for m in self.modules():
@@ -151,7 +158,7 @@ class CapsNet(nn.Module):
                 torch.cuda.synchronize()
                 print('last cap total time: {:.4f}'.format(time.perf_counter() - start))
 
-        elif self.cap_model == 'v1_1' or self.cap_model == 'v1_2':
+        elif self.cap_model[0:2] == 'v1':
 
             x = self.layer1(x)
             x = self.cap1_conv(x)
@@ -166,6 +173,10 @@ class CapsNet(nn.Module):
 
             elif self.cap_model == 'v1_2':
                 x = self.cap4_conv(x)
+                output = self.final_cls(x)
+            elif self.cap_model == 'v1_3':
+                x = self.cap4_conv(x)
+                x = self.cap4_conv_sub(x)
                 output = self.final_cls(x)
         else:
             raise NameError('Unknown structure or capsule model type.')

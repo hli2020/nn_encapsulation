@@ -24,18 +24,20 @@ show_jot_opt(args)
 
 # dataset
 test_loader = data.DataLoader(create_dataset(args, 'test'), args.batch_size_test,
-                              num_workers=args.num_workers, shuffle=False, pin_memory=True)
+                              num_workers=args.num_workers, shuffle=False,
+                              pin_memory=args.use_cuda)
 train_loader = data.DataLoader(create_dataset(args, 'train'), args.batch_size_train,
-                               num_workers=args.num_workers, shuffle=True, pin_memory=True)
+                               num_workers=args.num_workers, shuffle=True,
+                               pin_memory=args.use_cuda)
 
 # init visualizer
 visual = Visualizer(args)
 
 # model
 model = CapsNet(num_classes=train_loader.dataset.num_classes, opts=args)
-if args.debug_mode:
+if args.debug_mode and args.use_cuda:
     model = model.cuda()
-else:
+elif args.use_cuda:
     model = torch.nn.DataParallel(model).cuda()
 model_summary, param_num = torch_summarize(model)
 print_log(model_summary, args.file_name)
