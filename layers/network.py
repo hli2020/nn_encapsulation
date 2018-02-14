@@ -1,18 +1,18 @@
 import torch.nn as nn
 from layers.misc import connect_list
 from layers.models.cifar.resnet import BasicBlock, Bottleneck
-from layers.cap_layer import CapLayer, CapConv, CapFC
+from layers.cap_layer import CapLayer, CapConv, CapConv2, CapFC
 from object_detection.utils.util import weights_init
 import time
 import torch
 
 
-class CapsNet(nn.Module):
+class CapNet(nn.Module):
     """
     Capsule network.
     """
     def __init__(self, opts, num_classes=100):
-        super(CapsNet, self).__init__()
+        super(CapNet, self).__init__()
 
         self.use_imagenet = True if opts.dataset == 'tiny_imagenet' else False
         self.cap_model = opts.cap_model
@@ -78,12 +78,12 @@ class CapsNet(nn.Module):
         elif self.cap_model[0:2] == 'v1':
 
             connect_detail = connect_list[opts.connect_detail]
-
             self.layer1 = nn.Sequential(*[
                 nn.Conv2d(3, 32, kernel_size=3, padding=1),
                 nn.BatchNorm2d(32),
                 nn.ReLU(True)
             ])  # 32 spatial output
+
             self.cap1_conv = CapConv(ch_num=32*1, ch_out=32*2, groups=32, residual=connect_detail[0])
             self.cap1_conv_sub = CapConv(ch_num=32*2, groups=32, N=self.cap_N, residual=connect_detail[1])
             # 32 spatial output
@@ -117,6 +117,26 @@ class CapsNet(nn.Module):
                 # output: bs, 32*16, 4, 4
                 self.final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes,
                                        cap_dim=16, fc_manner=opts.fc_manner)
+
+        elif self.cap_model == 'v2':
+            connect_detail = connect_list[opts.connect_detail]
+            self.layer1 = nn.Sequential(*[
+                nn.Conv2d(3, 32, kernel_size=3, padding=1),
+                nn.BatchNorm2d(32),
+                nn.ReLU(True)
+            ])  # 32 spatial output
+
+            self.module1 = CapConv2(ch_in=32*1, ch_out=32*2, groups=32,
+                                    residual=connect_detail[0:2], iter_N=self.cap_N, no_downsample=True)
+            self.module2 = CapConv2(ch_in=32*2, ch_out=32*4, groups=32,
+                                    residual=connect_detail[2:4], iter_N=self.cap_N)
+            self.module3 = CapConv2(ch_in=32*4, ch_out=32*8, groups=32,
+                                    residual=connect_detail[4:6], iter_N=self.cap_N)
+            self.module4 = CapConv2(ch_in=32*8, ch_out=32*16, groups=32,
+                                    residual=connect_detail[6:], iter_N=self.cap_N)
+            # output: bs, 32*16, 4, 4
+            self.final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes,
+                                   cap_dim=16, fc_manner=opts.fc_manner)
 
         # init the network
         for m in self.modules():
@@ -178,6 +198,14 @@ class CapsNet(nn.Module):
                 x = self.cap4_conv(x)
                 x = self.cap4_conv_sub(x)
                 output = self.final_cls(x)
+
+        elif self.cap_model == 'v2':
+            x = self.layer1(x)
+            x = self.module1(x)
+            x = self.module2(x)
+            x = self.module3(x)
+            x = self.module4(x)
+            output = self.final_cls(x)
         else:
             raise NameError('Unknown structure or capsule model type.')
 

@@ -266,6 +266,30 @@ class CapConv(nn.Module):
         return out
 
 
+class CapConv2(nn.Module):
+    """Wrap up the CapConv layer with multiple sub layers into a module, with skip connection"""
+    def __init__(self, ch_in, ch_out, groups,
+                 residual, iter_N, no_downsample=False):
+        super(CapConv2, self).__init__()
+
+        if no_downsample:
+            ksize, stride, pad = 1, 1, 0
+        else:
+            ksize, stride, pad = 3, 2, 1
+        self.main_conv = CapConv(ch_num=ch_in, ch_out=ch_out, groups=groups,
+                                 kernel_size=ksize, stride=stride, pad=pad,
+                                 residual=residual[0])
+        layers = []
+        for i in range(iter_N):
+            layers.append(CapConv(ch_num=ch_out, groups=groups, residual=residual[1]))
+        self.sub_conv = nn.Sequential(*layers)
+
+    def forward(self, input):
+        out = self.main_conv(input)
+        out = self.sub_conv(out)
+        return out
+
+
 class CapFC(nn.Module):
     """
         given an input 4-D blob, generate the FC output;
