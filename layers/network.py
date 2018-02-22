@@ -16,7 +16,7 @@ class CapNet(nn.Module):
 
         self.use_imagenet = True if opts.dataset == 'tiny_imagenet' else False
         self.cap_model = opts.cap_model
-        self.use_multiple = opts.use_multiple
+        # self.use_multiple = opts.use_multiple
         input_ch = 1 if opts.dataset == 'fmnist' else 3
         self.measure_time = opts.measure_time
         self.cap_N = opts.cap_N
@@ -51,7 +51,6 @@ class CapNet(nn.Module):
 
         elif self.cap_model == 'v0':
             # original capsule idea in the paper
-
             # first conv
             self.tranfer_conv = nn.Conv2d(input_ch, opts.pre_ch_num, kernel_size=9, padding=1, stride=2)  # 256x13x13
             self.tranfer_bn = nn.InstanceNorm2d(opts.pre_ch_num, affine=True) \
@@ -76,7 +75,6 @@ class CapNet(nn.Module):
                                       out_dim=16, num_shared=opts.primary_cap_num, in_dim=8)
 
         elif self.cap_model[0:2] == 'v1':
-
             connect_detail = connect_list[opts.connect_detail]
             self.layer1 = nn.Sequential(*[
                 nn.Conv2d(3, 32, kernel_size=3, padding=1),
@@ -120,20 +118,25 @@ class CapNet(nn.Module):
 
         elif self.cap_model == 'v2':
             connect_detail = connect_list[opts.connect_detail]
-            self.layer1 = nn.Sequential(*[
+            self.module0 = nn.Sequential(*[
                 nn.Conv2d(3, 32, kernel_size=3, padding=1),
                 nn.BatchNorm2d(32),
                 nn.ReLU(True)
             ])  # 32 spatial output
 
             self.module1 = CapConv2(ch_in=32*1, ch_out=32*2, groups=32,
-                                    residual=connect_detail[0:2], iter_N=self.cap_N, no_downsample=True)
+                                    residual=connect_detail[0:2], iter_N=self.cap_N,
+                                    no_downsample=True,
+                                    more_skip=opts.more_skip, layerwise_skip_connect=opts.layerwise)
             self.module2 = CapConv2(ch_in=32*2, ch_out=32*4, groups=32,
-                                    residual=connect_detail[2:4], iter_N=self.cap_N)
+                                    residual=connect_detail[2:4], iter_N=self.cap_N,
+                                    more_skip=opts.more_skip, layerwise_skip_connect=opts.layerwise)
             self.module3 = CapConv2(ch_in=32*4, ch_out=32*8, groups=32,
-                                    residual=connect_detail[4:6], iter_N=self.cap_N)
+                                    residual=connect_detail[4:6], iter_N=self.cap_N,
+                                    more_skip=opts.more_skip, layerwise_skip_connect=opts.layerwise)
             self.module4 = CapConv2(ch_in=32*8, ch_out=32*16, groups=32,
-                                    residual=connect_detail[6:], iter_N=self.cap_N)
+                                    residual=connect_detail[6:], iter_N=self.cap_N,
+                                    more_skip=opts.more_skip, layerwise_skip_connect=opts.layerwise)
             # output: bs, 32*16, 4, 4
             self.final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes,
                                    cap_dim=16, fc_manner=opts.fc_manner)
@@ -179,7 +182,6 @@ class CapNet(nn.Module):
                 print('last cap total time: {:.4f}'.format(time.perf_counter() - start))
 
         elif self.cap_model[0:2] == 'v1':
-
             x = self.layer1(x)
             x = self.cap1_conv(x)
             x = self.cap1_conv_sub(x)
@@ -200,7 +202,7 @@ class CapNet(nn.Module):
                 output = self.final_cls(x)
 
         elif self.cap_model == 'v2':
-            x = self.layer1(x)
+            x = self.module0(x)
             x = self.module1(x)
             x = self.module2(x)
             x = self.module3(x)

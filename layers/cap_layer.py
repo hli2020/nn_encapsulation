@@ -221,8 +221,9 @@ class CapLayer(nn.Module):
 
 class CapConv(nn.Module):
     def __init__(self, ch_num, groups,
-                 N=1, ch_out=-1, manner='0',
+                 N=1, ch_out=-1,
                  kernel_size=1, stride=1, pad=0, residual=False):
+        """if residual is true, use skip connection"""
         super(CapConv, self).__init__()
         self.ch_num_in = ch_num
         self.ch_num_out = ch_num if ch_out == -1 else ch_out
@@ -235,23 +236,21 @@ class CapConv(nn.Module):
                 nn.Conv2d(self.ch_num_in, self.ch_num_out,
                           kernel_size=3, padding=1, stride=stride)
 
-        if manner == '0':
-            layers = []
+        layers = []
+        for i in range(self.iter_N):
+            layers.append(nn.Conv2d(self.ch_num_in, self.ch_num_out,
+                                    kernel_size=kernel_size, stride=stride,
+                                    groups=self.groups, padding=pad))
+            # TODO: change BN per capsule, along the channel
+            if i < self.iter_N-1:
+                layers.append(nn.BatchNorm2d(self.ch_num_out))
+                layers.append(nn.ReLU(True))
+                layers.append(conv_squash(self.groups))
 
-            for i in range(self.iter_N):
-                layers.append(nn.Conv2d(self.ch_num_in, self.ch_num_out,
-                                        kernel_size=kernel_size, stride=stride,
-                                        groups=self.groups, padding=pad))
-                # TODO: change BN per capsule, along the channel
-                if i < self.iter_N-1:
-                    layers.append(nn.BatchNorm2d(self.ch_num_out))
-                    layers.append(nn.ReLU(True))
-                    layers.append(conv_squash(self.groups))
-
-            self.sub_layer = nn.Sequential(*layers)
-            self.last_relu = nn.ReLU()
-            self.last_bn = nn.BatchNorm2d(self.ch_num_out)
-            self.last_squash = conv_squash(self.groups)
+        self.sub_layer = nn.Sequential(*layers)
+        self.last_bn = nn.BatchNorm2d(self.ch_num_out)
+        self.last_relu = nn.ReLU()
+        self.last_squash = conv_squash(self.groups)
 
     def forward(self, input):
 
@@ -269,24 +268,53 @@ class CapConv(nn.Module):
 class CapConv2(nn.Module):
     """Wrap up the CapConv layer with multiple sub layers into a module, with skip connection"""
     def __init__(self, ch_in, ch_out, groups,
-                 residual, iter_N, no_downsample=False):
+                 residual, iter_N,
+                 no_downsample=False,
+                 layerwise_skip_connect=True,
+                 more_skip=False):
         super(CapConv2, self).__init__()
+        assert len(residual) == 2
+        if more_skip:
+            assert iter_N >= 2
+            iter_N -= 1
+        self.more_skip = more_skip
 
         if no_downsample:
             ksize, stride, pad = 1, 1, 0
         else:
             ksize, stride, pad = 3, 2, 1
         self.main_conv = CapConv(ch_num=ch_in, ch_out=ch_out, groups=groups,
-                                 kernel_size=ksize, stride=stride, pad=pad,
-                                 residual=residual[0])
-        layers = []
-        for i in range(iter_N):
-            layers.append(CapConv(ch_num=ch_out, groups=groups, residual=residual[1]))
-        self.sub_conv = nn.Sequential(*layers)
+                                 kernel_size=ksize, stride=stride, pad=pad, residual=residual[0])
+        if layerwise_skip_connect:
+            layers = []
+            for i in range(iter_N):
+                layers.append(CapConv(ch_num=ch_out, groups=groups, residual=residual[1]))
+            self.sub_conv = nn.Sequential(*layers)
+        else:
+            "should be exactly the same as 'v1_3' in network.py"
+            self.sub_conv = CapConv(ch_num=ch_out, groups=groups, N=iter_N, residual=residual[1])
+
+        if more_skip:
+            # 'ms' means 'more_skip'
+            if ch_in != ch_out:
+                self.ms_conv_adjust_blob_shape = \
+                    nn.Conv2d(ch_in, ch_out, kernel_size=3, padding=1, stride=stride)
+            self.ms_conv = nn.Conv2d(ch_out, ch_out, kernel_size=1, groups=groups)
+            self.ms_bn = nn.BatchNorm2d(ch_out)
+            self.ms_relu = nn.ReLU()
+            self.ms_squash = conv_squash(groups)
 
     def forward(self, input):
         out = self.main_conv(input)
         out = self.sub_conv(out)
+        if self.more_skip:
+            out = self.ms_conv(out)
+            if hasattr(self, 'ms_conv_adjust_blob_shape'):
+                input = self.ms_conv_adjust_blob_shape(input)
+            out += input
+            out = self.ms_bn(out)
+            out = self.ms_relu(out)
+            out = self.ms_squash(out)
         return out
 
 

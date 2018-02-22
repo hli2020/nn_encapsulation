@@ -11,10 +11,10 @@ class Options(object):
         self.parser.add_argument('--experiment_name', default='base')
         self.parser.add_argument('--base_save_folder', default='result')
         self.parser.add_argument('--dataset', default='cifar10', help='[ cifar10 | tiny_imagenet ]')
+        self.parser.add_argument('--less_data_aug', action='store_true', help='see create_dset.py')
         # only valid for imagenet
         self.parser.add_argument('--setting', default='top1', type=str, help='[ top1 | top5 | obj_det ]')
         self.parser.add_argument('--bigger_input', action='store_true', help='only valid for imagenet')
-        self.parser.add_argument('--less_data_aug', action='store_true', help='see create_dset.py')
 
         self.parser.add_argument('--debug_mode', default=True, type=str2bool)
         self.parser.add_argument('--measure_time', action='store_true')
@@ -27,7 +27,7 @@ class Options(object):
         self.parser.add_argument('--device_id', default='0', type=str)
 
         # model params
-        self.parser.add_argument('--cap_model', default='v2', type=str, help='v_base, v0, ...')
+        self.parser.add_argument('--cap_model', default='v0', type=str, help='v_base, v0, ...')
 
         # only valid for cap_model=v_base
         self.parser.add_argument('--depth', default=14, type=int)
@@ -47,29 +47,32 @@ class Options(object):
         # if comp_cap=True, replace the capLayer with FC layer
         self.parser.add_argument('--comp_cap', action='store_true')
 
-        # only valid for cap_model=v1_x
-        self.parser.add_argument('--cap_N', default=3, type=int, help='multiple capLayers')
+        # valid for cap_model=v1_x and above
+        self.parser.add_argument('--cap_N', default=4, type=int, help='multiple capLayers')
         self.parser.add_argument('--connect_detail', default='default', type=str,
                                  help='residual connections, [default | only_sub | all]')
-        # only valid for cap_model=v1_2_x
+        # valid for cap_model=v1_2_x and above
         self.parser.add_argument('--fc_manner', default='default', type=str)
+        # valid for cap_model=v2_x and above
+        self.parser.add_argument('--more_skip', action='store_true')
+        self.parser.add_argument('--layerwise', action='store_true')
 
         # train
         self.parser.add_argument('--lr', default=0.0001, type=float, help='initial learning rate')
         # TODO(low): add lr scheme
         # self.parser.add_argument('--scheduler', default=None, help='plateau, multi_step')
-        self.parser.add_argument('--optim', default='rmsprop', type=str)
+        self.parser.add_argument('--optim', default='adam', type=str)
         self.parser.add_argument('--momentum', default=0.9, type=float, help='momentum')
         self.parser.add_argument('--weight_decay', default=5e-4, type=float)
         self.parser.add_argument('--gamma', default=0.1, type=float)  # for step lr scheme
         self.parser.add_argument('--beta1', type=float, default=0.9, help='momentum term of adam')
 
-        self.parser.add_argument('--batch_size_train', default=100, type=int)
-        self.parser.add_argument('--batch_size_test', default=100, type=int)
-        self.parser.add_argument('--max_epoch', default=300, type=int, help='Number of training epoches')
-        self.parser.add_argument('--schedule', default=[150, 225], nargs='+', type=int)
+        self.parser.add_argument('--batch_size_train', default=128, type=int)
+        self.parser.add_argument('--batch_size_test', default=128, type=int)
+        self.parser.add_argument('--max_epoch', default=600, type=int, help='Number of training epoches')
+        self.parser.add_argument('--schedule', default=[200, 300, 400], nargs='+', type=int)
         # loss
-        self.parser.add_argument('--loss_form', default='CE', type=str, help='[ CE | spread | margin ]')
+        self.parser.add_argument('--loss_form', default='margin', type=str, help='[ CE | spread | margin ]')
         # preserved for legacy reason (no more KL loss)
         self.parser.add_argument('--use_KL', action='store_true')
         self.parser.add_argument('--KL_manner', default=1, type=int)
@@ -120,3 +123,24 @@ class Options(object):
                 self.opt.show_test_after_epoch = 100
             self.opt.show_freq = 100
             self.opt.save_epoch = 25
+        self._sort_up_attr()
+
+    def _sort_up_attr(self):
+        options = []
+        if self.opt.dataset != 'tiny_imagenet':
+            options.extend(['setting', 'bigger_input'])
+        if self.opt.cap_model != 'v_base':
+            options.extend(['depth'])
+        if self.opt.cap_model != 'v0':
+            options.extend(['route_num', 'primary_cap_num', 'pre_ch_num',
+                            'add_cap_dropout', 'dropout_p', 'add_cap_BN_relu', 'use_instanceBN',
+                            'b_init', 'squash_manner', 'comp_cap'])
+        if self.opt.loss_form != 'spread':
+            options.extend(['fix_m'])
+
+        options.extend(['use_KL', 'KL_manner', 'KL_factor', 'use_multiple'])
+        self._delete_attr(options)
+
+    def _delete_attr(self, options):
+        for option in options:
+            delattr(self.opt, option)

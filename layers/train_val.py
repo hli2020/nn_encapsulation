@@ -54,11 +54,11 @@ def train(trainloader, model, criterion, optimizer, opt, visual, epoch):
             loss = criterion(outputs, targets, epoch)
         else:
             loss = criterion(outputs, targets)
-        if opt.use_KL:
-            normal_losses.update(loss.data[0], inputs.size(0))
-            loss_KL = opt.KL_factor * compute_KL(stats[-2], stats[-1])
-            KL_losses.update(loss_KL.data[0], inputs.size(0))
-            loss += loss_KL
+        # if opt.use_KL:
+        #     normal_losses.update(loss.data[0], inputs.size(0))
+        #     loss_KL = opt.KL_factor * compute_KL(stats[-2], stats[-1])
+        #     KL_losses.update(loss_KL.data[0], inputs.size(0))
+        #     loss += loss_KL
 
         # measure accuracy and record loss
         [prec1, prec5], _ = accuracy(outputs.data, targets.data, topk=(1, 5))
@@ -78,17 +78,17 @@ def train(trainloader, model, criterion, optimizer, opt, visual, epoch):
         batch_time.update(time.time() - end)
         end = time.time()
         if batch_idx % show_freq == 0 or batch_idx == len(trainloader)-1:
-            if opt.use_KL:
-                NotImplementedError()
-                curr_info = {
-                    'loss': losses.avg,
-                    'KL_loss': KL_losses.avg,
-                    'normal_loss': normal_losses.avg,
-                    'acc': top1.avg,
-                    'acc5': top5.avg,
-                    'data': data_time.avg,
-                    'batch': batch_time.avg,
-                }
+            # if opt.use_KL:
+            #     NotImplementedError()
+            #     curr_info = {
+            #         'loss': losses.avg,
+            #         'KL_loss': KL_losses.avg,
+            #         'normal_loss': normal_losses.avg,
+            #         'acc': top1.avg,
+            #         'acc5': top5.avg,
+            #         'data': data_time.avg,
+            #         'batch': batch_time.avg,
+            #     }
 
             visual.print_loss((losses.avg, top1.avg, top5.avg),
                            (epoch, batch_idx, epoch_size),
