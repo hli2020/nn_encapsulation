@@ -129,22 +129,26 @@ class CapNet(nn.Module):
                                     no_downsample=True,
                                     more_skip=opts.more_skip,
                                     layerwise_skip_connect=opts.layerwise,
-                                    wider_main_conv=opts.wider)
+                                    wider_main_conv=opts.wider,
+                                    manner=opts.manner)
             self.module2 = CapConv2(ch_in=32*2, ch_out=32*4, groups=32,
                                     residual=connect_detail[2:4], iter_N=self.cap_N,
                                     more_skip=opts.more_skip,
                                     layerwise_skip_connect=opts.layerwise,
-                                    wider_main_conv=opts.wider)
+                                    wider_main_conv=opts.wider,
+                                    manner=opts.manner)
             self.module3 = CapConv2(ch_in=32*4, ch_out=32*8, groups=32,
                                     residual=connect_detail[4:6], iter_N=self.cap_N,
                                     more_skip=opts.more_skip,
                                     layerwise_skip_connect=opts.layerwise,
-                                    wider_main_conv=opts.wider)
+                                    wider_main_conv=opts.wider,
+                                    manner=opts.manner)
             self.module4 = CapConv2(ch_in=32*8, ch_out=32*16, groups=32,
                                     residual=connect_detail[6:], iter_N=self.cap_N,
                                     more_skip=opts.more_skip,
                                     layerwise_skip_connect=opts.layerwise,
-                                    wider_main_conv=opts.wider)
+                                    wider_main_conv=opts.wider,
+                                    manner=opts.manner)
             # output: bs, 32*16, 4, 4
             self.final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes,
                                    cap_dim=16, fc_manner=opts.fc_manner)

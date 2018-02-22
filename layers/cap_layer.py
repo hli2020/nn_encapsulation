@@ -220,10 +220,24 @@ class CapLayer(nn.Module):
 
 
 class CapConv(nn.Module):
+    """
+        the basic capConv block
+        if residual is true, use skip connection
+
+            input
+            |   | conv2d
+            |   | BN-ReLU-Squash
+            |   | conv2d
+            |   | BN-ReLU-Squash
+            |   | ... (N times)
+            |   | conv2d
+            | + | (skip connection)
+            |   | BN-ReLU-Squash
+        """
     def __init__(self, ch_num, groups,
                  N=1, ch_out=-1,
-                 kernel_size=(1,), stride=1, pad=(0,), residual=False):
-        """if residual is true, use skip connection"""
+                 kernel_size=(1,), stride=1, pad=(0,), residual=False,
+                 manner='0'):
         super(CapConv, self).__init__()
         self.ch_num_in = ch_num
         self.ch_num_out = ch_num if ch_out == -1 else ch_out
@@ -239,15 +253,10 @@ class CapConv(nn.Module):
 
         layers = []
         for i in range(self.iter_N):
-            # TODO: merge them
-            if self.wider_conv:
-                layers.append(multi_conv(
-                    self.ch_num_in, self.ch_num_out,
-                    ksize=kernel_size, stride=stride, group=self.groups, pad=pad))
-            else:
-                layers.append(nn.Conv2d(self.ch_num_in, self.ch_num_out,
-                                        kernel_size=kernel_size[0], stride=stride,
-                                        groups=self.groups, padding=pad[0]))
+            layers.append(_make_core_conv(
+                manner=manner, wider_conv=self.wider_conv,
+                ch_num_in=self.ch_num_in, ch_num_out=self.ch_num_out,
+                kernel_size=kernel_size, stride=stride, groups=self.groups, pad=pad))
             # TODO: change BN per capsule, along the channel
             if i < self.iter_N-1:
                 layers.append(nn.BatchNorm2d(self.ch_num_out))
@@ -273,13 +282,18 @@ class CapConv(nn.Module):
 
 
 class CapConv2(nn.Module):
-    """Wrap up the CapConv layer with multiple sub layers into a module, with skip connection"""
+    """
+        Wrap up the CapConv layer with multiple sub layers into a module,
+        possibly with skip connection.
+    """
     def __init__(self, ch_in, ch_out, groups,
                  residual, iter_N,
                  no_downsample=False,               # for main_conv
                  layerwise_skip_connect=True,       # for sub_conv
                  more_skip=False,
-                 wider_main_conv=False):            # for main_conv
+                 wider_main_conv=False,             # for main_conv
+                 manner='0',                        # for both
+                 ):
         super(CapConv2, self).__init__()
         assert len(residual) == 2
         if more_skip:
@@ -288,27 +302,33 @@ class CapConv2(nn.Module):
         self.more_skip = more_skip
 
         # define main_conv
-        ksize = (5, 3, 1) if wider_main_conv else (3,)
-        pad = (2, 1, 0) if wider_main_conv else (1,)
-        stride = 1 if no_downsample else 2
+        main_ksize = (5, 3, 1) if wider_main_conv else (3,)
+        main_pad = (2, 1, 0) if wider_main_conv else (1,)
+        main_stride = 1 if no_downsample else 2
         self.main_conv = CapConv(ch_num=ch_in, ch_out=ch_out, groups=groups,
-                                 kernel_size=ksize, stride=stride, pad=pad, residual=residual[0])
-        # define sub_conv
+                                 kernel_size=main_ksize, stride=main_stride,
+                                 pad=main_pad, residual=residual[0], manner=manner)
+        # define sub_conv (stride/pad/ksize are set by default)
         if layerwise_skip_connect:
             layers = []
             for i in range(iter_N):
-                layers.append(CapConv(ch_num=ch_out, groups=groups, residual=residual[1]))
+                layers.append(CapConv(ch_num=ch_out, groups=groups,
+                                      residual=residual[1], manner=manner))
             self.sub_conv = nn.Sequential(*layers)
         else:
             "should be exactly the same as 'v1_3' in network.py"
-            self.sub_conv = CapConv(ch_num=ch_out, groups=groups, N=iter_N, residual=residual[1])
+            self.sub_conv = CapConv(ch_num=ch_out, groups=groups, N=iter_N,
+                                    residual=residual[1], manner=manner)
 
+        # define more_skip (optional)
         if more_skip:
             # 'ms' means 'more_skip'
             if ch_in != ch_out:
                 self.ms_conv_adjust_blob_shape = \
                     nn.Conv2d(ch_in, ch_out, kernel_size=3, padding=1, stride=stride)
-            self.ms_conv = nn.Conv2d(ch_out, ch_out, kernel_size=1, groups=groups)
+            self.ms_conv = \
+                _make_core_conv(manner=manner, ch_num_in=ch_out, ch_num_out=ch_out,
+                                kernel_size=(1,), groups=groups, stride=1, pad=(0,))
             self.ms_bn = nn.BatchNorm2d(ch_out)
             self.ms_relu = nn.ReLU()
             self.ms_squash = conv_squash(groups)
@@ -388,7 +408,77 @@ class CapFC(nn.Module):
             + ', fc_manner=' + self.fc_manner + ')'
 
 
+# Utilities below
+def _make_core_conv(
+        ch_num_in, ch_num_out, kernel_size, stride, groups, pad,
+        manner='0', wider_conv=False):
+    """
+        used in convCap/convCap2 block
+    """
+    conv_opt =[]
+    if manner == '0':
+        if wider_conv:
+            # TODO (easy): merge wider case with capRoute below
+            conv_opt = multi_conv(ch_num_in, ch_num_out,
+                                  ksize=kernel_size, stride=stride,
+                                  group=groups, pad=pad)
+        else:
+            conv_opt = nn.Conv2d(ch_num_in, ch_num_out,
+                                 kernel_size=kernel_size[0], stride=stride,
+                                 groups=groups, padding=pad[0])
+    elif manner == '1':
+        conv_opt = capConvRoute1(ch_num_in, ch_num_out,
+                                 ksize=kernel_size, stride=stride,
+                                 group=groups, pad=pad)
+    return conv_opt
+
+
+class capConvRoute1(nn.Module):
+    """
+        initial version of convCap with routing;
+        used in '_make_core_conv' method to build basic convCap
+    """
+    def __init__(self,
+                 ch_num_in, ch_num_out,
+                 ksize, pad, stride, group):
+        super(capConvRoute1, self).__init__()
+        self.expand_factor = int(ch_num_out/group)
+        self.group = group
+
+        self.main_cap = nn.Conv2d(
+            ch_num_in, ch_num_out, kernel_size=ksize[0],
+            stride=stride, groups=group, padding=pad[0])
+
+        # take the output of main_cap as input
+        self.main_cap_coeff = nn.Conv2d(
+            ch_num_out, group, kernel_size=3,
+            stride=1, padding=1, groups=group)
+
+        # take the input as input; NO GROUPING
+        self.res_cap = nn.Conv2d(
+            ch_num_in, ch_num_out, kernel_size=ksize[0],
+            stride=stride, padding=pad[0])
+        self.res_squash = conv_squash(group)
+
+    def forward(self, x):
+        main_out = self.main_cap(x)
+        main_coeff = self.main_cap_coeff(main_out)
+        main_coeff = torch.cat(
+            [main_coeff[:, i, :, :].unsqueeze(dim=1).repeat(1, self.expand_factor, 1, 1)
+             for i in range(self.group)], dim=1)
+
+        res_out = self.res_cap(x)
+        res_out = self.res_squash(res_out)      # TODO(not sure here)
+        res_coeff = 1 - main_coeff
+
+        out = main_out * main_coeff + res_out * res_coeff
+        return out
+
+
 class multi_conv(nn.Module):
+    """
+        used in '_make_core_conv' method to build parallel convolutions
+    """
     def __init__(self,
                  ch_num_in, ch_num_out,
                  ksize, pad, stride, group):
@@ -405,6 +495,7 @@ class multi_conv(nn.Module):
         self.multi1 = nn.Conv2d(ch_num_in, ch_num_out,
                                 kernel_size=ksize[0], stride=stride,
                                 groups=group, padding=pad[0])
+        # http://pytorch.org/docs/master/nn.html#torch.nn.ModuleList
         if self.multi_N >= 2:
             self.multi2 = nn.Conv2d(ch_num_in, ch_num_out,
                                     kernel_size=ksize[1], stride=stride,
