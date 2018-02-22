@@ -1,152 +1,37 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.nn.parameter import Parameter
 from torch.autograd import Variable
 import time
 import numpy as np
 import math
+from layers.misc import compute_stats
 
-
-def softmax_dim(input, axis=1):
-    input_size = input.size()
-
-    trans_input = input.transpose(axis, len(input_size)-1)
-    trans_size = trans_input.size()
-
-    input_2d = trans_input.contiguous().view(-1, trans_size[-1])
-
-    soft_max_2d = F.softmax(input_2d)
-
-    soft_max_nd = soft_max_2d.view(*trans_size)
-    return soft_max_nd.transpose(axis, len(input_size)-1)
-
-
-def squash(vec, manner='paper'):
-    assert len(vec.size()) == 3
-    # vec: 128 x 10 x 16
-    norm = vec.norm(dim=2)
-    if manner == 'paper':
-        norm_squared = norm ** 2
-        coeff = norm_squared / (1 + norm_squared)
-        coeff2 = torch.unsqueeze((coeff/norm), dim=2)
-    elif manner == 'sigmoid':
-        try:
-            mean = (norm.max() - norm.min()) / 2.0
-        except RuntimeError:
-            print(vec)
-            print(norm)
-        coeff = F.sigmoid(norm - mean)   # in-place bug
-        coeff2 = torch.unsqueeze((coeff/norm), dim=2)
-    # coeff2: 128 x 10 x 1
-    return torch.mul(vec, coeff2)
-
-
-def _update(x, y, a):
-    for i in range(len(x)):
-        a[int(x[i])].append(y[i])
-    return a
-
-
-def compute_stats(target, pred, v, non_target_j=False, KL_manner=-1):
-    eps = 1e-12
-    batch_cos_dist = []
-    batch_i_length = []
-    batch_cos_v = []
-    avg_len = [[] for _ in range(21)]    # there are 21 bins
-
-    bs = pred.size(0)
-    num_i = pred.size(1)
-    num_j = pred.size(2)
-    d_j = pred.size(3)
-
-    # THE FOLLOWING PROCESS IS ONE ITER WITHIN THE MINI-BATCH
-    # for i in range(2): #range(bs):
-    if KL_manner == 2:
-        # use orientation of u_hat
-        pred_mat_norm = pred / pred.norm(dim=3, keepdim=True)
-    elif KL_manner == 1:
-        # use cos_dist
-        pred_mat_norm = pred / pred.norm(dim=3, keepdim=True)     # bs 1152 10 16
-        pred_mat_norm = pred_mat_norm.permute(0, 2, 1, 3)   # bs 10 1152 16
-        v_norm = v / v.norm(dim=2, keepdim=True)    # bs 10 16
-        v_norm = v_norm.unsqueeze(dim=3)  # bs 10 16 1
-        cos_v = torch.matmul(pred_mat_norm, v_norm)  # bs 10 1152 1
-
-    else:
-        # TODO: unoptimized version, compute per sample, for showing results.
-        for i in range(bs):
-            samplet_gt = (target[i].data[0]+1) % 10 if non_target_j else target[i].data[0]
-            pred_mat_norm = pred[i, :, samplet_gt, :].squeeze() / \
-                            (pred[i, :, samplet_gt, :].squeeze().norm(dim=1).unsqueeze(dim=1) + eps)   # 1152 x 16
-
-            # # 1. cos_distance, i - i
-            # cosine_dist = torch.matmul(pred_mat_norm, pred_mat_norm.t()).data
-            # cosine_dist = cosine_dist.cpu().numpy()
-            # new_data = []
-            # for j in range(pred.size(1)):
-            #     new_data.extend(cosine_dist[j, j:])
-            # batch_cos_dist.extend(new_data)
-
-            # 2. |u_hat|
-            i_length = pred[i, :, samplet_gt, :].squeeze().norm(dim=1).data
-            i_length.cpu().numpy()
-            batch_i_length.extend(i_length)
-
-            # 3. cos_dist, i - j
-            v_norm = v[i, samplet_gt, :] / (v[i, samplet_gt, :].norm() + eps)
-            v_norm = v_norm.unsqueeze(dim=1)  # 16 x 1
-            cos_v = torch.matmul(pred_mat_norm, v_norm).squeeze().data
-            cos_v = cos_v.cpu().numpy()
-            batch_cos_v.extend(cos_v)
-
-            # 4.1. avg_len
-            x_list = np.floor(cos_v * 10 + 10)   # 1152
-            y_list = pred[i, :, samplet_gt, :].squeeze().norm(dim=1).data.cpu().numpy()   # 1152
-            avg_len = _update(x_list, y_list, avg_len)
-
-        # # 4.2
-        # avg_len_new = []
-        # for i in range(21):
-        #     avg_value = 0. if avg_len[i] == [] else np.mean(avg_len[i])
-        #     avg_len_new.append(avg_value)
-    if target is not None:
-        return batch_cos_dist, batch_i_length, batch_cos_v, \
-                {'X': list(range(21)), 'Y': avg_len}
-    else:
-        if KL_manner == 1:
-            # previous std is: 128 x 10 x 1152 x 1, we should have sample-wise std and mean
-            std = torch.std(cos_v.view(bs, -1), dim=1)      # 128 x 1
-            mean = torch.mean(cos_v.view(bs, -1), dim=1)    # 128 x 1
-        elif KL_manner == 2:
-            std = torch.std(pred_mat_norm.view(-1, num_j*num_i, d_j), dim=1)     # 128 x 16
-            mean = torch.mean(pred_mat_norm.view(-1, num_j*num_i, d_j), dim=1)   # 128 x 16
-        return mean, std
-# info = {
-#     'sample_index': 4,
-#     'j': samplet_gt,
-#     'i_num': pred.size(1),
-#     'd2_num': pred.size(3),
-#     'curr_iter': curr_iter,
-# }
-# vis.plot_hist(cosine_dist, i_length, info)
+# to find the different prediction during routing
+FIND_DIFF = False
+# to see the detailed values of b, c, v, delta_b
+LOOK_INTO_DETAILS = False
 
 
 class CapLayer(nn.Module):
+    """
+        The original capsule implementation in the NIPS paper;
+        and detailed ablative analysis on it.
+    """
     def __init__(self, opts, num_in_caps, num_out_caps,
                  out_dim, in_dim, num_shared):
         super(CapLayer, self).__init__()
 
-        # for finding different prediction during routing
-        self.FIND_DIFF = False
-        self.look_into_details = opts.look_into_details  # TODO here
         self.measure_time = opts.measure_time
         self.which_sample, self.which_j = 0, 0
         self.non_target_j = opts.non_target_j
 
         self.out_dim = out_dim
+        self.in_dim = in_dim
         self.num_shared = num_shared
         self.route_num = opts.route_num
-        self.w_version = opts.w_version
+        self.comp_cap = opts.comp_cap
         self.num_out_caps = num_out_caps
         self.num_in_caps = num_in_caps
 
@@ -156,53 +41,60 @@ class CapLayer(nn.Module):
         self.add_cap_dropout = opts.add_cap_dropout
         self.squash_manner = opts.squash_manner
 
-        if opts.w_version == 'v2':
-            # faster
+        if self.comp_cap:
+            self.fc1 = nn.Linear(num_in_caps, num_in_caps)
+            self.relu1 = nn.ReLU(inplace=True)
+            self.drop1 = nn.Dropout(p=.5)
+            self.fc2 = nn.Linear(num_in_caps, num_out_caps)
+            self.fc_time = opts.fc_time
+        else:
             self.W = nn.Conv2d(num_shared*in_dim, num_shared*num_out_caps*out_dim,
                                kernel_size=1, stride=1, groups=num_shared)
-        elif opts.w_version == 'v3':
-            # for fair comparison
-            if opts.fc_time > 0:    # for computing the parameter num
-                self.fc1 = nn.Linear(num_in_caps, num_in_caps)
-                self.relu1 = nn.ReLU(inplace=True)
-                self.drop1 = nn.Dropout(p=.5)
-            self.fc2 = nn.Linear(num_in_caps, num_out_caps)
-            # self.do_squash = opts.do_squash  # DEPRECATED
-            self.fc_time = opts.fc_time
 
+        if self.add_cap_dropout:
+            self.cap_droput = nn.Dropout2d(p=opts.dropout_p)
+
+        if self.add_cap_BN_relu:
+            # self.cap_BN = nn.BatchNorm2d(out_dim)
+            self.cap_BN = nn.InstanceNorm2d(out_dim, affine=True)
+            self.cap_relu = nn.ReLU(True)
+
+    def forward(self, input, target=None, curr_iter=None, draw_hist=None):
+        """
+        target, curr_iter, draw_hist are for debugging or stats collection purpose only
+        """
+
+        start = []
+        # for draw_hist (test)
+        batch_cos_dist, batch_i_length, batch_cos_v, avg_len = [], [], [], []
+        # for KL loss (train)
+        mean, std = [], []
+        bs, in_channels, h, w = input.size()
+
+        # create b on the fly
         # if opts.b_init == 'rand':
         #     self.b = Variable(torch.rand(num_out_caps, num_in_caps), requires_grad=False)
         # elif opts.b_init == 'zero':
         #     self.b = Variable(torch.zeros(num_out_caps, num_in_caps), requires_grad=False)
         # elif opts.b_init == 'learn':
         #     self.b = Variable(torch.zeros(num_out_caps, num_in_caps), requires_grad=True)
-
-        if self.add_cap_dropout:
-            self.cap_droput = nn.Dropout2d(p=opts.dropout_p)
-        if self.add_cap_BN_relu:
-            # self.cap_BN = nn.BatchNorm2d(out_dim)  # loss is nan
-            self.cap_BN = nn.InstanceNorm2d(out_dim, affine=True)
-            self.cap_relu = nn.ReLU(True)
-
-    def forward(self, input, target, curr_iter, vis):
-
-        batch_cos_dist = []
-        batch_i_length = []
-        batch_cos_v = []
-        avg_len = []
-        mean, std = [], []   # for KL loss
-        bs, in_channels, h, w = input.size()
         b = Variable(torch.zeros(bs, self.num_out_caps, self.num_in_caps),
                      requires_grad=False)
 
-        if self.FIND_DIFF:
+        if FIND_DIFF:
             pred_list = []
             pred_list.extend(list(range(bs)))
             pred_list.extend(target.data)
 
-        if self.w_version == 'v2':
+        if self.comp_cap:
+            x = input.view(input.size(0), -1)
+            x = self.fc1(x)
+            x = self.relu1(x)
+            x = self.drop1(x)
+            v = self.fc2(x)
 
-            # 1. pred_i_j_d2
+        else:
+            # 1. affine mapping (get 'pred')
             if self.measure_time:
                 torch.cuda.synchronize()
                 start = time.perf_counter()
@@ -211,52 +103,42 @@ class CapLayer(nn.Module):
             # pred: bs, 5120, 6, 6
             # -> bs, 10, 16, 32x6x6 (view)
             spatial_size = pred.size(2)
-            # manner 1
-            pred = pred.view(bs, self.num_out_caps, self.out_dim,
-                             spatial_size*spatial_size*self.num_shared)
-            # # manner 2
-            # pred = pred.view(bs, self.num_out_caps, self.out_dim, self.num_shared,
-            #                  spatial_size, spatial_size)
-            # pred = pred.view(bs, self.num_out_caps, self.out_dim, -1)
-            # _pred = pred.permute(0, 1, 3, 2)
+            pred = pred.view(bs, self.num_shared, self.num_out_caps, self.out_dim,
+                             spatial_size, spatial_size)
+            pred = pred.permute(0, 2, 3, 1, 4, 5).contiguous()
+            pred = pred.view(bs, pred.size(1), pred.size(2), -1)
 
             if self.add_cap_BN_relu:
                 NotImplementedError()
                 # pred = self.cap_BN(pred.permute(0, 3, 1, 2).contiguous())
                 # pred = pred.permute(0, 2, 3, 1)
                 # pred = self.cap_relu(pred)
-
             if self.add_cap_dropout:
                 NotImplementedError()
                 # v = self.cap_droput(v)
+
             if self.measure_time:
                 torch.cuda.synchronize()
                 print('\tcap W time: {:.4f}'.format(time.perf_counter() - start))
 
-            # 2. routing
+            # 2. dynamic routing (get 'v')
             start = time.perf_counter()
             for i in range(self.route_num):
 
                 internal_start = time.perf_counter()
-                c = softmax_dim(b, axis=1)              # c: 128(bs) x 10(j) x 1152(i), \sum_j = 1
+                c = F.softmax(b, dim=2)
                 if self.measure_time:
                     torch.cuda.synchronize()
                     b_sftmax_t = time.perf_counter() - internal_start
                     t1 = time.perf_counter()
-                # print(pred.size())
-                # print(c.size())
-                # print('pred id')
-                # print(pred.get_device())
-                # print('c id')
-                # print(c.get_device())
 
-                s = torch.matmul(pred, c.unsqueeze(3)).squeeze()   # TODO: (0.0238)
+                s = torch.matmul(pred, c.unsqueeze(3)).squeeze()   # TODO: optimize time (0.0238)
                 if self.measure_time:
                     torch.cuda.synchronize()
                     s_matmul_t = time.perf_counter() - t1
                     t2 = time.perf_counter()
-                # Here 'squash' has an additional argument, 'squash_manner'
-                # final output: v: bs x 10 x 16
+
+                # shape of v: bs, out_cap_num, out_cap_dim
                 v = squash(s, self.squash_manner)
                 if self.measure_time:
                     torch.cuda.synchronize()
@@ -270,16 +152,17 @@ class CapLayer(nn.Module):
                         permute_t = time.perf_counter() - t3
                         t4 = time.perf_counter()
 
-                    # delta_b = torch.matmul(_pred, v.unsqueeze(3)).squeeze()  # TODO: super-time-consuming (0.1557s)
+                    # delta_b = torch.matmul(_pred, v.unsqueeze(3)).squeeze()  # TODO: super inefficient (0.1557s)
                     delta_b = torch.matmul(v.unsqueeze(2), pred).squeeze()
                     if self.measure_time:
                         torch.cuda.synchronize()
                         delta_matmul_t = time.perf_counter() - t4
                         t5 = time.perf_counter()
-                    # if self.FIND_DIFF:
-                    #     v_all_classes = v.norm(dim=2)
-                    #     _, curr_pred = torch.max(v_all_classes, 1)
-                    #     pred_list.extend(curr_pred.data)
+
+                    if FIND_DIFF:
+                        v_all_classes = v.norm(dim=2)
+                        _, curr_pred = torch.max(v_all_classes, 1)
+                        pred_list.extend(curr_pred.data)
 
                     b = torch.add(b, delta_b)
                     if self.measure_time:
@@ -309,13 +192,14 @@ class CapLayer(nn.Module):
                 torch.cuda.synchronize()
                 print('\tcap Route (r={:d}) time: {:.4f}'.format(self.route_num, time.perf_counter() - start))
 
-            if vis is not None:
+            if draw_hist:
                 batch_cos_dist, batch_i_length, batch_cos_v, avg_len = \
                     compute_stats(target, pred, v, self.non_target_j)
+
             if self.use_KL:
                 mean, std = compute_stats(None, pred, v, KL_manner=self.KL_manner)
 
-            if self.FIND_DIFF:
+            if FIND_DIFF:
                 temp = np.asarray(pred_list)
                 temp = np.resize(temp, (self.route_num+2, bs)).transpose()  # 128 x 5
                 predict_ = temp[:, 2:]
@@ -330,170 +214,369 @@ class CapLayer(nn.Module):
                     print(temp[diff_ind, :])
                     print('\n')
 
-        elif self.w_version == 'v3':
-            # COMPLETELY nothing to do with capsule
-            x = input.view(input.size(0), -1)
-            for i in range(self.fc_time):
-                x = self.fc1(x)
-                x = self.relu1(x)
-                x = self.drop1(x)
-            v = self.fc2(x)
-            # if self.do_squash:
-            #     v = squash(v)
-
-        # FOR debug, see the detailed values of b, c, v, delta_b
-        if self.FIND_DIFF and HAS_DIFF:
-            self.which_sample = diff_ind[0]
-        if self.FIND_DIFF or self.look_into_details:
-            print('sample index is: {:d}'.format(self.which_sample))
-        if target is not None:
-            self.which_j = target[self.which_sample].data[0]
-            if self.look_into_details:
-                print('target is: {:d} (also which_j)'.format(self.which_j))
-        else:
-            if self.look_into_details:
-                print('no target input, just pick up a random j, which_j is: {:d}'.format(self.which_j))
-
-        if self.look_into_details:
-            print('u_hat:')
-            print(pred[self.which_sample, :, self.which_j, :])
-        # start all over again
-        if self.look_into_details:
-            b = Variable(torch.zeros(b.size()), requires_grad=False)
-            for i in range(self.route_num):
-
-                c = softmax_dim(b, axis=1)              # 128 x 10 x 1152, c_nji, \sum_j = 1
-                temp_ = [torch.matmul(c[:, zz, :].unsqueeze(dim=1), pred[:, :, zz, :].squeeze()).squeeze()
-                         for zz in range(self.num_out_caps)]
-                s = torch.stack(temp_, dim=1)
-                v = squash(s, self.squash_manner)       # 128 x 10 x 16
-                temp_ = [torch.matmul(v[:, zz, :].unsqueeze(dim=1), pred[:, :, zz, :].permute(0, 2, 1)).squeeze()
-                         for zz in range(self.num_out_caps)]
-                delta_b = torch.stack(temp_, dim=1).detach()
-                if self.FIND_DIFF:
-                    v_all_classes = v.norm(dim=2)
-                    _, curr_pred = torch.max(v_all_classes, 1)
-                    pred_list.extend(curr_pred.data)
-                b = torch.add(b, delta_b)
-                print('[{:d}/{:d}] b:'.format(i, self.route_num))
-                print(b[self.which_sample, self.which_j, :])
-                print('[{:d}/{:d}] c:'.format(i, self.route_num))
-                print(c[self.which_sample, self.which_j, :])
-                print('[{:d}/{:d}] v:'.format(i, self.route_num))
-                print(v[self.which_sample, self.which_j, :])
-
-                print('[{:d}/{:d}] v all classes:'.format(i, self.route_num))
-                print(v[self.which_sample, :, :].norm(dim=1))
-
-                print('[{:d}/{:d}] delta_b:'.format(i, self.route_num))
-                print(delta_b[self.which_sample, self.which_j, :])
-                print('\n')
-        # END of debug
-
-        return v, [batch_cos_dist, batch_i_length,
-                   batch_cos_v, avg_len, mean, std]
+        stats = [batch_cos_dist, batch_i_length, batch_cos_v, avg_len,
+                 mean, std]
+        return v, stats
 
 
-class CapLayer2(nn.Module):
+class CapConv(nn.Module):
     """
-        Convolution Capsule Layer
-        input:      [bs, in_dim (d1), spatial_size_1, spatial_size_1]
-        output:     [bs, out_dim (d2), spatial_size_2, spatial_size_2]
-                    or [bs, out_dim (d2), spatial_size_2] if as_final_output=True
+        the basic capConv block
+        if residual is true, use skip connection
 
-        Args:
-                    in_dim:             dim of input capsules, d1
-                    out_dim:            dim of output capsules, d2
-                    spatial_size_1:     spatial_size_1 ** 2 = num_in_caps, total # of input caps
-                    spatial_size_2:     spatial_size_2 ** 2 = num_out_caps, total # of output caps
-                    as_final_output:    if True, spatial_size_2 = num_out_caps
+            input
+            |   | conv2d
+            |   | BN-ReLU-Squash
+            |   | conv2d
+            |   | BN-ReLU-Squash
+            |   | ... (N times)
+            |   | conv2d
+            | + | (skip connection)
+            |   | BN-ReLU-Squash
+        """
+    def __init__(self, ch_num, groups,
+                 N=1, ch_out=-1,
+                 kernel_size=(1,), stride=1, pad=(0,), residual=False,
+                 manner='0'):
+        super(CapConv, self).__init__()
+        self.ch_num_in = ch_num
+        self.ch_num_out = ch_num if ch_out == -1 else ch_out
+        self.groups = groups
+        self.iter_N = N
+        self.residual = residual
+        self.wider_conv = True if len(kernel_size) >= 2 else False
 
-        Convolution parameters (W): nn.Conv2d(IN, OUT, kernel_size=1)
-        Propagation coefficients (b or c): bs_j_i
+        if self.residual and self.ch_num_in != self.ch_num_out:
+            self.conv_adjust_blob_shape = \
+                nn.Conv2d(self.ch_num_in, self.ch_num_out,
+                          kernel_size=3, padding=1, stride=stride)
+
+        layers = []
+        for i in range(self.iter_N):
+            layers.append(_make_core_conv(
+                manner=manner, wider_conv=self.wider_conv,
+                ch_num_in=self.ch_num_in, ch_num_out=self.ch_num_out,
+                kernel_size=kernel_size, stride=stride, groups=self.groups, pad=pad))
+            # TODO: change BN per capsule, along the channel
+            if i < self.iter_N-1:
+                layers.append(nn.BatchNorm2d(self.ch_num_out))
+                layers.append(nn.ReLU(True))
+                layers.append(conv_squash(self.groups))
+
+        self.block = nn.Sequential(*layers)
+        self.last_bn = nn.BatchNorm2d(self.ch_num_out)
+        self.last_relu = nn.ReLU()
+        self.last_squash = conv_squash(self.groups)
+
+    def forward(self, input):
+
+        out = self.block(input)
+        if self.residual:
+            if hasattr(self, 'conv_adjust_blob_shape'):
+                input = self.conv_adjust_blob_shape(input)
+            out += input
+        out = self.last_bn(out)
+        out = self.last_relu(out)
+        out = self.last_squash(out)
+        return out
+
+
+class CapConv2(nn.Module):
     """
-    def __init__(self,
-                 opts, in_dim, out_dim, spatial_size_1, spatial_size_2,
-                 route_num, as_final_output=False,
-                 shared_size=-1, shared_group=1):
-        super(CapLayer2, self).__init__()
-        self.num_in_caps = int(spatial_size_1 ** 2)
-        if as_final_output:
-            self.num_out_caps = spatial_size_2
-        else:
-            self.num_out_caps = int(spatial_size_2 ** 2)
-        self.use_KL = opts.use_KL
-        self.KL_manner = opts.KL_manner
-        self.in_dim = in_dim
-        self.out_dim = out_dim
-        self.route_num = route_num
-        self.as_final_output = as_final_output
-        self.shared_size = shared_size
-        self.shared_group = shared_group
-        if shared_size == -1:
-            self.num_conv_groups = 1
-        else:
-            assert spatial_size_1 % shared_size == 0
-            self.num_conv_groups = int((spatial_size_1/shared_size) ** 2)
-        if shared_group > 1:
-            self.learnable_b = Variable(
-                torch.normal(means=torch.zeros(shared_group), std=torch.ones(shared_group)),
-                requires_grad=True)
+        Wrap up the CapConv layer with multiple sub layers into a module,
+        possibly with skip connection.
+    """
+    def __init__(self, ch_in, ch_out, groups,
+                 residual, iter_N,
+                 no_downsample=False,               # for main_conv
+                 layerwise_skip_connect=True,       # for sub_conv
+                 more_skip=False,
+                 wider_main_conv=False,             # for main_conv
+                 manner='0',                        # for both
+                 ):
+        super(CapConv2, self).__init__()
+        assert len(residual) == 2
+        if more_skip:
+            assert iter_N >= 2
+            iter_N -= 1
+        self.more_skip = more_skip
 
-        IN = int(self.in_dim * self.num_conv_groups)
-        OUT = int(self.out_dim * self.num_out_caps * self.num_conv_groups / self.shared_group)
-        self.W = nn.Conv2d(IN, OUT, groups=self.num_conv_groups, kernel_size=1, stride=1)
+        # define main_conv
+        main_ksize = (5, 3, 1) if wider_main_conv else (3,)
+        main_pad = (2, 1, 0) if wider_main_conv else (1,)
+        main_stride = 1 if no_downsample else 2
+        self.main_conv = CapConv(ch_num=ch_in, ch_out=ch_out, groups=groups,
+                                 kernel_size=main_ksize, stride=main_stride,
+                                 pad=main_pad, residual=residual[0], manner=manner)
+        # define sub_conv (stride/pad/ksize are set by default)
+        if layerwise_skip_connect:
+            layers = []
+            for i in range(iter_N):
+                layers.append(CapConv(ch_num=ch_out, groups=groups,
+                                      residual=residual[1], manner=manner))
+            self.sub_conv = nn.Sequential(*layers)
+        else:
+            "should be exactly the same as 'v1_3' in network.py"
+            self.sub_conv = CapConv(ch_num=ch_out, groups=groups, N=iter_N,
+                                    residual=residual[1], manner=manner)
+
+        # define more_skip (optional)
+        if more_skip:
+            # 'ms' means 'more_skip'
+            if ch_in != ch_out:
+                self.ms_conv_adjust_blob_shape = \
+                    nn.Conv2d(ch_in, ch_out, kernel_size=3, padding=1, stride=stride)
+            self.ms_conv = \
+                _make_core_conv(manner=manner, ch_num_in=ch_out, ch_num_out=ch_out,
+                                kernel_size=(1,), groups=groups, stride=1, pad=(0,))
+            self.ms_bn = nn.BatchNorm2d(ch_out)
+            self.ms_relu = nn.ReLU()
+            self.ms_squash = conv_squash(groups)
+
+    def forward(self, input):
+        out = self.main_conv(input)
+        out = self.sub_conv(out)
+        if self.more_skip:
+            out = self.ms_conv(out)
+            if hasattr(self, 'ms_conv_adjust_blob_shape'):
+                input = self.ms_conv_adjust_blob_shape(input)
+            out += input
+            out = self.ms_bn(out)
+            out = self.ms_relu(out)
+            out = self.ms_squash(out)
+        return out
+
+
+class CapFC(nn.Module):
+    """
+        given an input 4-D blob, generate the FC output;
+        this layer assumes the input capsule's dim is the same as that of the output's capsule
+    """
+    def __init__(self, in_cap_num, out_cap_num, cap_dim, fc_manner='default'):
+        super(CapFC, self).__init__()
+        self.in_cap_num = in_cap_num
+        self.out_cap_num = out_cap_num
+        self.cap_dim = cap_dim
+        self.fc_manner = fc_manner
+        if fc_manner == 'default':
+            self.weight = Parameter(torch.Tensor(cap_dim, in_cap_num, out_cap_num))
+            self.reset_parameters()
+        elif fc_manner == 'fc':
+            self.fc_layer = nn.Linear(self.in_cap_num*self.cap_dim,
+                                      self.out_cap_num*self.cap_dim)
+        elif fc_manner == 'paper':
+            self.W1 = Parameter(torch.Tensor(cap_dim, cap_dim*out_cap_num))
+            self.W2 = Parameter(torch.Tensor(out_cap_num, in_cap_num, 1))
+            self.reset_parameters()
 
     def forward(self, x):
-        mean, std = [], []   # for KL loss
-        bs = x.size(0)
-        # generate random b on-the-fly
-        b = Variable(torch.rand(bs, self.num_out_caps, self.num_in_caps), requires_grad=False)
+        if self.fc_manner == 'default':
+            x = x.view(x.size(0), -1, self.cap_dim, x.size(2), x.size(3))
+            x = x.permute(0, 1, 3, 4, 2).contiguous()
+            x = x.view(x.size(0), -1, self.cap_dim)
+            input = x.permute(0, 2, 1).contiguous().unsqueeze(2)
+            input = torch.matmul(input, self.weight).squeeze().permute(0, 2, 1).contiguous()
+        elif self.fc_manner == 'fc':
+            x = x.view(x.size(0), -1)
+            input = self.fc_layer(x)
+            input = input.view(input.size(0), self.out_cap_num, self.cap_dim)
+        elif self.fc_manner == 'paper':
+            x = x.view(x.size(0), -1, self.cap_dim, x.size(2), x.size(3))
+            x = x.permute(0, 1, 3, 4, 2).contiguous()
+            x = x.view(x.size(0), -1, self.cap_dim)
+            input = torch.matmul(x, self.W1)
+            input = input.view(input.size(0), self.in_cap_num, self.cap_dim, self.out_cap_num)
+            input = input.permute(0, 3, 2, 1).contiguous()
+            input = torch.matmul(input, self.W2).squeeze()
+        return squash(input)
 
-        start = time.time()
-        # x: bs, d1, 32 (spatial_size_1), 32
-        # -> W(x): bs, d2x16x16, 32 (spatial_size_1), 32
-        if self.num_conv_groups != 1:
-            # reshape the input x first
-            x = x.resize(bs, self.in_dim * self.num_conv_groups, self.shared_size, self.shared_size)
+    def reset_parameters(self):
+        if self.fc_manner == 'default':
+            stdv = 1. / math.sqrt(self.weight.size(1))
+            self.weight.data.uniform_(-stdv, stdv)
+        elif self.fc_manner == 'paper':
+            stdv = 1. / math.sqrt(self.W1.size(1))
+            self.W1.data.uniform_(-stdv, stdv)
+            stdv = 1. / math.sqrt(self.W2.size(1))
+            self.W2.data.uniform_(-stdv, stdv)
 
-        pred = self.W(x)
-        pred = pred.resize(bs, int(self.num_out_caps / self.shared_group), self.out_dim, self.num_in_caps)
+    def __repr__(self):
+        return self.__class__.__name__ + '(' \
+            + 'in_cap_num=' + str(self.in_cap_num) \
+            + ', out_cap_num=' + str(self.out_cap_num) \
+            + ', cap_dim=' + str(self.cap_dim) \
+            + ', fc_manner=' + self.fc_manner + ')'
 
-        if self.shared_group != 1:
-            raw_pred = pred
-            pred = raw_pred + self.learnable_b[0]
-            for ind in range(1, self.shared_group):
-                pred = torch.cat((pred, raw_pred + self.learnable_b[ind]), dim=1)
-        # assert pred.size(1) == self.num_out_caps
-        pred = pred.permute(0, 3, 1, 2)
-        # pred_i_j_d2
-        # print('cap W time: {:.4f}'.format(time.time() - start))
 
-        # routing starts
-        start = time.time()
-        for i in range(self.route_num):
+# Utilities below
+def _make_core_conv(
+        ch_num_in, ch_num_out, kernel_size, stride, groups, pad,
+        manner='0', wider_conv=False):
+    """
+        used in convCap/convCap2 block
+    """
+    conv_opt =[]
+    if manner == '0':
+        if wider_conv:
+            # TODO (easy): merge wider case with capRoute below
+            conv_opt = multi_conv(ch_num_in, ch_num_out,
+                                  ksize=kernel_size, stride=stride,
+                                  group=groups, pad=pad)
+        else:
+            conv_opt = nn.Conv2d(ch_num_in, ch_num_out,
+                                 kernel_size=kernel_size[0], stride=stride,
+                                 groups=groups, padding=pad[0])
+    elif manner == '1':
+        conv_opt = capConvRoute1(ch_num_in, ch_num_out,
+                                 ksize=kernel_size, stride=stride,
+                                 group=groups, pad=pad)
+    return conv_opt
 
-            c = softmax_dim(b, axis=1)              # bs x j x i, c_nji, \sum_j = 1
-            s = [torch.matmul(c[:, zz, :].unsqueeze(dim=1), pred[:, :, zz, :].squeeze()).squeeze()
-                 for zz in range(self.num_out_caps)]
-            s = torch.stack(s, dim=1)
-            v = squash(s)                           # do squashing along the last dim, bs x j x d2
-            delta_b = [torch.matmul(v[:, zz, :].unsqueeze(dim=1), pred[:, :, zz, :].permute(0, 2, 1)).squeeze()
-                       for zz in range(self.num_out_caps)]
-            delta_b = torch.stack(delta_b, dim=1).detach()
-            b = torch.add(b, delta_b)
-        # print('cap Route (r={:d}) time: {:.4f}'.format(self.route_num, time.time() - start))
-        # routing ends
-        # v: bs, num_out_caps, out_dim
 
-        if self.use_KL:
-            mean, std = compute_stats(None, pred, v, KL_manner=self.KL_manner)
+class capConvRoute1(nn.Module):
+    """
+        initial version of convCap with routing;
+        used in '_make_core_conv' method to build basic convCap
+    """
+    def __init__(self,
+                 ch_num_in, ch_num_out,
+                 ksize, pad, stride, group):
+        super(capConvRoute1, self).__init__()
+        self.expand_factor = int(ch_num_out/group)
+        self.group = group
 
-        if not self.as_final_output:
-            # v: eg., 64, 256(16x16), 20 -> 64, 20, 16, 16
-            spatial_out = int(math.sqrt(self.num_out_caps))
-            v = v.permute(0, 2, 1).resize(bs, self.out_dim, spatial_out, spatial_out)
-        return v, [mean, std]
+        self.main_cap = nn.Conv2d(
+            ch_num_in, ch_num_out, kernel_size=ksize[0],
+            stride=stride, groups=group, padding=pad[0])
+
+        # take the output of main_cap as input
+        self.main_cap_coeff = nn.Conv2d(
+            ch_num_out, group, kernel_size=3,
+            stride=1, padding=1, groups=group)
+
+        # take the input as input; NO GROUPING
+        self.res_cap = nn.Conv2d(
+            ch_num_in, ch_num_out, kernel_size=ksize[0],
+            stride=stride, padding=pad[0])
+        self.res_squash = conv_squash(group)
+
+    def forward(self, x):
+        main_out = self.main_cap(x)
+        main_coeff = self.main_cap_coeff(main_out)
+        main_coeff = torch.cat(
+            [main_coeff[:, i, :, :].unsqueeze(dim=1).repeat(1, self.expand_factor, 1, 1)
+             for i in range(self.group)], dim=1)
+
+        res_out = self.res_cap(x)
+        res_out = self.res_squash(res_out)      # TODO(not sure here)
+        res_coeff = 1 - main_coeff
+
+        out = main_out * main_coeff + res_out * res_coeff
+        return out
+
+
+class multi_conv(nn.Module):
+    """
+        used in '_make_core_conv' method to build parallel convolutions
+    """
+    def __init__(self,
+                 ch_num_in, ch_num_out,
+                 ksize, pad, stride, group):
+        super(multi_conv, self).__init__()
+        assert len(ksize) == len(pad)
+        self.ch_num_in = ch_num_in
+        self.ch_num_out = ch_num_out
+        self.ksize = ksize
+        self.pad = pad
+        self.stride = stride
+        self.group = group
+        self.multi_N = len(ksize)
+
+        self.multi1 = nn.Conv2d(ch_num_in, ch_num_out,
+                                kernel_size=ksize[0], stride=stride,
+                                groups=group, padding=pad[0])
+        # http://pytorch.org/docs/master/nn.html#torch.nn.ModuleList
+        if self.multi_N >= 2:
+            self.multi2 = nn.Conv2d(ch_num_in, ch_num_out,
+                                    kernel_size=ksize[1], stride=stride,
+                                    groups=group, padding=pad[1])
+            self.multi3 = nn.Conv2d(ch_num_in, ch_num_out,
+                                    kernel_size=ksize[2], stride=stride,
+                                    groups=group, padding=pad[2])
+
+    def forward(self, input):
+
+        # for i in range(self.multi_N):
+        #     out = self.layers[i](input)
+        #     if i == 0:
+        #         out_sum = out
+        #     else:
+        #         out_sum += out
+        out_sum = self.multi1(input)
+        if self.multi_N >= 2:
+            out_sum += self.multi2(input)
+            out_sum += self.multi3(input)
+        return out_sum
+
+    # def __repr__(self):
+    #     return self.__class__.__name__ + '(' \
+    #         + 'ch_num_in=' + str(self.ch_num_in) \
+    #         + ', ch_num_out=' + str(self.ch_num_out) \
+    #         + ', ksize=' + str(self.ksize) \
+    #         + ', stride=' + str(self.stride) \
+    #         + ', group=' + str(self.group) \
+    #         + ', pad=' + str(self.pad) + ')'
+
+
+class conv_squash(nn.Module):
+    def __init__(self, num_shared):
+        super(conv_squash, self).__init__()
+        self.num_shared = num_shared
+
+    def forward(self, x):
+        spatial_size = x.size(2)
+        batch_size = x.size(0)
+        cap_dim = int(x.size(1) / self.num_shared)
+        x = x.view(batch_size, self.num_shared, cap_dim, spatial_size, spatial_size)
+        x = x.permute(0, 1, 3, 4, 2).contiguous()
+        x = x.view(batch_size, -1, cap_dim)
+        x = squash(x)
+        # revert back to original shape
+        x = x.view(batch_size, self.num_shared, spatial_size, spatial_size, cap_dim)
+        x = x.permute(0, 1, 4, 2, 3).contiguous()
+        x = x.view(batch_size, -1, spatial_size, spatial_size)
+        return x
+
+    def __repr__(self):
+        return self.__class__.__name__ + '(' \
+            + 'num_shared=' + str(self.num_shared) + ')'
+
+
+def squash(vec, manner='paper'):
+    """given a 3-D (bs, num_cap, dim_cap) input, squash the capsules
+    output has the same shape as input
+    """
+    EPS, coeff2, mean = 1e-20, [], []
+
+    assert len(vec.size()) == 3
+    norm = vec.norm(dim=2)
+
+    if manner == 'paper':
+        norm_squared = norm ** 2
+        coeff = norm_squared / (1 + norm_squared)
+        coeff2 = torch.unsqueeze((coeff/(norm+EPS)), dim=2)
+        # coeff2: bs x num_cap x 1
+
+    elif manner == 'sigmoid':
+        try:
+            mean = (norm.max() - norm.min()) / 2.0
+        except RuntimeError:
+            print(vec)
+            print(norm)
+        coeff = F.sigmoid(norm - mean)   # in-place bug
+        coeff2 = torch.unsqueeze((coeff/norm), dim=2)
+
+    return torch.mul(vec, coeff2)
 
 
 class MarginLoss(nn.Module):
@@ -507,6 +590,7 @@ class MarginLoss(nn.Module):
 
     def forward(self, output, target):
         # output, 128 x 10
+        # print(output.size())
         gt = Variable(torch.zeros(output.size(0), self.num_classes), requires_grad=False)
         gt = gt.scatter_(1, target.unsqueeze(1), 1)
         zero = Variable(torch.zeros(1))

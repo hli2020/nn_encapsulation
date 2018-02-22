@@ -3,12 +3,13 @@
 start=`date +%s`
 
 # train and test
-CUDA_VISIBLE_DEVICES=5,6 python holly_capsule.py \
---experiment_name=base_200_v1_try1 \
+CUDA_VISIBLE_DEVICES=7 python holly_capsule.py \
+--experiment_name=base_200_v1_try2 \
 --num_workers=8 \
 --debug_mode=False \
 --dataset=tiny_imagenet \
 --setting=top1 \
+--less_data_aug \
 --cap_model=v_base \
 --depth=14 \
 --max_epoch=500 \
