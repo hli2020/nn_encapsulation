@@ -222,7 +222,7 @@ class CapLayer(nn.Module):
 class CapConv(nn.Module):
     def __init__(self, ch_num, groups,
                  N=1, ch_out=-1,
-                 kernel_size=1, stride=1, pad=0, residual=False):
+                 kernel_size=(1,), stride=1, pad=(0,), residual=False):
         """if residual is true, use skip connection"""
         super(CapConv, self).__init__()
         self.ch_num_in = ch_num
@@ -230,6 +230,7 @@ class CapConv(nn.Module):
         self.groups = groups
         self.iter_N = N
         self.residual = residual
+        self.wider_conv = True if len(kernel_size) >= 2 else False
 
         if self.residual and self.ch_num_in != self.ch_num_out:
             self.conv_adjust_blob_shape = \
@@ -238,23 +239,29 @@ class CapConv(nn.Module):
 
         layers = []
         for i in range(self.iter_N):
-            layers.append(nn.Conv2d(self.ch_num_in, self.ch_num_out,
-                                    kernel_size=kernel_size, stride=stride,
-                                    groups=self.groups, padding=pad))
+            # TODO: merge them
+            if self.wider_conv:
+                layers.append(multi_conv(
+                    self.ch_num_in, self.ch_num_out,
+                    ksize=kernel_size, stride=stride, group=self.groups, pad=pad))
+            else:
+                layers.append(nn.Conv2d(self.ch_num_in, self.ch_num_out,
+                                        kernel_size=kernel_size[0], stride=stride,
+                                        groups=self.groups, padding=pad[0]))
             # TODO: change BN per capsule, along the channel
             if i < self.iter_N-1:
                 layers.append(nn.BatchNorm2d(self.ch_num_out))
                 layers.append(nn.ReLU(True))
                 layers.append(conv_squash(self.groups))
 
-        self.sub_layer = nn.Sequential(*layers)
+        self.block = nn.Sequential(*layers)
         self.last_bn = nn.BatchNorm2d(self.ch_num_out)
         self.last_relu = nn.ReLU()
         self.last_squash = conv_squash(self.groups)
 
     def forward(self, input):
 
-        out = self.sub_layer(input)
+        out = self.block(input)
         if self.residual:
             if hasattr(self, 'conv_adjust_blob_shape'):
                 input = self.conv_adjust_blob_shape(input)
@@ -269,9 +276,10 @@ class CapConv2(nn.Module):
     """Wrap up the CapConv layer with multiple sub layers into a module, with skip connection"""
     def __init__(self, ch_in, ch_out, groups,
                  residual, iter_N,
-                 no_downsample=False,
-                 layerwise_skip_connect=True,
-                 more_skip=False):
+                 no_downsample=False,               # for main_conv
+                 layerwise_skip_connect=True,       # for sub_conv
+                 more_skip=False,
+                 wider_main_conv=False):            # for main_conv
         super(CapConv2, self).__init__()
         assert len(residual) == 2
         if more_skip:
@@ -279,12 +287,13 @@ class CapConv2(nn.Module):
             iter_N -= 1
         self.more_skip = more_skip
 
-        if no_downsample:
-            ksize, stride, pad = 1, 1, 0
-        else:
-            ksize, stride, pad = 3, 2, 1
+        # define main_conv
+        ksize = (5, 3, 1) if wider_main_conv else (3,)
+        pad = (2, 1, 0) if wider_main_conv else (1,)
+        stride = 1 if no_downsample else 2
         self.main_conv = CapConv(ch_num=ch_in, ch_out=ch_out, groups=groups,
                                  kernel_size=ksize, stride=stride, pad=pad, residual=residual[0])
+        # define sub_conv
         if layerwise_skip_connect:
             layers = []
             for i in range(iter_N):
@@ -377,6 +386,55 @@ class CapFC(nn.Module):
             + ', out_cap_num=' + str(self.out_cap_num) \
             + ', cap_dim=' + str(self.cap_dim) \
             + ', fc_manner=' + self.fc_manner + ')'
+
+
+class multi_conv(nn.Module):
+    def __init__(self,
+                 ch_num_in, ch_num_out,
+                 ksize, pad, stride, group):
+        super(multi_conv, self).__init__()
+        assert len(ksize) == len(pad)
+        self.ch_num_in = ch_num_in
+        self.ch_num_out = ch_num_out
+        self.ksize = ksize
+        self.pad = pad
+        self.stride = stride
+        self.group = group
+        self.multi_N = len(ksize)
+
+        self.multi1 = nn.Conv2d(ch_num_in, ch_num_out,
+                                kernel_size=ksize[0], stride=stride,
+                                groups=group, padding=pad[0])
+        if self.multi_N >= 2:
+            self.multi2 = nn.Conv2d(ch_num_in, ch_num_out,
+                                    kernel_size=ksize[1], stride=stride,
+                                    groups=group, padding=pad[1])
+            self.multi3 = nn.Conv2d(ch_num_in, ch_num_out,
+                                    kernel_size=ksize[2], stride=stride,
+                                    groups=group, padding=pad[2])
+
+    def forward(self, input):
+
+        # for i in range(self.multi_N):
+        #     out = self.layers[i](input)
+        #     if i == 0:
+        #         out_sum = out
+        #     else:
+        #         out_sum += out
+        out_sum = self.multi1(input)
+        if self.multi_N >= 2:
+            out_sum += self.multi2(input)
+            out_sum += self.multi3(input)
+        return out_sum
+
+    # def __repr__(self):
+    #     return self.__class__.__name__ + '(' \
+    #         + 'ch_num_in=' + str(self.ch_num_in) \
+    #         + ', ch_num_out=' + str(self.ch_num_out) \
+    #         + ', ksize=' + str(self.ksize) \
+    #         + ', stride=' + str(self.stride) \
+    #         + ', group=' + str(self.group) \
+    #         + ', pad=' + str(self.pad) + ')'
 
 
 class conv_squash(nn.Module):

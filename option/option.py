@@ -27,7 +27,7 @@ class Options(object):
         self.parser.add_argument('--device_id', default='0', type=str)
 
         # model params
-        self.parser.add_argument('--cap_model', default='v0', type=str, help='v_base, v0, ...')
+        self.parser.add_argument('--cap_model', default='v2', type=str, help='v_base, v0, ...')
 
         # only valid for cap_model=v_base
         self.parser.add_argument('--depth', default=14, type=int)
@@ -49,13 +49,14 @@ class Options(object):
 
         # valid for cap_model=v1_x and above
         self.parser.add_argument('--cap_N', default=4, type=int, help='multiple capLayers')
-        self.parser.add_argument('--connect_detail', default='default', type=str,
-                                 help='residual connections, [default | only_sub | all]')
+        self.parser.add_argument('--connect_detail', default='all', type=str,
+                                 help='residual connections, [all | only_sub | all]')
         # valid for cap_model=v1_2_x and above
         self.parser.add_argument('--fc_manner', default='default', type=str)
         # valid for cap_model=v2_x and above
         self.parser.add_argument('--more_skip', action='store_true')
         self.parser.add_argument('--layerwise', action='store_true')
+        self.parser.add_argument('--wider', action='store_true')
 
         # train
         self.parser.add_argument('--lr', default=0.0001, type=float, help='initial learning rate')
