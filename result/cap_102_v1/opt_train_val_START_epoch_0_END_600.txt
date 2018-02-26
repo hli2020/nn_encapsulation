@@ -307,3 +307,21 @@ Summary	epoch/iter [2/600] ||	TRAIN, Top1_err: 45.6660, Top5_err: 5.8800 ||	TEST
 [cap_102_v1]	epoch/iter [3/600][100/391] ||	Loss: 0.3039, Top1_err: 42.1101, Top5_err: 4.9660 ||	Data/batch time: 0.0027/1.1436
 [cap_102_v1]	epoch/iter [3/600][200/391] ||	Loss: 0.3021, Top1_err: 42.0048, Top5_err: 4.9052 ||	Data/batch time: 0.0016/1.1542
 [cap_102_v1]	epoch/iter [3/600][300/391] ||	Loss: 0.2993, Top1_err: 41.5542, Top5_err: 4.8562 ||	Data/batch time: 0.0013/1.1555
+[cap_102_v1]	epoch/iter [3/600][390/391] ||	Loss: 0.2976, Top1_err: 41.3780, Top5_err: 4.8420 ||	Data/batch time: 0.0011/1.1515
+Summary	epoch/iter [3/600] ||	TRAIN, Top1_err: 41.3780, Top5_err: 4.8420 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+[cap_102_v1]	epoch/iter [4/600][0/391] ||	Loss: 0.2547, Top1_err: 32.8125, Top5_err: 3.9062 ||	Data/batch time: 0.2037/1.4315
+[cap_102_v1]	epoch/iter [4/600][100/391] ||	Loss: 0.2807, Top1_err: 38.5210, Top5_err: 4.3472 ||	Data/batch time: 0.0025/1.1271
+[cap_102_v1]	epoch/iter [4/600][200/391] ||	Loss: 0.2802, Top1_err: 38.5961, Top5_err: 4.2250 ||	Data/batch time: 0.0015/1.1440
+[cap_102_v1]	epoch/iter [4/600][300/391] ||	Loss: 0.2787, Top1_err: 38.2034, Top5_err: 4.1684 ||	Data/batch time: 0.0012/1.1417
+[cap_102_v1]	epoch/iter [4/600][390/391] ||	Loss: 0.2770, Top1_err: 37.9280, Top5_err: 4.1240 ||	Data/batch time: 0.0010/1.1317
+Summary	epoch/iter [4/600] ||	TRAIN, Top1_err: 37.9280, Top5_err: 4.1240 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+[cap_102_v1]	epoch/iter [5/600][0/391] ||	Loss: 0.2513, Top1_err: 34.3750, Top5_err: 3.1250 ||	Data/batch time: 0.2300/1.2524
+[cap_102_v1]	epoch/iter [5/600][100/391] ||	Loss: 0.2594, Top1_err: 35.2723, Top5_err: 3.1559 ||	Data/batch time: 0.0028/1.1060
+[cap_102_v1]	epoch/iter [5/600][200/391] ||	Loss: 0.2596, Top1_err: 35.1951, Top5_err: 3.3427 ||	Data/batch time: 0.0017/1.1025
+[cap_102_v1]	epoch/iter [5/600][300/391] ||	Loss: 0.2586, Top1_err: 34.9356, Top5_err: 3.2937 ||	Data/batch time: 0.0013/1.1058
+[cap_102_v1]	epoch/iter [5/600][390/391] ||	Loss: 0.2574, Top1_err: 35.0160, Top5_err: 3.2400 ||	Data/batch time: 0.0011/1.1198
+Summary	epoch/iter [5/600] ||	TRAIN, Top1_err: 35.0160, Top5_err: 3.2400 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+[cap_102_v1]	epoch/iter [6/600][0/391] ||	Loss: 0.2725, Top1_err: 36.7188, Top5_err: 2.3438 ||	Data/batch time: 0.1849/1.3440
