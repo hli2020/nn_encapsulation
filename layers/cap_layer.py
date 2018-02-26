@@ -245,6 +245,7 @@ class CapConv(nn.Module):
         self.iter_N = N
         self.residual = residual
         self.wider_conv = True if len(kernel_size) >= 2 else False
+        self.manner = manner
 
         if self.residual and self.ch_num_in != self.ch_num_out:
             self.conv_adjust_blob_shape = \
@@ -258,14 +259,17 @@ class CapConv(nn.Module):
                 ch_num_in=self.ch_num_in, ch_num_out=self.ch_num_out,
                 kernel_size=kernel_size, stride=stride, groups=self.groups, pad=pad))
             # TODO: change BN per capsule, along the channel
+            # TODO: investigate whether need BN and relu
             if i < self.iter_N-1:
-                layers.append(nn.BatchNorm2d(self.ch_num_out))
-                layers.append(nn.ReLU(True))
+                if manner == '0':
+                    layers.append(nn.BatchNorm2d(self.ch_num_out))
+                    layers.append(nn.ReLU(True))
                 layers.append(conv_squash(self.groups))
 
         self.block = nn.Sequential(*layers)
-        self.last_bn = nn.BatchNorm2d(self.ch_num_out)
-        self.last_relu = nn.ReLU()
+        if manner == '0':
+            self.last_bn = nn.BatchNorm2d(self.ch_num_out)
+            self.last_relu = nn.ReLU()
         self.last_squash = conv_squash(self.groups)
 
     def forward(self, input):
@@ -275,8 +279,9 @@ class CapConv(nn.Module):
             if hasattr(self, 'conv_adjust_blob_shape'):
                 input = self.conv_adjust_blob_shape(input)
             out += input
-        out = self.last_bn(out)
-        out = self.last_relu(out)
+        if self.manner == '0':
+            out = self.last_bn(out)
+            out = self.last_relu(out)
         out = self.last_squash(out)
         return out
 
@@ -302,6 +307,7 @@ class CapConv2(nn.Module):
         self.more_skip = more_skip
 
         # define main_conv
+        # wider switch
         main_ksize = (5, 3, 1) if wider_main_conv else (3,)
         main_pad = (2, 1, 0) if wider_main_conv else (1,)
         main_stride = 1 if no_downsample else 2
@@ -309,6 +315,7 @@ class CapConv2(nn.Module):
                                  kernel_size=main_ksize, stride=main_stride,
                                  pad=main_pad, residual=residual[0], manner=manner)
         # define sub_conv (stride/pad/ksize are set by default)
+        # layerwise switch
         if layerwise_skip_connect:
             layers = []
             for i in range(iter_N):
@@ -321,11 +328,12 @@ class CapConv2(nn.Module):
                                     residual=residual[1], manner=manner)
 
         # define more_skip (optional)
+        # more_skip switch
         if more_skip:
             # 'ms' means 'more_skip'
             if ch_in != ch_out:
                 self.ms_conv_adjust_blob_shape = \
-                    nn.Conv2d(ch_in, ch_out, kernel_size=3, padding=1, stride=stride)
+                    nn.Conv2d(ch_in, ch_out, kernel_size=3, padding=1, stride=1)
             self.ms_conv = \
                 _make_core_conv(manner=manner, ch_num_in=ch_out, ch_num_out=ch_out,
                                 kernel_size=(1,), groups=groups, stride=1, pad=(0,))
@@ -414,6 +422,7 @@ def _make_core_conv(
         manner='0', wider_conv=False):
     """
         used in convCap/convCap2 block
+        kernel_size, pad, should be tuple type
     """
     conv_opt =[]
     if manner == '0':
@@ -445,9 +454,13 @@ class capConvRoute1(nn.Module):
         self.expand_factor = int(ch_num_out/group)
         self.group = group
 
-        self.main_cap = nn.Conv2d(
-            ch_num_in, ch_num_out, kernel_size=ksize[0],
-            stride=stride, groups=group, padding=pad[0])
+        self.main_cap = nn.Sequential(*[
+            nn.Conv2d(ch_num_in, ch_num_out, kernel_size=ksize[0],
+                      stride=stride, groups=group, padding=pad[0]),
+            nn.BatchNorm2d(ch_num_out),
+            nn.ReLU(),
+            conv_squash(group)
+        ])
 
         # take the output of main_cap as input
         self.main_cap_coeff = nn.Conv2d(
@@ -455,10 +468,13 @@ class capConvRoute1(nn.Module):
             stride=1, padding=1, groups=group)
 
         # take the input as input; NO GROUPING
-        self.res_cap = nn.Conv2d(
-            ch_num_in, ch_num_out, kernel_size=ksize[0],
-            stride=stride, padding=pad[0])
-        self.res_squash = conv_squash(group)
+        self.res_cap = nn.Sequential(*[
+            nn.Conv2d(ch_num_in, ch_num_out, kernel_size=ksize[0],
+                      stride=stride, padding=pad[0]),
+            nn.BatchNorm2d(ch_num_out),
+            nn.ReLU(),
+            conv_squash(group)
+        ])
 
     def forward(self, x):
         main_out = self.main_cap(x)
@@ -468,7 +484,6 @@ class capConvRoute1(nn.Module):
              for i in range(self.group)], dim=1)
 
         res_out = self.res_cap(x)
-        res_out = self.res_squash(res_out)      # TODO(not sure here)
         res_coeff = 1 - main_coeff
 
         out = main_out * main_coeff + res_out * res_coeff
