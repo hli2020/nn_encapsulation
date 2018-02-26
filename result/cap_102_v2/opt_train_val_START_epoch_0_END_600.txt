@@ -9,7 +9,7 @@ cap_model: v2
 connect_detail: all
 dataset: cifar10
 debug_mode: False
-device_id: 0,1
+device_id: 0
 draw_hist: False
 experiment_name: cap_102_v2
 fc_manner: default
@@ -31,9 +31,9 @@ non_target_j: False
 num_workers: 2
 optim: adam
 phase: train_val
-port_id: 8000
-random_seed: 9229
-s35: False
+port_id: 9000
+random_seed: 3063
+s35: True
 save_epoch: 25
 save_folder: result/cap_102_v2
 schedule: [200, 300, 400]
@@ -421,4 +421,5 @@ Total param num # 18.215332 Mb
 
 init learning rate 0.0001000000 at iter 0
 
-[cap_102_v2]	epoch/iter [0/600][0/391] ||	Loss: 0.6566, Top1_err: 89.0625, Top5_err: 48.4375 ||	Data/batch time: 0.0557/4.1548
+[cap_102_v2]	epoch/iter [0/600][0/391] ||	Loss: 0.6432, Top1_err: 92.9688, Top5_err: 46.8750 ||	Data/batch time: 0.1460/4.8425
+[cap_102_v2]	epoch/iter [0/600][100/391] ||	Loss: 0.5089, Top1_err: 81.1881, Top5_err: 33.8722 ||	Data/batch time: 0.0020/1.1887
