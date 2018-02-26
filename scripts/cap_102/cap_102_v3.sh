@@ -3,22 +3,15 @@
 start=`date +%s`
 
 # train and test
-DEVICE_ID=3
+DEVICE_ID=1
 CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
 --device_id=$DEVICE_ID \
---experiment_name=base_102_v2_N_4 \
+--experiment_name=cap_102_v3 \
 --connect_detail=all \
---cap_N=4 \
 --cap_model=v2 \
+--manner=2 \
 --debug_mode=False \
 --less_data_aug \
---max_epoch=600 \
---loss_form=margin \
---optim=adam \
---schedule 200 300 400 \
---lr=0.0001 \
---batch_size_train=128 \
---batch_size_test=128 \
 --s35
 
 

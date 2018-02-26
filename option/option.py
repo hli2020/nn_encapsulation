@@ -57,7 +57,7 @@ class Options(object):
         self.parser.add_argument('--more_skip', action='store_true')
         self.parser.add_argument('--layerwise', action='store_true')
         self.parser.add_argument('--wider', action='store_true')
-        self.parser.add_argument('--manner', default='1', type=str)     # capRoute scheme
+        self.parser.add_argument('--manner', default='2', type=str)     # capRoute scheme
 
         # train
         self.parser.add_argument('--lr', default=0.0001, type=float, help='initial learning rate')
