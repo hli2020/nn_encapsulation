@@ -50,13 +50,14 @@ class Options(object):
         # valid for cap_model=v1_x and above
         self.parser.add_argument('--cap_N', default=4, type=int, help='multiple capLayers')
         self.parser.add_argument('--connect_detail', default='all', type=str,
-                                 help='residual connections, [all | only_sub | all]')
+                                 help='residual connections, [default | only_sub | all]')
         # valid for cap_model=v1_2_x and above
         self.parser.add_argument('--fc_manner', default='default', type=str)
         # valid for cap_model=v2_x and above
         self.parser.add_argument('--more_skip', action='store_true')
         self.parser.add_argument('--layerwise', action='store_true')
         self.parser.add_argument('--wider', action='store_true')
+        self.parser.add_argument('--manner', default='1', type=str)     # capRoute scheme
 
         # train
         self.parser.add_argument('--lr', default=0.0001, type=float, help='initial learning rate')
