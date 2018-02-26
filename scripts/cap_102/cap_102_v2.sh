@@ -10,7 +10,7 @@ CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
 --connect_detail=all \
 --cap_model=v2 \
 --manner=1 \
---debug_mode=False \
+--debug_mode=True \
 --less_data_aug
 
 

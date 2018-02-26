@@ -461,13 +461,11 @@ class capConvRoute1(nn.Module):
             nn.ReLU(),
             conv_squash(group)
         ])
-
         # take the output of main_cap as input
         self.main_cap_coeff = nn.Conv2d(
             ch_num_out, group, kernel_size=3,
             stride=1, padding=1, groups=group)
-
-        # take the input as input; NO GROUPING
+        # res_cap: take the input as input; NO GROUPING
         self.res_cap = nn.Sequential(*[
             nn.Conv2d(ch_num_in, ch_num_out, kernel_size=ksize[0],
                       stride=stride, padding=pad[0]),
@@ -485,10 +483,16 @@ class capConvRoute1(nn.Module):
 
         res_out = self.res_cap(x)
         res_coeff = 1 - main_coeff
-
         out = main_out * main_coeff + res_out * res_coeff
         return out
 
+
+class capConvRoute2(capConvRoute1):
+    def __init__(self,
+                 ch_num_in, ch_num_out,
+                 ksize, pad, stride, group):
+        super(capConvRoute2, self).__init__()
+        self.main_cap_coeff
 
 class multi_conv(nn.Module):
     """
