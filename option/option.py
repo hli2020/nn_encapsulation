@@ -27,12 +27,13 @@ class Options(object):
         self.parser.add_argument('--device_id', default='0', type=str)
 
         # model params
-        self.parser.add_argument('--cap_model', default='v2', type=str, help='v_base, v0, ...')
+        self.parser.add_argument('--cap_model', default='v0', type=str, help='v_base, v0, ...')
 
         # only valid for cap_model=v_base
         self.parser.add_argument('--depth', default=14, type=int)
 
         # only valid for cap_model=v0:
+        self.parser.add_argument('--route', default='EM', type=str)
         self.parser.add_argument('--route_num', default=3, type=int)
         self.parser.add_argument('--primary_cap_num', default=32, type=int)
         self.parser.add_argument('--pre_ch_num', default=256, type=int)
@@ -74,7 +75,7 @@ class Options(object):
         self.parser.add_argument('--max_epoch', default=600, type=int, help='Number of training epoches')
         self.parser.add_argument('--schedule', default=[200, 300, 400], nargs='+', type=int)
         # loss
-        self.parser.add_argument('--loss_form', default='margin', type=str, help='[ CE | spread | margin ]')
+        self.parser.add_argument('--loss_form', default='spread', type=str, help='[ CE | spread | margin ]')
         # preserved for legacy reason (no more KL loss)
         self.parser.add_argument('--use_KL', action='store_true')
         self.parser.add_argument('--KL_manner', default=1, type=int)
@@ -134,9 +135,12 @@ class Options(object):
         if self.opt.cap_model != 'v_base':
             options.extend(['depth'])
         if self.opt.cap_model != 'v0':
-            options.extend(['route_num', 'primary_cap_num', 'pre_ch_num',
+            options.extend(['route', 'route_num', 'primary_cap_num', 'pre_ch_num',
                             'add_cap_dropout', 'dropout_p', 'add_cap_BN_relu', 'use_instanceBN',
                             'b_init', 'squash_manner', 'comp_cap'])
+        if self.opt.cap_model[0:2] != 'v1' or self.opt.cap_model[0:2] != 'v2':
+            options.extend(['cap_N', 'connect_detail', 'fc_manner',
+                            'more_skip', 'layerwise', 'wider', 'manner'])
         if self.opt.loss_form != 'spread':
             options.extend(['fix_m'])
 

@@ -38,11 +38,13 @@ def train(trainloader, model, criterion, optimizer, opt, visual, epoch):
         inputs, targets = torch.autograd.Variable(inputs), torch.autograd.Variable(targets)
 
         # Last two entries in 'stats' have mean, std for KL loss
-        outputs, stats = model(inputs, targets)  # 128 x 10 x 16
+        outputs, stats, activation = model(inputs, targets)  # 128 x 10 x 16
         try:
             outputs = outputs.norm(dim=2)
         except RuntimeError:
             outputs = outputs
+        outputs = activation
+
         # print(outputs.size())
         # _, ind = outputs[4, :].max(0)
         # print('predict index: {:d}'.format(ind.data[0]))
