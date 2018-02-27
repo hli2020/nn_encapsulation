@@ -8,6 +8,7 @@ import numpy as np
 import math
 from layers.misc import compute_stats
 
+EPS = np.finfo(float).eps
 # to find the different prediction during routing
 FIND_DIFF = False
 # to see the detailed values of b, c, v, delta_b
@@ -58,15 +59,18 @@ class CapLayer(nn.Module):
             self.cap_BN = nn.InstanceNorm2d(out_dim, affine=True)
             self.cap_relu = nn.ReLU(True)
         if self.route == 'EM':
-            self.beta_v = Parameter(torch.Tensor(self.num_out_caps))
-            self.beta_a = Parameter(torch.Tensor(self.num_out_caps))
-            stdv = 1. / math.sqrt(self.beta_v.size(0))
-            self.beta_v.data.uniform_(-stdv, stdv)
-            self.beta_a.data.uniform_(-stdv, stdv)
+            # self.beta_v = Parameter(torch.Tensor(self.num_out_caps))
+            # self.beta_a = Parameter(torch.Tensor(self.num_out_caps))
+            # stdv = 1. / math.sqrt(self.beta_v.size(0))
+            # # stdv = 1000
+            # self.beta_v.data.uniform_(-stdv, stdv)
+            # self.beta_a.data.uniform_(-stdv, stdv)
+            self.beta_v = 10
+            self.beta_a = -self.beta_v
 
     def forward(self, input,
                 target=None, curr_iter=None, draw_hist=None,
-                activate=None):
+                activate=[]):
         """
             target, curr_iter, draw_hist are for debugging or stats collection purpose only;
             'activate' is the activation of previous layer, a_i (i being # of input capsules)
@@ -106,7 +110,6 @@ class CapLayer(nn.Module):
                              spatial_size, spatial_size)
             pred = pred.permute(0, 2, 3, 1, 4, 5).contiguous()
             pred = pred.view(bs, pred.size(1), pred.size(2), -1)
-
             # if self.add_cap_BN_relu:
             #     NotImplementedError()
             #     # pred = self.cap_BN(pred.permute(0, 3, 1, 2).contiguous())
@@ -120,6 +123,18 @@ class CapLayer(nn.Module):
                 print('\tcap W time: {:.4f}'.format(time.perf_counter() - start))
 
             # 2. routing (get 'v')
+            # _check = np.isnan(pred.data.cpu().numpy())
+            # if _check.any():
+            #     a = 1
+            # print('\nlearned W mean: {:.4f}'.format(torch.mean(self.W.weight.data)))
+            # print('learned b mean: {:.4f}'.format(torch.mean(self.W.bias.data)))
+            # try:
+            #     a = torch.mean(self.W.weight.grad.data)
+            #     print('last iter saved grad:')
+            #     print('learned W_grad mean: {:.6f}'.format(torch.mean(self.W.weight.grad.data)))
+            #     print('learned b_grad mean: {:.6f}'.format(torch.mean(self.W.bias.grad.data)))
+            # except:
+            #     pass
             start = time.perf_counter()
             if self.route == 'dynamic':
                 v = self.dynamic(bs, pred, pred_list)
@@ -134,7 +149,6 @@ class CapLayer(nn.Module):
                     compute_stats(target, pred, v, self.non_target_j)
             if self.use_KL:
                 mean, std = compute_stats(None, pred, v, KL_manner=self.KL_manner)
-
             if FIND_DIFF:
                 temp = np.asarray(pred_list)
                 temp = np.resize(temp, (self.route_num+2, bs)).transpose()  # 128 x 5
@@ -234,7 +248,7 @@ class CapLayer(nn.Module):
     def EM(self, bs, pred, activate):
         # V_ij is just pred (bs, 10, 16, 1152)
         # output capsule is mu_j (bs, 10, 16)
-        factor = 1.
+        factor = 1.  # R init
         R = Variable(torch.ones(self.num_in_caps, self.num_out_caps), requires_grad=False)
         R /= self.num_out_caps * factor
         R = R.repeat(bs, 1, 1)
@@ -243,6 +257,7 @@ class CapLayer(nn.Module):
             activation, mu, std = self._M_step(R, activate, pred, i)
             if i < self.route_num-1:
                 R = self._E_step(activation, mu, std, pred)
+
             print('activation, iter={:d}, min: {:.3f}, max: {:.3f}'.format(
                 i, activation.data.min(), activation.data.max()
             ))
@@ -251,13 +266,11 @@ class CapLayer(nn.Module):
     def _M_step(self, R, activate, V, iter):
         # activate: bs, i
         # activation: bs, j
-        factor = 1.
-        if activate is not None:
+        factor = 1.  # adjust lambda
+        if activate != []:
             R = R*activate.view(activate.size(0), activate.size(1), 1)
-        else:
-            raise ValueError('hyli: activate does not exist!')
 
-        R_j = torch.sum(R, dim=1).unsqueeze(dim=2)  # bs, j, 1
+        R_j = torch.sum(R, dim=1).unsqueeze(dim=2) + EPS  # bs, j, 1
         mu = torch.matmul(V, R.permute(0, 2, 1).unsqueeze(dim=3)).squeeze()
         mu = mu / R_j
 
@@ -265,22 +278,31 @@ class CapLayer(nn.Module):
         std = torch.matmul(std_V, R.permute(0, 2, 1).unsqueeze(dim=3)).squeeze()
         std = torch.sqrt(std / R_j)
 
-        cost = torch.log(std) + self.beta_v.view(self.beta_v.size(0), 1)
+        # cost = torch.log(std) + self.beta_v.view(self.beta_v.size(0), 1)
+        cost = torch.log(std) + self.beta_v
         cost *= R_j
         cost_sum = self.beta_a - torch.sum(cost, dim=2)
         temperature = (1.0+iter)/factor
         activation = F.sigmoid(temperature * cost_sum)
+
+        # _check = np.isnan(activation.data.cpu().numpy())
+        # if _check.any():
+        #     a = 1
         return activation, mu, std
 
     def _E_step(self, activation, mu, std, V):
         # TODO: not sure how it works
-        prefix = 1 / torch.sqrt(torch.prod(2*math.pi*(std**2), dim=2))
+        prefix = 1 / (torch.sqrt(torch.prod(2*math.pi*(std**2), dim=2)) + EPS)
         deno = (2*(std**2))
         x = (V - mu.unsqueeze(dim=3))**2 / deno.unsqueeze(dim=3)
         x = torch.sum(x, dim=2)
         p = prefix.unsqueeze(dim=2) * torch.exp(-x)     # bs, j, i
         r = p * activation.unsqueeze(dim=2)
         R = F.softmax(r, dim=1)
+
+        # _check = np.isnan(R.data.cpu().numpy())
+        # if _check.any():
+        #     a = 1
         return R.permute(0, 2, 1)
 
 

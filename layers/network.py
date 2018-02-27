@@ -168,7 +168,6 @@ class CapNet(nn.Module):
 
     def forward(self, x, target=None, curr_iter=0, vis=None):
         stats, output, start, activation = [], [], [], []
-
         if self.measure_time:
             torch.cuda.synchronize()
             start = time.perf_counter()
@@ -183,8 +182,8 @@ class CapNet(nn.Module):
             x = self.avgpool(x)
             x = x.view(x.size(0), -1)
             output = self.fc(x)
-
         elif self.cap_model == 'v0':
+            activate = []
             x = self.tranfer_conv(x)
             x = self.tranfer_bn(x)
             x = self.tranfer_relu(x)
@@ -198,9 +197,10 @@ class CapNet(nn.Module):
             if self.use_imagenet:
                 x = self.max_pool(x)
             # this is the final output
-            if self.route == 'EM':
-                activate = self.generate_activate(x).view(x.size(0), -1)
-            output, stats, activation = self.cap_layer(x, target, curr_iter, vis, activate=activate)
+            # if self.route == 'EM':
+            #     activate = self.generate_activate(x).view(x.size(0), -1)
+            output, stats, activation = self.cap_layer(
+                x, target, curr_iter, vis, activate=activate)
             if self.measure_time:
                 torch.cuda.synchronize()
                 print('last cap total time: {:.4f}'.format(time.perf_counter() - start))

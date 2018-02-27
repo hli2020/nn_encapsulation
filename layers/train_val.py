@@ -43,7 +43,7 @@ def train(trainloader, model, criterion, optimizer, opt, visual, epoch):
             outputs = outputs.norm(dim=2)
         except RuntimeError:
             outputs = outputs
-        outputs = activation
+        # outputs = activation
 
         # print(outputs.size())
         # _, ind = outputs[4, :].max(0)
@@ -67,12 +67,21 @@ def train(trainloader, model, criterion, optimizer, opt, visual, epoch):
         losses.update(loss.data[0], inputs.size(0))
         top1.update(prec1[0], inputs.size(0))
         top5.update(prec5[0], inputs.size(0))
-
         # OPTIMIZE
         start = time.time()
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+
+        # print('after bp:')
+        # w_grad_mean = torch.mean(model.cap_layer.W.weight.grad.data)
+        # print('iter: {:d}, W_grad mean: {:.6f}'.format(
+        #     batch_idx, w_grad_mean))
+        # if np.isnan(w_grad_mean):
+        #     a = 1
+        # print('iter: {:d}, bias_grad mean: {:.6f}'.format(
+        #     batch_idx, torch.mean(model.cap_layer.W.bias.grad.data)))
+
         # if opt.meaure_time:
         #     print('iter bp time: {:.4f}\n'.format(time.time()-start))
 
@@ -91,7 +100,6 @@ def train(trainloader, model, criterion, optimizer, opt, visual, epoch):
             #         'data': data_time.avg,
             #         'batch': batch_time.avg,
             #     }
-
             visual.print_loss((losses.avg, top1.avg, top5.avg),
                            (epoch, batch_idx, epoch_size),
                            (data_time.avg, batch_time.avg))
@@ -135,7 +143,7 @@ def test(testloader, model, opt, visual, epoch=0, criterion=None):
 
         # the computation of stats is in 'cap_layer.py'
         # 'stats' is from the mini-batch in ONE iteration
-        outputs, stats = model(inputs_, targets, batch_idx, opt.draw_hist)
+        outputs, stats, _ = model(inputs_, targets, batch_idx, opt.draw_hist)
 
         if opt.draw_hist:
             # skip test evaluation
