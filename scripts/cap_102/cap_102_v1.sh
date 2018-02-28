@@ -3,13 +3,13 @@
 start=`date +%s`
 
 # train and test
-DEVICE_ID=0,1
+DEVICE_ID=6,7
 CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
 --device_id=$DEVICE_ID \
 --experiment_name=cap_102_v1 \
 --connect_detail=all \
 --cap_model=v2 \
---manner=1 \
+--manner=0 \
 --debug_mode=False \
 --less_data_aug
 
