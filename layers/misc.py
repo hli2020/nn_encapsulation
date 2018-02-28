@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+import torch.nn as nn
 
 
 # residual connections for cap_model=v1_x
@@ -8,6 +9,24 @@ connect_list = {
     'all':          [True, True, True, True, True, True, True, True],
     'default':      [False, False, False, False, False, False, False, False],
 }
+
+
+def weights_init_cap(m):
+    """
+        init random weights
+    """
+    # if isinstance(m, nn.Conv2d):
+    #     nn.init.xavier_normal(m.weight.data)
+    #     m.bias.data.zero_()
+    if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
+        nn.init.xavier_normal(m.weight.data)
+        nn.init.normal(m.bias.data)
+    elif isinstance(m, nn.BatchNorm2d) or isinstance(m, nn.InstanceNorm2d):
+        m.weight.data.fill_(1)
+        m.bias.data.zero_()
+    elif isinstance(m, nn.Linear):
+        nn.init.xavier_normal(m.weight.data)
+        nn.init.normal(m.bias.data)
 
 
 def _update(x, y, a):

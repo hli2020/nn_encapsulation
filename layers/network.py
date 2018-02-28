@@ -3,6 +3,7 @@ from layers.misc import connect_list
 from layers.models.cifar.resnet import BasicBlock, Bottleneck
 from layers.cap_layer import CapLayer, CapConv, CapConv2, CapFC
 from object_detection.utils.util import weights_init
+from layers.misc import weights_init_cap
 import time
 import torch
 
@@ -19,7 +20,6 @@ class CapNet(nn.Module):
         # self.use_multiple = opts.use_multiple
         input_ch = 1 if opts.dataset == 'fmnist' else 3
         self.measure_time = opts.measure_time
-        self.cap_N = opts.cap_N
 
         if self.cap_model == 'v_base':
             # resnet baseline
@@ -51,6 +51,7 @@ class CapNet(nn.Module):
 
         elif self.cap_model == 'v0':
             # original capsule idea in the paper
+            self.route = opts.route
             # first conv
             self.tranfer_conv = nn.Conv2d(input_ch, opts.pre_ch_num, kernel_size=9, padding=1, stride=2)  # 256x13x13
             self.tranfer_bn = nn.InstanceNorm2d(opts.pre_ch_num, affine=True) \
@@ -66,13 +67,22 @@ class CapNet(nn.Module):
             self.tranfer_relu1 = nn.ReLU(True)
 
             # needed for large spatial input on imagenet
-            if opts.bigger_input:
-                self.max_pool = nn.MaxPool2d(9, stride=9)  # input 224, before cap, 54 x 54
-            else:
-                self.max_pool = nn.MaxPool2d(5, stride=5)  # input 128, before cap, 30 x 30
+            if opts.dataset == 'tiny_imagenet':
+                if opts.bigger_input:
+                    self.max_pool = nn.MaxPool2d(9, stride=9)  # input 224, before cap, 54 x 54
+                else:
+                    self.max_pool = nn.MaxPool2d(5, stride=5)  # input 128, before cap, 30 x 30
             # capsLayer
+            # for cifar, the input should be bs, 256, 6, 6
+            if opts.route == 'EM':
+                self.generate_activate = nn.Sequential(*[
+                    nn.Conv2d(256, 32, kernel_size=3, padding=1),
+                    nn.BatchNorm2d(32),
+                    nn.ReLU()
+                ])
             self.cap_layer = CapLayer(opts, num_in_caps=opts.primary_cap_num*6*6, num_out_caps=num_classes,
-                                      out_dim=16, num_shared=opts.primary_cap_num, in_dim=8)
+                                      out_dim=16, num_shared=opts.primary_cap_num, in_dim=8,
+                                      route=opts.route)
 
         elif self.cap_model[0:2] == 'v1':
             connect_detail = connect_list[opts.connect_detail]
@@ -83,23 +93,23 @@ class CapNet(nn.Module):
             ])  # 32 spatial output
 
             self.cap1_conv = CapConv(ch_num=32*1, ch_out=32*2, groups=32, residual=connect_detail[0])
-            self.cap1_conv_sub = CapConv(ch_num=32*2, groups=32, N=self.cap_N, residual=connect_detail[1])
+            self.cap1_conv_sub = CapConv(ch_num=32*2, groups=32, N=opts.cap_N, residual=connect_detail[1])
             # 32 spatial output
 
             self.cap2_conv = CapConv(ch_num=32*2, ch_out=32*4, groups=32,
                                      kernel_size=3, stride=2, pad=1, residual=connect_detail[2])
-            self.cap2_conv_sub = CapConv(ch_num=32*4, groups=32, N=self.cap_N, residual=connect_detail[3])
+            self.cap2_conv_sub = CapConv(ch_num=32*4, groups=32, N=opts.cap_N, residual=connect_detail[3])
             # 16 spatial output
 
             self.cap3_conv = CapConv(ch_num=32*4, ch_out=32*8, groups=32,
                                      kernel_size=3, stride=2, pad=1, residual=connect_detail[4])
-            self.cap3_conv_sub = CapConv(ch_num=32*8, groups=32, N=self.cap_N, residual=connect_detail[5])
+            self.cap3_conv_sub = CapConv(ch_num=32*8, groups=32, N=opts.cap_N, residual=connect_detail[5])
             # 8 spatial output
 
             if self.cap_model == 'v1_1':
                 self.final_cls = CapLayer(
                     opts, num_in_caps=opts.primary_cap_num*8*8, num_out_caps=num_classes,
-                    out_dim=16, in_dim=8, num_shared=opts.primary_cap_num)
+                    out_dim=16, in_dim=8, num_shared=opts.primary_cap_num, route=opts.route)
 
             elif self.cap_model == 'v1_2':
                 # increase cap_num and downsize spatial capsules
@@ -111,7 +121,7 @@ class CapNet(nn.Module):
             elif self.cap_model == 'v1_3':
                 self.cap4_conv = CapConv(ch_num=32*8, ch_out=32*16, groups=32,
                                          kernel_size=3, stride=2, pad=1, residual=connect_detail[6])
-                self.cap4_conv_sub = CapConv(ch_num=32*16, groups=32, N=self.cap_N, residual=connect_detail[7])
+                self.cap4_conv_sub = CapConv(ch_num=32*16, groups=32, N=opts.cap_N, residual=connect_detail[7])
                 # output: bs, 32*16, 4, 4
                 self.final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes,
                                        cap_dim=16, fc_manner=opts.fc_manner)
@@ -125,41 +135,39 @@ class CapNet(nn.Module):
             ])  # 32 spatial output
 
             self.module1 = CapConv2(ch_in=32*1, ch_out=32*2, groups=32,
-                                    residual=connect_detail[0:2], iter_N=self.cap_N,
+                                    residual=connect_detail[0:2], iter_N=opts.cap_N,
                                     no_downsample=True,
                                     more_skip=opts.more_skip,
                                     layerwise_skip_connect=opts.layerwise,
                                     wider_main_conv=opts.wider,
                                     manner=opts.manner)
             self.module2 = CapConv2(ch_in=32*2, ch_out=32*4, groups=32,
-                                    residual=connect_detail[2:4], iter_N=self.cap_N,
+                                    residual=connect_detail[2:4], iter_N=opts.cap_N,
                                     more_skip=opts.more_skip,
                                     layerwise_skip_connect=opts.layerwise,
                                     wider_main_conv=opts.wider,
                                     manner=opts.manner)
             self.module3 = CapConv2(ch_in=32*4, ch_out=32*8, groups=32,
-                                    residual=connect_detail[4:6], iter_N=self.cap_N,
+                                    residual=connect_detail[4:6], iter_N=opts.cap_N,
                                     more_skip=opts.more_skip,
                                     layerwise_skip_connect=opts.layerwise,
                                     wider_main_conv=opts.wider,
                                     manner=opts.manner)
             self.module4 = CapConv2(ch_in=32*8, ch_out=32*16, groups=32,
-                                    residual=connect_detail[6:], iter_N=self.cap_N,
+                                    residual=connect_detail[6:], iter_N=opts.cap_N,
                                     more_skip=opts.more_skip,
                                     layerwise_skip_connect=opts.layerwise,
                                     wider_main_conv=opts.wider,
                                     manner=opts.manner)
-            # output: bs, 32*16, 4, 4
+            # output after module4: bs, 32*16, 4, 4
             self.final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes,
                                    cap_dim=16, fc_manner=opts.fc_manner)
-
         # init the network
         for m in self.modules():
-            weights_init(m)
+            weights_init_cap(m)
 
     def forward(self, x, target=None, curr_iter=0, vis=None):
-        stats, output, start = [], [], []
-
+        stats, output, start, activation = [], [], [], []
         if self.measure_time:
             torch.cuda.synchronize()
             start = time.perf_counter()
@@ -174,7 +182,6 @@ class CapNet(nn.Module):
             x = self.avgpool(x)
             x = x.view(x.size(0), -1)
             output = self.fc(x)
-
         elif self.cap_model == 'v0':
             x = self.tranfer_conv(x)
             x = self.tranfer_bn(x)
@@ -188,7 +195,13 @@ class CapNet(nn.Module):
                 start = time.perf_counter()
             if self.use_imagenet:
                 x = self.max_pool(x)
-            output, stats = self.cap_layer(x, target, curr_iter, vis)
+            # this is the final output
+            activate = None
+            if self.route == 'EM':
+                activate = self.generate_activate(x).view(x.size(0), -1)
+            output, stats, activation = self.cap_layer(
+                x, target, curr_iter, vis, activate=activate)
+
             if self.measure_time:
                 torch.cuda.synchronize()
                 print('last cap total time: {:.4f}'.format(time.perf_counter() - start))
@@ -203,7 +216,7 @@ class CapNet(nn.Module):
             x = self.cap3_conv_sub(x)
 
             if self.cap_model == 'v1_1':
-                output, _ = self.final_cls(x)
+                output, _, _ = self.final_cls(x)
 
             elif self.cap_model == 'v1_2':
                 x = self.cap4_conv(x)
@@ -223,7 +236,7 @@ class CapNet(nn.Module):
         else:
             raise NameError('Unknown structure or capsule model type.')
 
-        return output, stats
+        return output, stats, activation
 
     def _make_layer(self, block, planes, blocks, stride=1):
         """make resnet sub-layers"""
