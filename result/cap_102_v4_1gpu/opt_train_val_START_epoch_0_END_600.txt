@@ -1,4 +1,4 @@
-Experiment: cap_102_v4
+Experiment: cap_102_v4_1gpu
 ------------ Train and Test Options -----------------
 base_save_folder: result
 batch_size_test: 128
@@ -10,11 +10,11 @@ coeff_dimwise: False
 connect_detail: all
 dataset: cifar10
 debug_mode: False
-device_id: 4,5,6,7
+device_id: 3
 draw_hist: False
-experiment_name: cap_102_v4
+experiment_name: cap_102_v4_1gpu
 fc_manner: default
-file_name: result/cap_102_v4/opt_train_val_START_epoch_0_END_600.txt
+file_name: result/cap_102_v4_1gpu/opt_train_val_START_epoch_0_END_600.txt
 gamma: 0.1
 layerwise: False
 less_data_aug: True
@@ -33,10 +33,10 @@ num_workers: 2
 optim: adam
 phase: train_val
 port_id: 9000
-random_seed: 2064
+random_seed: 5377
 s35: True
 save_epoch: 25
-save_folder: result/cap_102_v4
+save_folder: result/cap_102_v4_1gpu
 schedule: [200, 300, 400]
 show_freq: 100
 show_test_after_epoch: 100
@@ -442,14 +442,6 @@ Total param num # 172.445068 Mb
 
 init learning rate 0.0001000000 at iter 0
 
-[cap_102_v4]	epoch/iter [0/600][0/391] ||	Loss: 0.6105, Top1_err: 90.6250, Top5_err: 47.6562 ||	Data/batch time: 0.1441/22.5002
-[cap_102_v4]	epoch/iter [0/600][100/391] ||	Loss: 0.4715, Top1_err: 75.4486, Top5_err: 24.0486 ||	Data/batch time: 0.0020/0.9265
-[cap_102_v4]	epoch/iter [0/600][200/391] ||	Loss: 0.4350, Top1_err: 68.2719, Top5_err: 17.8638 ||	Data/batch time: 0.0012/0.8055
-[cap_102_v4]	epoch/iter [0/600][300/391] ||	Loss: 0.4145, Top1_err: 64.2805, Top5_err: 15.2253 ||	Data/batch time: 0.0010/0.7647
-[cap_102_v4]	epoch/iter [0/600][390/391] ||	Loss: 0.4004, Top1_err: 61.7240, Top5_err: 13.7220 ||	Data/batch time: 0.0008/0.7656
-Summary	epoch/iter [0/600] ||	TRAIN, Top1_err: 61.7240, Top5_err: 13.7220 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
-
-model saved at result/cap_102_v4/epoch_1.pth
-[cap_102_v4]	epoch/iter [1/600][0/391] ||	Loss: 0.3207, Top1_err: 47.6562, Top5_err: 7.8125 ||	Data/batch time: 0.2751/3.4868
-[cap_102_v4]	epoch/iter [1/600][100/391] ||	Loss: 0.3342, Top1_err: 49.8840, Top5_err: 7.5186 ||	Data/batch time: 0.0032/0.7108
-[cap_102_v4]	epoch/iter [1/600][200/391] ||	Loss: 0.3249, Top1_err: 48.2004, Top5_err: 7.0585 ||	Data/batch time: 0.0018/0.6978
+[cap_102_v4_1gpu]	epoch/iter [0/600][0/391] ||	Loss: 0.6342, Top1_err: 92.9688, Top5_err: 47.6562 ||	Data/batch time: 0.0895/5.0556
+[cap_102_v4_1gpu]	epoch/iter [0/600][100/391] ||	Loss: 0.4691, Top1_err: 75.1083, Top5_err: 23.9558 ||	Data/batch time: 0.0016/1.3401
+[cap_102_v4_1gpu]	epoch/iter [0/600][200/391] ||	Loss: 0.4356, Top1_err: 68.1825, Top5_err: 18.1631 ||	Data/batch time: 0.0011/1.3404
