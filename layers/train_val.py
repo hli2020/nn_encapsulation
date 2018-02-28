@@ -43,7 +43,7 @@ def train(trainloader, model, criterion, optimizer, opt, visual, epoch):
             outputs = outputs.norm(dim=2)
         except RuntimeError:
             outputs = outputs
-        # outputs = activation
+        # outputs = activation  # way worse
 
         # print(outputs.size())
         # _, ind = outputs[4, :].max(0)

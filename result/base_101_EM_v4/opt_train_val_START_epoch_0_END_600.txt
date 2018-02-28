@@ -1,0 +1,83 @@
+Experiment: base_101_EM_v4
+------------ Train and Test Options -----------------
+E_step_norm: True
+add_cap_BN_relu: False
+add_cap_dropout: False
+b_init: zero
+base_save_folder: result
+batch_size_test: 128
+batch_size_train: 128
+beta1: 0.9
+cap_model: v0
+comp_cap: False
+dataset: cifar10
+debug_mode: False
+device_id: 0
+draw_hist: False
+dropout_p: 0.2
+experiment_name: base_101_EM_v4
+file_name: result/base_101_EM_v4/opt_train_val_START_epoch_0_END_600.txt
+gamma: 0.1
+less_data_aug: False
+loss_form: margin
+lr: 0.0001
+manual_seed: -1
+max_epoch: 600
+measure_time: False
+momentum: 0.9
+multi_crop_test: False
+no_visdom: False
+non_target_j: False
+num_workers: 2
+optim: adam
+phase: train_val
+port_id: 8000
+pre_ch_num: 256
+primary_cap_num: 32
+random_seed: 262
+route: EM
+route_num: 3
+s35: False
+save_epoch: 25
+save_folder: result/base_101_EM_v4
+schedule: [200, 300, 400]
+show_freq: 100
+show_test_after_epoch: 100
+squash_manner: paper
+use_cuda: True
+use_instanceBN: False
+weight_decay: 0.0005
+------------------ End --------------------
+DataParallel (
+  (module): CapNet(
+    (tranfer_conv): Conv2d (3, 256, kernel_size=(9, 9), stride=(2, 2), padding=(1, 1))
+    (tranfer_bn): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+    (tranfer_relu): ReLU(inplace)
+    (tranfer_conv1): Conv2d (256, 256, kernel_size=(3, 3), stride=(2, 2))
+    (tranfer_bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+    (tranfer_relu1): ReLU(inplace)
+    (generate_activate): Sequential(
+      (0): Conv2d (256, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU()
+    )
+    (cap_layer): CapLayer(
+      (W): Conv2d (256, 5120, kernel_size=(1, 1), stride=(1, 1), groups=32)
+    )
+  ), weights=((256, 3, 9, 9), (256,), (256,), (256,), (256, 256, 3, 3), (256,), (256,), (256,), (32, 256, 3, 3), (32,), (32,), (32,), (10,), (10,), (5120, 8, 1, 1), (5120,)), parameters=773492
+)
+Total param num # 2.950638 Mb
+
+init learning rate 0.0001000000 at iter 0
+
+[base_101_EM_v4]	epoch/iter [0/600][0/391] ||	Loss: 14.2231, Top1_err: 86.7188, Top5_err: 49.2188 ||	Data/batch time: 0.0935/0.8524
+[base_101_EM_v4]	epoch/iter [0/600][100/391] ||	Loss: 4.9241, Top1_err: 88.9155, Top5_err: 49.8762 ||	Data/batch time: 0.0012/0.1691
+[base_101_EM_v4]	epoch/iter [0/600][200/391] ||	Loss: 3.4006, Top1_err: 88.7321, Top5_err: 50.1555 ||	Data/batch time: 0.0008/0.1668
+[base_101_EM_v4]	epoch/iter [0/600][300/391] ||	Loss: 2.6615, Top1_err: 88.6239, Top5_err: 49.1694 ||	Data/batch time: 0.0006/0.1660
+[base_101_EM_v4]	epoch/iter [0/600][390/391] ||	Loss: 2.2562, Top1_err: 88.6360, Top5_err: 48.0740 ||	Data/batch time: 0.0006/0.2045
+Summary	epoch/iter [0/600] ||	TRAIN, Top1_err: 88.6360, Top5_err: 48.0740 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+model saved at result/base_101_EM_v4/epoch_1.pth
+[base_101_EM_v4]	epoch/iter [1/600][0/391] ||	Loss: 0.7749, Top1_err: 92.9688, Top5_err: 40.6250 ||	Data/batch time: 0.1088/0.4046
+[base_101_EM_v4]	epoch/iter [1/600][100/391] ||	Loss: 0.7455, Top1_err: 88.0415, Top5_err: 40.3697 ||	Data/batch time: 0.0019/0.3823
+[base_101_EM_v4]	epoch/iter [1/600][200/391] ||	Loss: 0.6978, Top1_err: 86.3456, Top5_err: 38.7088 ||	Data/batch time: 0.0013/0.3726

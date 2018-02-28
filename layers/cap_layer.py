@@ -59,18 +59,20 @@ class CapLayer(nn.Module):
             self.cap_BN = nn.InstanceNorm2d(out_dim, affine=True)
             self.cap_relu = nn.ReLU(True)
         if self.route == 'EM':
-            # self.beta_v = Parameter(torch.Tensor(self.num_out_caps))
-            # self.beta_a = Parameter(torch.Tensor(self.num_out_caps))
-            # stdv = 1. / math.sqrt(self.beta_v.size(0))
-            # # stdv = 1000
-            # self.beta_v.data.uniform_(-stdv, stdv)
-            # self.beta_a.data.uniform_(-stdv, stdv)
-            self.beta_v = 10
-            self.beta_a = -self.beta_v
+            self.beta_v = Parameter(torch.Tensor(self.num_out_caps))
+            self.beta_a = Parameter(torch.Tensor(self.num_out_caps))
+            nn.init.uniform(self.beta_v.data)
+            nn.init.uniform(self.beta_a.data)
+            # self.beta_v = 10
+            # self.beta_a = -self.beta_v
+            self.fac_R_init = 1.
+            self.fac_temperature = 1.
+            self.fac_nor = 10.0
+            self.E_step_norm = opts.E_step_norm
 
     def forward(self, input,
                 target=None, curr_iter=None, draw_hist=None,
-                activate=[]):
+                activate=None):
         """
             target, curr_iter, draw_hist are for debugging or stats collection purpose only;
             'activate' is the activation of previous layer, a_i (i being # of input capsules)
@@ -248,9 +250,8 @@ class CapLayer(nn.Module):
     def EM(self, bs, pred, activate):
         # V_ij is just pred (bs, 10, 16, 1152)
         # output capsule is mu_j (bs, 10, 16)
-        factor = 1.  # R init
         R = Variable(torch.ones(self.num_in_caps, self.num_out_caps), requires_grad=False)
-        R /= self.num_out_caps * factor
+        R /= self.num_out_caps * self.fac_R_init
         R = R.repeat(bs, 1, 1)
 
         for i in range(self.route_num):
@@ -258,18 +259,16 @@ class CapLayer(nn.Module):
             if i < self.route_num-1:
                 R = self._E_step(activation, mu, std, pred)
 
-            print('activation, iter={:d}, min: {:.3f}, max: {:.3f}'.format(
-                i, activation.data.min(), activation.data.max()
-            ))
+            # print('activation, iter={:d}, min: {:.3f}, max: {:.3f}'.format(
+            #     i, activation.data.min(), activation.data.max()
+            # ))
         return mu, activation
 
     def _M_step(self, R, activate, V, iter):
         # activate: bs, i
         # activation: bs, j
-        factor = 1.  # adjust lambda
-        if activate != []:
+        if activate is not None:
             R = R*activate.view(activate.size(0), activate.size(1), 1)
-
         R_j = torch.sum(R, dim=1).unsqueeze(dim=2) + EPS  # bs, j, 1
         mu = torch.matmul(V, R.permute(0, 2, 1).unsqueeze(dim=3)).squeeze()
         mu = mu / R_j
@@ -278,11 +277,12 @@ class CapLayer(nn.Module):
         std = torch.matmul(std_V, R.permute(0, 2, 1).unsqueeze(dim=3)).squeeze()
         std = torch.sqrt(std / R_j)
 
-        # cost = torch.log(std) + self.beta_v.view(self.beta_v.size(0), 1)
-        cost = torch.log(std) + self.beta_v
+        cost = torch.log(std + EPS) + self.beta_v.view(self.beta_v.size(0), 1)    # learned beta
+        # cost = torch.log(std) + self.beta_v   # fixed beta
         cost *= R_j
-        cost_sum = self.beta_a - torch.sum(cost, dim=2)
-        temperature = (1.0+iter)/factor
+        cost_sum = normalize_cap(torch.sum(cost, dim=2), self.fac_nor)
+        cost_sum = self.beta_a - cost_sum
+        temperature = (1.0+iter)/self.fac_temperature
         activation = F.sigmoid(temperature * cost_sum)
 
         # _check = np.isnan(activation.data.cpu().numpy())
@@ -291,14 +291,16 @@ class CapLayer(nn.Module):
         return activation, mu, std
 
     def _E_step(self, activation, mu, std, V):
-        # TODO: not sure how it works
+
         prefix = 1 / (torch.sqrt(torch.prod(2*math.pi*(std**2), dim=2)) + EPS)
-        deno = (2*(std**2))
+        deno = (2*(std**2)) + EPS
         x = (V - mu.unsqueeze(dim=3))**2 / deno.unsqueeze(dim=3)
         x = torch.sum(x, dim=2)
-        p = prefix.unsqueeze(dim=2) * torch.exp(-x)     # bs, j, i
+        if self.E_step_norm:
+            x = normalize_cap(x, self.fac_nor)
+        p = prefix.unsqueeze(dim=2) * torch.exp(-x)
         r = p * activation.unsqueeze(dim=2)
-        R = F.softmax(r, dim=1)
+        R = r / (torch.sum(r, dim=1, keepdim=True) + EPS)
 
         # _check = np.isnan(R.data.cpu().numpy())
         # if _check.any():
@@ -486,6 +488,7 @@ class CapFC(nn.Module):
         return squash(input)
 
     def reset_parameters(self):
+        "init param here"
         if self.fc_manner == 'default':
             stdv = 1. / math.sqrt(self.weight.size(1))
             self.weight.data.uniform_(-stdv, stdv)
@@ -504,6 +507,16 @@ class CapFC(nn.Module):
 
 
 # Utilities below
+def normalize_cap(input, factor):
+    "input: bs, j, (i)"
+    min_input, _ = torch.min(input, dim=1, keepdim=True)
+    max_input, _ = torch.max(input, dim=1, keepdim=True)
+    output = \
+        factor*(input - min_input) / (max_input - min_input + EPS) - factor/2
+
+    return output
+
+
 def _make_core_conv(
         ch_num_in, ch_num_out, kernel_size, stride, groups, pad,
         manner='0', wider_conv=False):

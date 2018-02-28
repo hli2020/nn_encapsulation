@@ -33,7 +33,8 @@ class Options(object):
         self.parser.add_argument('--depth', default=14, type=int)
 
         # only valid for cap_model=v0:
-        self.parser.add_argument('--route', default='EM', type=str)
+        self.parser.add_argument('--route', default='dynamic', type=str)
+        self.parser.add_argument('--E_step_norm', action='store_true')
         self.parser.add_argument('--route_num', default=3, type=int)
         self.parser.add_argument('--primary_cap_num', default=32, type=int)
         self.parser.add_argument('--pre_ch_num', default=256, type=int)
@@ -75,14 +76,14 @@ class Options(object):
         self.parser.add_argument('--max_epoch', default=600, type=int, help='Number of training epoches')
         self.parser.add_argument('--schedule', default=[200, 300, 400], nargs='+', type=int)
         # loss
-        self.parser.add_argument('--loss_form', default='spread', type=str, help='[ CE | spread | margin ]')
+        self.parser.add_argument('--loss_form', default='margin', type=str, help='[ CE | spread | margin ]')
+        self.parser.add_argument('--fix_m', action='store_true', help='valid for use_spread_loss only')
         # preserved for legacy reason (no more KL loss)
         self.parser.add_argument('--use_KL', action='store_true')
         self.parser.add_argument('--KL_manner', default=1, type=int)
         self.parser.add_argument('--KL_factor', default=.1, type=float)
         # stacking std, mean info of multiple capLayers (in CapLayer2 class), to compute KL loss
         self.parser.add_argument('--use_multiple', action='store_true', help='valid for N > 1')
-        self.parser.add_argument('--fix_m', action='store_true', help='valid for use_spread_loss only')
 
         # test
         self.parser.add_argument('--show_test_after_epoch', type=int, default=-1)

@@ -3,6 +3,7 @@ from layers.misc import connect_list
 from layers.models.cifar.resnet import BasicBlock, Bottleneck
 from layers.cap_layer import CapLayer, CapConv, CapConv2, CapFC
 from object_detection.utils.util import weights_init
+from layers.misc import weights_init_cap
 import time
 import torch
 
@@ -164,7 +165,7 @@ class CapNet(nn.Module):
 
         # init the network
         for m in self.modules():
-            weights_init(m)
+            weights_init_cap(m)
 
     def forward(self, x, target=None, curr_iter=0, vis=None):
         stats, output, start, activation = [], [], [], []
@@ -183,7 +184,6 @@ class CapNet(nn.Module):
             x = x.view(x.size(0), -1)
             output = self.fc(x)
         elif self.cap_model == 'v0':
-            activate = []
             x = self.tranfer_conv(x)
             x = self.tranfer_bn(x)
             x = self.tranfer_relu(x)
@@ -197,10 +197,12 @@ class CapNet(nn.Module):
             if self.use_imagenet:
                 x = self.max_pool(x)
             # this is the final output
-            # if self.route == 'EM':
-            #     activate = self.generate_activate(x).view(x.size(0), -1)
+            activate = None
+            if self.route == 'EM':
+                activate = self.generate_activate(x).view(x.size(0), -1)
             output, stats, activation = self.cap_layer(
                 x, target, curr_iter, vis, activate=activate)
+
             if self.measure_time:
                 torch.cuda.synchronize()
                 print('last cap total time: {:.4f}'.format(time.perf_counter() - start))
