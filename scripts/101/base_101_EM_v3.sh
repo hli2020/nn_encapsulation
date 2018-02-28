@@ -3,13 +3,16 @@
 start=`date +%s`
 
 # train and test
-CUDA_VISIBLE_DEVICES=2 python holly_capsule.py \
+DEVICE_ID=2
+CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
+--device_id=$DEVICE_ID \
 --experiment_name=base_101_EM_v3 \
 --debug_mode=False \
 --route=EM \
 --dataset=cifar10 \
 --cap_model=v0 \
---loss_form=margin
+--loss_form=margin \
+--less_data_aug
 
 
 end=`date +%s`
