@@ -159,10 +159,9 @@ class CapNet(nn.Module):
                                     layerwise_skip_connect=opts.layerwise,
                                     wider_main_conv=opts.wider,
                                     manner=opts.manner)
-            # output: bs, 32*16, 4, 4
+            # output after module4: bs, 32*16, 4, 4
             self.final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes,
                                    cap_dim=16, fc_manner=opts.fc_manner)
-
         # init the network
         for m in self.modules():
             weights_init_cap(m)

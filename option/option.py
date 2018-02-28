@@ -27,7 +27,7 @@ class Options(object):
         self.parser.add_argument('--device_id', default='0', type=str)
 
         # model params
-        self.parser.add_argument('--cap_model', default='v0', type=str, help='v_base, v0, ...')
+        self.parser.add_argument('--cap_model', default='v2', type=str, help='v_base, v0, ...')
 
         # only valid for cap_model=v_base
         self.parser.add_argument('--depth', default=14, type=int)
@@ -59,7 +59,9 @@ class Options(object):
         self.parser.add_argument('--more_skip', action='store_true')
         self.parser.add_argument('--layerwise', action='store_true')
         self.parser.add_argument('--wider', action='store_true')
-        self.parser.add_argument('--manner', default='2', type=str)     # capRoute scheme
+        # manner=0, 1, 2, ...
+        self.parser.add_argument('--manner', default='3', type=str)     # capRoute scheme
+        self.parser.add_argument('--coeff_dimwise', action='store_true')  # TODO
 
         # train
         self.parser.add_argument('--lr', default=0.0001, type=float, help='initial learning rate')
@@ -136,10 +138,10 @@ class Options(object):
         if self.opt.cap_model != 'v_base':
             options.extend(['depth'])
         if self.opt.cap_model != 'v0':
-            options.extend(['route', 'route_num', 'primary_cap_num', 'pre_ch_num',
+            options.extend(['E_step_norm', 'route', 'route_num', 'primary_cap_num', 'pre_ch_num',
                             'add_cap_dropout', 'dropout_p', 'add_cap_BN_relu', 'use_instanceBN',
                             'b_init', 'squash_manner', 'comp_cap'])
-        if self.opt.cap_model[0:2] != 'v1' or self.opt.cap_model[0:2] != 'v2':
+        if self.opt.cap_model[0:2] != 'v1' and self.opt.cap_model[0:2] != 'v2':
             options.extend(['cap_N', 'connect_detail', 'fc_manner',
                             'more_skip', 'layerwise', 'wider', 'manner'])
         if self.opt.loss_form != 'spread':

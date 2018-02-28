@@ -185,7 +185,7 @@ class CapLayer(nn.Module):
         for i in range(self.route_num):
 
             internal_start = time.perf_counter()
-            c = F.softmax(b, dim=2)   # TODO(highly urgent)
+            c = F.softmax(b, dim=2)   # TODO(highly urgent: should be 1; sum over j, NOT i)
             if self.measure_time:
                 torch.cuda.synchronize()
                 b_sftmax_t = time.perf_counter() - internal_start
@@ -340,7 +340,6 @@ class CapConv(nn.Module):
             self.conv_adjust_blob_shape = \
                 nn.Conv2d(self.ch_num_in, self.ch_num_out,
                           kernel_size=3, padding=1, stride=stride)
-
         layers = []
         for i in range(self.iter_N):
             layers.append(_make_core_conv(
@@ -396,6 +395,7 @@ class CapConv2(nn.Module):
         self.more_skip = more_skip
 
         # define main_conv
+        "the main conv is for increasing cap_dim; larger ksize is needed"
         # wider switch
         main_ksize = (5, 3, 1) if wider_main_conv else (3,)
         main_pad = (2, 1, 0) if wider_main_conv else (1,)
@@ -403,7 +403,9 @@ class CapConv2(nn.Module):
         self.main_conv = CapConv(ch_num=ch_in, ch_out=ch_out, groups=groups,
                                  kernel_size=main_ksize, stride=main_stride,
                                  pad=main_pad, residual=residual[0], manner=manner)
+
         # define sub_conv (stride/pad/ksize are set by default)
+        "the sub conv is for stabilizing the cap block at a fixed cap_dim; ksize is by default to be 1"
         # layerwise switch
         if layerwise_skip_connect:
             layers = []
@@ -543,6 +545,10 @@ def _make_core_conv(
         conv_opt = capConvRoute2(ch_num_in, ch_num_out,
                                  ksize=kernel_size, stride=stride,
                                  group=groups, pad=pad)
+    elif manner == '3':
+        conv_opt = capConvRoute3(ch_num_in, ch_num_out,
+                                 ksize=kernel_size, stride=stride,
+                                 group=groups, pad=pad)
     return conv_opt
 
 
@@ -582,7 +588,7 @@ class capConvRoute1(nn.Module):
                  ch_num_in, ch_num_out,
                  ksize, pad, stride, group):
         super(capConvRoute1, self).__init__()
-        self.expand_factor = int(ch_num_out/group)
+        self.expand_factor = int(ch_num_out/group)  # just the out_cap_dim
         self.group = group
 
         self.main_cap = nn.Sequential(*[
@@ -592,7 +598,7 @@ class capConvRoute1(nn.Module):
             nn.ReLU(),
             conv_squash(group)
         ])
-        # take the output of main_cap as input
+        # take the output of main_cap as coeff's input
         self.main_cap_coeff = nn.Conv2d(
             ch_num_out, group, kernel_size=3,
             stride=1, padding=1, groups=group)
@@ -624,6 +630,7 @@ class capConvRoute2(capConvRoute1):
                  ksize, pad, stride, group):
         super(capConvRoute2, self).__init__(
             ch_num_in, ch_num_out, ksize, pad, stride, group)
+        # take input x as the coeff's input!
         self.main_cap_coeff = nn.Conv2d(
             ch_num_in, group, kernel_size=ksize[0],
             stride=stride, groups=group, padding=pad[0])
@@ -637,6 +644,49 @@ class capConvRoute2(capConvRoute1):
 
         res_out = self.res_cap(x)
         res_coeff = 1 - main_coeff
+        out = main_out * main_coeff + res_out * res_coeff
+        return out
+
+
+class capConvRoute3(capConvRoute1):
+    def __init__(self,
+                 ch_num_in, ch_num_out,
+                 ksize, pad, stride, group):
+        super(capConvRoute3, self).__init__(
+            ch_num_in, ch_num_out, ksize, pad, stride, group)
+
+        # use main_cap in the parent class
+        # res_cap: ksize is larger than main_cap; NO GROUPING
+        self.res_cap = nn.Sequential(*[
+            nn.Conv2d(ch_num_in, ch_num_out, kernel_size=ksize[0]+4,
+                      stride=stride, padding=pad[0]+2),
+            nn.BatchNorm2d(ch_num_out),
+            nn.ReLU(),
+            conv_squash(group)
+        ])
+        self.main_cap_coeff = nn.Conv2d(
+            ch_num_out, group, kernel_size=3, stride=1, padding=1, groups=group)
+        self.res_cap_coeff = nn.Conv2d(
+            ch_num_out, group, kernel_size=3, stride=1, padding=1, groups=group)
+
+    def forward(self, x):
+        # co-efficients are communicated in a X-shape
+        main_out = self.main_cap(x)
+        res_coeff = self.main_cap_coeff(main_out)
+        res_coeff = res_coeff.unsqueeze(dim=2).repeat(1, 1, self.expand_factor, 1, 1)
+        res_coeff = res_coeff.view(res_coeff.size(0), -1, res_coeff.size(3), res_coeff.size(4))
+
+        res_out = self.res_cap(x)
+        main_coeff = self.res_cap_coeff(res_out)
+        # t = time.time()
+        main_coeff = main_coeff.unsqueeze(dim=2).repeat(1, 1, self.expand_factor, 1, 1)
+        main_coeff = main_coeff.view(main_coeff.size(0), -1, main_coeff.size(3), main_coeff.size(4))
+        # print('time is {:.5f}'.format(time.time() - t))
+        # t = time.time()
+        # main_coeff = torch.cat(
+        #     [main_coeff[:, i, :, :].unsqueeze(dim=1).repeat(1, self.expand_factor, 1, 1)
+        #      for i in range(self.group)], dim=1)
+        # print('time is {:.5f}'.format(time.time() - t))
         out = main_out * main_coeff + res_out * res_coeff
         return out
 
