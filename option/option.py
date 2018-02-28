@@ -62,6 +62,9 @@ class Options(object):
         # manner=0, 1, 2, ...
         self.parser.add_argument('--manner', default='3', type=str)     # capRoute scheme
         self.parser.add_argument('--coeff_dimwise', action='store_true')  # TODO
+        # NOTE: add a net_config param to control each module of the configs listed above;
+        # if net_config == 'default', all configs above matter; otherwise, see details in 'network.py'
+        self.parser.add_argument('--net_config', default='set1', type=str)
 
         # train
         self.parser.add_argument('--lr', default=0.0001, type=float, help='initial learning rate')
