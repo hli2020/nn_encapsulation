@@ -3,6 +3,7 @@ from layers.misc import connect_list
 from layers.models.cifar.resnet import BasicBlock, Bottleneck
 from layers.cap_layer import CapLayer, CapConv, CapConv2, CapFC
 from object_detection.utils.util import weights_init
+from layers.models.net_config import build_net
 from layers.misc import weights_init_cap
 import time
 import torch
@@ -133,35 +134,38 @@ class CapNet(nn.Module):
                 nn.BatchNorm2d(32),
                 nn.ReLU(True)
             ])  # 32 spatial output
-
-            self.module1 = CapConv2(ch_in=32*1, ch_out=32*2, groups=32,
-                                    residual=connect_detail[0:2], iter_N=opts.cap_N,
-                                    no_downsample=True,
-                                    more_skip=opts.more_skip,
-                                    layerwise_skip_connect=opts.layerwise,
-                                    wider_main_conv=opts.wider,
-                                    manner=opts.manner)
-            self.module2 = CapConv2(ch_in=32*2, ch_out=32*4, groups=32,
-                                    residual=connect_detail[2:4], iter_N=opts.cap_N,
-                                    more_skip=opts.more_skip,
-                                    layerwise_skip_connect=opts.layerwise,
-                                    wider_main_conv=opts.wider,
-                                    manner=opts.manner)
-            self.module3 = CapConv2(ch_in=32*4, ch_out=32*8, groups=32,
-                                    residual=connect_detail[4:6], iter_N=opts.cap_N,
-                                    more_skip=opts.more_skip,
-                                    layerwise_skip_connect=opts.layerwise,
-                                    wider_main_conv=opts.wider,
-                                    manner=opts.manner)
-            self.module4 = CapConv2(ch_in=32*8, ch_out=32*16, groups=32,
-                                    residual=connect_detail[6:], iter_N=opts.cap_N,
-                                    more_skip=opts.more_skip,
-                                    layerwise_skip_connect=opts.layerwise,
-                                    wider_main_conv=opts.wider,
-                                    manner=opts.manner)
-            # output: bs, 32*16, 4, 4
-            self.final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes,
-                                   cap_dim=16, fc_manner=opts.fc_manner)
+            if opts.net_config == 'default':
+                self.module1 = CapConv2(ch_in=32*1, ch_out=32*2, groups=32,
+                                        residual=connect_detail[0:2], iter_N=opts.cap_N,
+                                        no_downsample=True,
+                                        more_skip=opts.more_skip,
+                                        layerwise_skip_connect=opts.layerwise,
+                                        wider_main_conv=opts.wider,
+                                        manner=opts.manner)
+                self.module2 = CapConv2(ch_in=32*2, ch_out=32*4, groups=32,
+                                        residual=connect_detail[2:4], iter_N=opts.cap_N,
+                                        more_skip=opts.more_skip,
+                                        layerwise_skip_connect=opts.layerwise,
+                                        wider_main_conv=opts.wider,
+                                        manner=opts.manner)
+                self.module3 = CapConv2(ch_in=32*4, ch_out=32*8, groups=32,
+                                        residual=connect_detail[4:6], iter_N=opts.cap_N,
+                                        more_skip=opts.more_skip,
+                                        layerwise_skip_connect=opts.layerwise,
+                                        wider_main_conv=opts.wider,
+                                        manner=opts.manner)
+                self.module4 = CapConv2(ch_in=32*8, ch_out=32*16, groups=32,
+                                        residual=connect_detail[6:], iter_N=opts.cap_N,
+                                        more_skip=opts.more_skip,
+                                        layerwise_skip_connect=opts.layerwise,
+                                        wider_main_conv=opts.wider,
+                                        manner=opts.manner)
+                # output after module4: bs, 32*16, 4, 4
+                self.final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes,
+                                       cap_dim=16, fc_manner=opts.fc_manner)
+            else:
+                self.module1, self.module2, self.module3, self.module4, self.final_cls = \
+                    build_net(opts.net_config)
 
         # init the network
         for m in self.modules():

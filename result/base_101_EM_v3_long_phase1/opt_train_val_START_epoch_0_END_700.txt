@@ -320,3 +320,17 @@ Summary	epoch/iter [34/700] ||	TRAIN, Top1_err: 24.2700, Top5_err: 2.5600 ||	TES
 [base_101_EM_v3_long_phase1]	epoch/iter [35/700][0/391] ||	Loss: 0.1810, Top1_err: 24.2188, Top5_err: 1.5625 ||	Data/batch time: 0.2187/0.3052
 [base_101_EM_v3_long_phase1]	epoch/iter [35/700][100/391] ||	Loss: 0.2028, Top1_err: 24.2574, Top5_err: 2.4134 ||	Data/batch time: 0.0027/0.1052
 [base_101_EM_v3_long_phase1]	epoch/iter [35/700][200/391] ||	Loss: 0.2027, Top1_err: 24.2498, Top5_err: 2.4642 ||	Data/batch time: 0.0017/0.1042
+[base_101_EM_v3_long_phase1]	epoch/iter [35/700][300/391] ||	Loss: 0.2020, Top1_err: 24.2136, Top5_err: 2.5047 ||	Data/batch time: 0.0013/0.1039
+[base_101_EM_v3_long_phase1]	epoch/iter [35/700][390/391] ||	Loss: 0.2010, Top1_err: 24.0940, Top5_err: 2.4480 ||	Data/batch time: 0.0011/0.1036
+Summary	epoch/iter [35/700] ||	TRAIN, Top1_err: 24.0940, Top5_err: 2.4480 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+[base_101_EM_v3_long_phase1]	epoch/iter [36/700][0/391] ||	Loss: 0.1659, Top1_err: 16.4062, Top5_err: 3.9062 ||	Data/batch time: 0.1517/0.2366
+[base_101_EM_v3_long_phase1]	epoch/iter [36/700][100/391] ||	Loss: 0.2007, Top1_err: 23.8784, Top5_err: 2.3824 ||	Data/batch time: 0.0020/0.1043
+[base_101_EM_v3_long_phase1]	epoch/iter [36/700][200/391] ||	Loss: 0.1983, Top1_err: 23.7484, Top5_err: 2.3049 ||	Data/batch time: 0.0012/0.1036
+[base_101_EM_v3_long_phase1]	epoch/iter [36/700][300/391] ||	Loss: 0.1971, Top1_err: 23.5880, Top5_err: 2.3308 ||	Data/batch time: 0.0010/0.1035
+[base_101_EM_v3_long_phase1]	epoch/iter [36/700][390/391] ||	Loss: 0.1980, Top1_err: 23.8340, Top5_err: 2.3640 ||	Data/batch time: 0.0009/0.1033
+Summary	epoch/iter [36/700] ||	TRAIN, Top1_err: 23.8340, Top5_err: 2.3640 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+[base_101_EM_v3_long_phase1]	epoch/iter [37/700][0/391] ||	Loss: 0.2216, Top1_err: 28.9062, Top5_err: 5.4688 ||	Data/batch time: 0.2430/0.3297
+[base_101_EM_v3_long_phase1]	epoch/iter [37/700][100/391] ||	Loss: 0.1934, Top1_err: 23.2519, Top5_err: 2.1349 ||	Data/batch time: 0.0029/0.1055
+[base_101_EM_v3_long_phase1]	epoch/iter [37/700][200/391] ||	Loss: 0.1943, Top1_err: 23.0760, Top5_err: 2.1455 ||	Data/batch time: 0.0017/0.1044
