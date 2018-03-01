@@ -185,7 +185,7 @@ class CapLayer(nn.Module):
         for i in range(self.route_num):
 
             internal_start = time.perf_counter()
-            c = F.softmax(b, dim=2)   # TODO(highly urgent)
+            c = F.softmax(b, dim=1)
             if self.measure_time:
                 torch.cuda.synchronize()
                 b_sftmax_t = time.perf_counter() - internal_start
