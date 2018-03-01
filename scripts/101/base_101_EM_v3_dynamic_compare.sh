@@ -3,12 +3,12 @@
 start=`date +%s`
 
 # train and test
-DEVICE_ID=0
+DEVICE_ID=1
 CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
 --device_id=$DEVICE_ID \
---experiment_name=base_101_EM_v3_long_phase1 \
+--experiment_name=base_101_EM_v3_dynamic_compare \
 --debug_mode=False \
---route=EM \
+--route=dynamic \
 --schedule 400 500 600 \
 --max_epoch=700 \
 --dataset=cifar10 \

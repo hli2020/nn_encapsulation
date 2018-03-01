@@ -185,7 +185,7 @@ class CapLayer(nn.Module):
         for i in range(self.route_num):
 
             internal_start = time.perf_counter()
-            c = F.softmax(b, dim=2)   # TODO(highly urgent: should be 1; sum over j, NOT i)
+            c = F.softmax(b, dim=2)   # dim=1 WON'T converge!!!!
             if self.measure_time:
                 torch.cuda.synchronize()
                 b_sftmax_t = time.perf_counter() - internal_start
@@ -217,7 +217,6 @@ class CapLayer(nn.Module):
                     torch.cuda.synchronize()
                     delta_matmul_t = time.perf_counter() - t4
                     t5 = time.perf_counter()
-
                 if FIND_DIFF:
                     v_all_classes = v.norm(dim=2)
                     _, curr_pred = torch.max(v_all_classes, 1)
