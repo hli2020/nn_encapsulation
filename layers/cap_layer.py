@@ -423,7 +423,7 @@ class CapConv2(nn.Module):
             # 'ms' means 'more_skip'
             if ch_in != ch_out:
                 self.ms_conv_adjust_blob_shape = \
-                    nn.Conv2d(ch_in, ch_out, kernel_size=3, padding=1, stride=1)
+                    nn.Conv2d(ch_in, ch_out, kernel_size=3, padding=1, stride=main_stride)
             self.ms_conv = \
                 _make_core_conv(manner=manner, ch_num_in=ch_out, ch_num_out=ch_out,
                                 kernel_size=(1,), groups=groups, stride=1, pad=(0,))
@@ -528,7 +528,7 @@ def _make_core_conv(
     conv_opt =[]
     if manner == '0':
         if wider_conv:
-            # TODO (easy): merge wider case with capRoute below
+            # TODO (easy): merge wider case with capRoute* below
             conv_opt = multi_conv(ch_num_in, ch_num_out,
                                   ksize=kernel_size, stride=stride,
                                   group=groups, pad=pad)
