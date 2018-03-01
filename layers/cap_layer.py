@@ -385,6 +385,7 @@ class CapConv2(nn.Module):
                  more_skip=False,
                  wider_main_conv=False,             # for main_conv
                  manner='0',                        # for both
+                 ot_choice=None
                  ):
         super(CapConv2, self).__init__()
         assert len(residual) == 2
@@ -392,6 +393,7 @@ class CapConv2(nn.Module):
             assert iter_N >= 2
             iter_N -= 1
         self.more_skip = more_skip
+        self.ot_choice = ot_choice
 
         # define main_conv
         "the main conv is for increasing cap_dim; larger ksize is needed"
@@ -424,6 +426,7 @@ class CapConv2(nn.Module):
             if ch_in != ch_out:
                 self.ms_conv_adjust_blob_shape = \
                     nn.Conv2d(ch_in, ch_out, kernel_size=3, padding=1, stride=main_stride)
+
             self.ms_conv = \
                 _make_core_conv(manner=manner, ch_num_in=ch_out, ch_num_out=ch_out,
                                 kernel_size=(1,), groups=groups, stride=1, pad=(0,))
@@ -432,7 +435,15 @@ class CapConv2(nn.Module):
             self.ms_squash = conv_squash(groups)
 
     def forward(self, input):
+        if self.ot_choice == 'within2':
+            out_list = []
+            out_list.append(input)    # as ground truth "y"
+
         out = self.main_conv(input)
+        if self.ot_choice == 'within':
+            out_list = []
+            out_list.append(out)    # as ground truth "y"
+
         out = self.sub_conv(out)
         if self.more_skip:
             out = self.ms_conv(out)
@@ -442,7 +453,13 @@ class CapConv2(nn.Module):
             out = self.ms_bn(out)
             out = self.ms_relu(out)
             out = self.ms_squash(out)
-        return out
+
+        if self.ot_choice == 'within' or self.ot_choice == 'within2':
+            # TODO: within2 should be inserted into the sub_conv module
+            out_list.append(out)   # as latent variable "z"
+            return out, out_list
+        else:
+            return out
 
 
 class CapFC(nn.Module):

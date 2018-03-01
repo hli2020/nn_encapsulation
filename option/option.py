@@ -47,6 +47,10 @@ class Options(object):
         self.parser.add_argument('--squash_manner', default='paper', type=str, help='[sigmoid|paper]')
         # if comp_cap=True, replace the capLayer with FC layer
         self.parser.add_argument('--comp_cap', action='store_true')
+        # NOTE: add a net_config param to control each module of the configs listed below;
+        # if net_config == 'default', all configs below matter; otherwise, see details in 'network.py'
+        self.parser.add_argument('--net_config', default='set_OT', type=str, help='[default | set1 |...| set_OT]')
+
         # valid for cap_model=v1_x and above
         self.parser.add_argument('--cap_N', default=4, type=int, help='multiple capLayers')
         self.parser.add_argument('--connect_detail', default='all', type=str,
@@ -57,12 +61,9 @@ class Options(object):
         self.parser.add_argument('--more_skip', action='store_true')
         self.parser.add_argument('--layerwise', action='store_true')
         self.parser.add_argument('--wider', action='store_true')
-        # manner=0, 1, 2, ...
-        self.parser.add_argument('--manner', default='3', type=str)     # capRoute scheme
+        # manner=0, 1, 2, 3 ... where 1&2 almost DEPRECATED
+        self.parser.add_argument('--manner', default='0', type=str)     # capRoute scheme
         self.parser.add_argument('--coeff_dimwise', action='store_true')  # TODO
-        # NOTE: add a net_config param to control each module of the configs listed above;
-        # if net_config == 'default', all configs above matter; otherwise, see details in 'network.py'
-        self.parser.add_argument('--net_config', default='set3', type=str)
 
         # train
         self.parser.add_argument('--lr', default=0.0001, type=float, help='initial learning rate')
@@ -79,6 +80,9 @@ class Options(object):
         self.parser.add_argument('--max_epoch', default=600, type=int, help='Number of training epoches')
         self.parser.add_argument('--schedule', default=[200, 300, 400], nargs='+', type=int)
         # loss
+        self.parser.add_argument('--ot_loss', action='store_true')
+        self.parser.add_argument('--ot_loss_fac', default=1.0, type=float)
+
         self.parser.add_argument('--loss_fac', default=1.0, type=float)  # make loss larger
         self.parser.add_argument('--loss_form', default='margin', type=str, help='[ CE | spread | margin ]')
         self.parser.add_argument('--fix_m', action='store_true', help='valid for use_spread_loss only')

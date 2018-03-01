@@ -2,6 +2,7 @@ import torch.nn as nn
 from layers.misc import connect_list
 from layers.models.cifar.resnet import BasicBlock, Bottleneck
 from layers.cap_layer import CapLayer, CapConv, CapConv2, CapFC
+from layers.OT_module import OptTrans
 from object_detection.utils.util import weights_init
 from layers.models.net_config import build_net
 from layers.misc import weights_init_cap
@@ -21,6 +22,7 @@ class CapNet(nn.Module):
         # self.use_multiple = opts.use_multiple
         input_ch = 1 if opts.dataset == 'fmnist' else 3
         self.measure_time = opts.measure_time
+        self.ot_loss = opts.ot_loss
 
         if self.cap_model == 'v_base':
             # resnet baseline
@@ -164,15 +166,23 @@ class CapNet(nn.Module):
                 self.final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes,
                                        cap_dim=16, fc_manner=opts.fc_manner)
             else:
-                self.module1, self.module2, self.module3, self.module4, self.final_cls = \
-                    build_net(opts.net_config)
+                "specify the network config below"
+                if self.ot_loss:
+                    self.module1, self.module2, self.module3, self.module4, self.final_cls, \
+                    self.module3_ot_loss, self.module4_ot_loss = \
+                        build_net(opts.net_config, opts)
+                else:
+                    self.module1, self.module2, self.module3, self.module4, self.final_cls, _, _ = \
+                        build_net(opts.net_config, opts)
 
         # init the network
         for m in self.modules():
             weights_init_cap(m)
 
-    def forward(self, x, target=None, curr_iter=0, vis=None):
-        stats, output, start, activation = [], [], [], []
+    def forward(self, x, target=None,
+                curr_iter=0, vis=None, phase='train'):
+        "activation resides in v0; ot_loss in v2"
+        stats, output, start, activation, ot_loss = [], [], [], [], 0
         if self.measure_time:
             torch.cuda.synchronize()
             start = time.perf_counter()
@@ -235,13 +245,30 @@ class CapNet(nn.Module):
             x = self.module0(x)
             x = self.module1(x)
             x = self.module2(x)
-            x = self.module3(x)
-            x = self.module4(x)
+
+            if self.ot_loss:
+                if phase == 'train':
+                    x, out_list = self.module3(x)
+                    ot_loss += self.module3_ot_loss(out_list[1], out_list[0].detach())
+                elif phase == 'test':
+                    x, _ = self.module3(x)
+            else:
+                x = self.module3(x)
+
+            if self.ot_loss:
+                if phase == 'train':
+                    x, out_list = self.module4(x)
+                    ot_loss += self.module4_ot_loss(out_list[1], out_list[0].detach())
+                elif phase == 'test':
+                    x, _ = self.module4(x)
+            else:
+                x = self.module4(x)
+
             output = self.final_cls(x)
         else:
             raise NameError('Unknown structure or capsule model type.')
 
-        return output, stats, activation
+        return output, stats, activation, ot_loss
 
     def _make_layer(self, block, planes, blocks, stride=1):
         """make resnet sub-layers"""

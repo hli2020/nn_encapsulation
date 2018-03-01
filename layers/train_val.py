@@ -38,7 +38,9 @@ def train(trainloader, model, criterion, optimizer, opt, visual, epoch):
         inputs, targets = torch.autograd.Variable(inputs), torch.autograd.Variable(targets)
 
         # Last two entries in 'stats' have mean, std for KL loss
-        outputs, stats, activation = model(inputs, targets)  # 128 x 10 x 16
+        # 'activation' is for EM routing
+        outputs, stats, activation, ot_loss = \
+            model(inputs, targets)  # 128 x 10 x 16
         try:
             outputs = outputs.norm(dim=2)
         except RuntimeError:
@@ -61,6 +63,8 @@ def train(trainloader, model, criterion, optimizer, opt, visual, epoch):
         #     loss_KL = opt.KL_factor * compute_KL(stats[-2], stats[-1])
         #     KL_losses.update(loss_KL.data[0], inputs.size(0))
         #     loss += loss_KL
+        if opt.ot_loss:
+            loss += opt.ot_loss_fac * ot_loss
 
         loss *= opt.loss_fac
         # measure accuracy and record loss
@@ -144,7 +148,8 @@ def test(testloader, model, opt, visual, epoch=0, criterion=None):
 
         # the computation of stats is in 'cap_layer.py'
         # 'stats' is from the mini-batch in ONE iteration
-        outputs, stats, _ = model(inputs_, targets, batch_idx, opt.draw_hist)
+        outputs, stats, _, _ = model(inputs_, targets,
+                                     batch_idx, opt.draw_hist, phase='test')
 
         if opt.draw_hist:
             # skip test evaluation
