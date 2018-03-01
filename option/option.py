@@ -27,7 +27,7 @@ class Options(object):
         self.parser.add_argument('--device_id', default='0', type=str)
 
         # model params
-        self.parser.add_argument('--cap_model', default='v2', type=str, help='v_base, v0, ...')
+        self.parser.add_argument('--cap_model', default='v0', type=str, help='v_base, v0, ...')
 
         # only valid for cap_model=v_base
         self.parser.add_argument('--depth', default=14, type=int)
