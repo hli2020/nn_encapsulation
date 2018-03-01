@@ -62,6 +62,7 @@ def train(trainloader, model, criterion, optimizer, opt, visual, epoch):
         #     KL_losses.update(loss_KL.data[0], inputs.size(0))
         #     loss += loss_KL
 
+        loss *= opt.loss_fac
         # measure accuracy and record loss
         [prec1, prec5], _ = accuracy(outputs.data, targets.data, topk=(1, 5))
         losses.update(loss.data[0], inputs.size(0))
