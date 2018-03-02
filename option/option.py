@@ -49,7 +49,7 @@ class Options(object):
         self.parser.add_argument('--comp_cap', action='store_true')
         # NOTE: add a net_config param to control each module of the configs listed below;
         # if net_config == 'default', all configs below matter; otherwise, see details in 'network.py'
-        self.parser.add_argument('--net_config', default='set_OT', type=str, help='[default | set1 |...| set_OT]')
+        self.parser.add_argument('--net_config', default='set_OT_compare', type=str, help='[default | set1 |...| set_OT]')
 
         # valid for cap_model=v1_x and above
         self.parser.add_argument('--cap_N', default=4, type=int, help='multiple capLayers')

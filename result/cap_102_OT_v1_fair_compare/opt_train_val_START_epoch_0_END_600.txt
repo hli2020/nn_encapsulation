@@ -1,0 +1,155 @@
+Experiment: cap_102_OT_v1_fair_compare
+------------ Train and Test Options -----------------
+base_save_folder: result
+batch_size_test: 128
+batch_size_train: 128
+beta1: 0.9
+cap_N: 4
+cap_model: v2
+coeff_dimwise: False
+connect_detail: all
+dataset: cifar10
+debug_mode: False
+device_id: 
+draw_hist: False
+experiment_name: cap_102_OT_v1_fair_compare
+fc_manner: default
+file_name: result/cap_102_OT_v1_fair_compare/opt_train_val_START_epoch_0_END_600.txt
+gamma: 0.1
+layerwise: False
+less_data_aug: True
+loss_fac: 50.0
+loss_form: margin
+lr: 0.0001
+manner: 0
+manual_seed: -1
+max_epoch: 600
+measure_time: False
+momentum: 0.9
+more_skip: False
+multi_crop_test: False
+net_config: set_OT_compare
+no_visdom: False
+non_target_j: False
+num_workers: 2
+optim: adam
+ot_loss: False
+ot_loss_fac: 1.0
+phase: train_val
+port_id: 8000
+random_seed: 4177
+s35: False
+save_epoch: 25
+save_folder: result/cap_102_OT_v1_fair_compare
+schedule: [200, 300, 400]
+show_freq: 100
+show_test_after_epoch: 100
+use_cuda: False
+weight_decay: 0.0005
+wider: False
+------------------ End --------------------
+CapNet (
+  (module0): Sequential (
+    (0): Conv2d (3, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)), weights=((32, 3, 3, 3), (32,)), parameters=896
+    (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True), weights=((32,), (32,)), parameters=64
+    (2): ReLU(inplace), weights=(), parameters=0
+  ), weights=((32, 3, 3, 3), (32,), (32,), (32,)), parameters=960
+  (module1): CapConv2(
+    (main_conv): CapConv(
+      (conv_adjust_blob_shape): Conv2d (32, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (block): Sequential(
+        (0): Conv2d (32, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32)
+      )
+      (last_bn): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (last_relu): ReLU()
+      (last_squash): conv_squash(num_shared=32)
+    )
+    (sub_conv): CapConv(
+      (block): Sequential(
+        (0): Conv2d (64, 64, kernel_size=(1, 1), stride=(1, 1), groups=32)
+        (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+        (2): ReLU(inplace)
+        (3): conv_squash(num_shared=32)
+        (4): Conv2d (64, 64, kernel_size=(1, 1), stride=(1, 1), groups=32)
+      )
+      (last_bn): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (last_relu): ReLU()
+      (last_squash): conv_squash(num_shared=32)
+    )
+  ), weights=((64, 32, 3, 3), (64,), (64, 1, 3, 3), (64,), (64,), (64,), (64, 2, 1, 1), (64,), (64,), (64,), (64, 2, 1, 1), (64,), (64,), (64,)), parameters=19904
+  (module2): CapConv2(
+    (main_conv): CapConv(
+      (conv_adjust_blob_shape): Conv2d (64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      (block): Sequential(
+        (0): Conv2d (64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=32)
+      )
+      (last_bn): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True)
+      (last_relu): ReLU()
+      (last_squash): conv_squash(num_shared=32)
+    )
+    (sub_conv): CapConv(
+      (block): Sequential(
+        (0): Conv2d (128, 128, kernel_size=(1, 1), stride=(1, 1), groups=32)
+        (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True)
+        (2): ReLU(inplace)
+        (3): conv_squash(num_shared=32)
+        (4): Conv2d (128, 128, kernel_size=(1, 1), stride=(1, 1), groups=32)
+      )
+      (last_bn): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True)
+      (last_relu): ReLU()
+      (last_squash): conv_squash(num_shared=32)
+    )
+  ), weights=((128, 64, 3, 3), (128,), (128, 2, 3, 3), (128,), (128,), (128,), (128, 4, 1, 1), (128,), (128,), (128,), (128, 4, 1, 1), (128,), (128,), (128,)), parameters=78336
+  (module3): CapConv2(
+    (main_conv): CapConv(
+      (conv_adjust_blob_shape): Conv2d (128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      (block): Sequential(
+        (0): Conv2d (128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=32)
+      )
+      (last_bn): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+      (last_relu): ReLU()
+      (last_squash): conv_squash(num_shared=32)
+    )
+    (sub_conv): CapConv(
+      (block): Sequential(
+        (0): Conv2d (256, 256, kernel_size=(1, 1), stride=(1, 1), groups=32)
+        (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+        (2): ReLU(inplace)
+        (3): conv_squash(num_shared=32)
+        (4): Conv2d (256, 256, kernel_size=(1, 1), stride=(1, 1), groups=32)
+      )
+      (last_bn): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+      (last_relu): ReLU()
+      (last_squash): conv_squash(num_shared=32)
+    )
+  ), weights=((256, 128, 3, 3), (256,), (256, 4, 3, 3), (256,), (256,), (256,), (256, 8, 1, 1), (256,), (256,), (256,), (256, 8, 1, 1), (256,), (256,), (256,)), parameters=310784
+  (module4): CapConv2(
+    (main_conv): CapConv(
+      (conv_adjust_blob_shape): Conv2d (256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      (block): Sequential(
+        (0): Conv2d (256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=32)
+      )
+      (last_bn): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True)
+      (last_relu): ReLU()
+      (last_squash): conv_squash(num_shared=32)
+    )
+    (sub_conv): CapConv(
+      (block): Sequential(
+        (0): Conv2d (512, 512, kernel_size=(1, 1), stride=(1, 1), groups=32)
+        (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True)
+        (2): ReLU(inplace)
+        (3): conv_squash(num_shared=32)
+        (4): Conv2d (512, 512, kernel_size=(1, 1), stride=(1, 1), groups=32)
+      )
+      (last_bn): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True)
+      (last_relu): ReLU()
+      (last_squash): conv_squash(num_shared=32)
+    )
+  ), weights=((512, 256, 3, 3), (512,), (512, 8, 3, 3), (512,), (512,), (512,), (512, 16, 1, 1), (512,), (512,), (512,), (512, 16, 1, 1), (512,), (512,), (512,)), parameters=1238016
+  (final_cls): CapFC(in_cap_num=512, out_cap_num=10, cap_dim=16, fc_manner=default), weights=((16, 512, 10),), parameters=81920
+)
+Total param num # 6.599121 Mb
+
+init learning rate 0.0001000000 at iter 0
+
+[cap_102_OT_v1_fair_compare]	epoch/iter [0/600][0/391] ||	Loss: 27.5174, Top1_err: 89.0625, Top5_err: 52.3438 ||	Data/batch time: 0.0303/5.1564
