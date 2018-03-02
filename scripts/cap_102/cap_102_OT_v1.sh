@@ -6,11 +6,11 @@ start=`date +%s`
 DEVICE_ID=0
 CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
 --device_id=$DEVICE_ID \
---experiment_name=cap_102_OT_v1 \
+--experiment_name=cap_102_OT_v1_rerun \
 --cap_model=v2 \
 --net_config=set_OT \
 --ot_loss \
---ot_loss_fac=1 \
+--ot_loss_fac=10 \
 --loss_fac=50 \
 --debug_mode=False \
 --less_data_aug \

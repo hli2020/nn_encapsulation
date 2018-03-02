@@ -11,6 +11,7 @@ CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
 --net_config=set_OT \
 --ot_loss \
 --ot_loss_fac=10 \
+--remove_bias \
 --loss_fac=50 \
 --debug_mode=False \
 --less_data_aug \

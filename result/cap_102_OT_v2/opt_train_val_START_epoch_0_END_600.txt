@@ -1,4 +1,4 @@
-Experiment: cap_102_OT_v1
+Experiment: cap_102_OT_v2
 ------------ Train and Test Options -----------------
 base_save_folder: result
 batch_size_test: 128
@@ -12,9 +12,9 @@ dataset: cifar10
 debug_mode: False
 device_id: 
 draw_hist: False
-experiment_name: cap_102_OT_v1
+experiment_name: cap_102_OT_v2
 fc_manner: default
-file_name: result/cap_102_OT_v1/opt_train_val_START_epoch_0_END_600.txt
+file_name: result/cap_102_OT_v2/opt_train_val_START_epoch_0_END_600.txt
 gamma: 0.1
 layerwise: False
 less_data_aug: True
@@ -37,11 +37,11 @@ ot_loss: True
 ot_loss_fac: 10.0
 phase: train_val
 port_id: 8000
-random_seed: 540
-remove_bias: False
+random_seed: 3551
+remove_bias: True
 s35: False
 save_epoch: 25
-save_folder: result/cap_102_OT_v1
+save_folder: result/cap_102_OT_v2
 schedule: [200, 300, 400]
 show_freq: 100
 show_test_after_epoch: 100
@@ -185,12 +185,7 @@ Total param num # 14.485863 Mb
 
 init learning rate 0.0001000000 at iter 0
 
-[cap_102_OT_v1]	epoch/iter [0/600][0/391] ||	Loss: 525.5266, Top1_err: 88.2812, Top5_err: 51.5625 ||	Data/batch time: 0.0550/2.9440
-[cap_102_OT_v1]	epoch/iter [0/600][100/391] ||	Loss: 150.6022, Top1_err: 82.7738, Top5_err: 38.2271 ||	Data/batch time: 0.0008/0.2412
-[cap_102_OT_v1]	epoch/iter [0/600][200/391] ||	Loss: 105.9337, Top1_err: 79.5243, Top5_err: 32.3927 ||	Data/batch time: 0.0006/0.2265
-[cap_102_OT_v1]	epoch/iter [0/600][300/391] ||	Loss: 87.3907, Top1_err: 76.8272, Top5_err: 29.0750 ||	Data/batch time: 0.0005/0.2251
-[cap_102_OT_v1]	epoch/iter [0/600][390/391] ||	Loss: 77.6530, Top1_err: 75.0960, Top5_err: 26.9680 ||	Data/batch time: 0.0005/0.2273
-Summary	epoch/iter [0/600] ||	TRAIN, Top1_err: 75.0960, Top5_err: 26.9680 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
-
-model saved at result/cap_102_OT_v1/epoch_1.pth
-[cap_102_OT_v1]	epoch/iter [1/600][0/391] ||	Loss: 40.2597, Top1_err: 65.6250, Top5_err: 18.7500 ||	Data/batch time: 0.0762/0.3508
+[cap_102_OT_v2]	epoch/iter [0/600][0/391] ||	Loss: 2386.2791, Top1_err: 89.0625, Top5_err: 50.7812 ||	Data/batch time: 0.0567/2.9136
+[cap_102_OT_v2]	epoch/iter [0/600][100/391] ||	Loss: 604.3007, Top1_err: 83.1606, Top5_err: 37.5000 ||	Data/batch time: 0.0010/0.2192
+[cap_102_OT_v2]	epoch/iter [0/600][200/391] ||	Loss: 416.2401, Top1_err: 78.9179, Top5_err: 30.6553 ||	Data/batch time: 0.0006/0.2114
+[cap_102_OT_v2]	epoch/iter [0/600][300/391] ||	Loss: 328.4943, Top1_err: 75.8072, Top5_err: 26.9466 ||	Data/batch time: 0.0005/0.2098

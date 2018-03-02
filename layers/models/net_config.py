@@ -139,7 +139,7 @@ def build_net(type, opts):
                            manner='0',
                            ot_choice='within')
         module3_ot_loss = OptTrans(ch_x=32*8, ch_y=32*8,
-                                   spatial_x=8, spatial_y=8, batch_size=opts.batch_size_train)
+                                   spatial_x=8, spatial_y=8, remove_bias=opts.remove_bias)
         module4 = CapConv2(ch_in=32*8, ch_out=32*16, groups=32,
                            residual=[True, True], iter_N=2,
                            more_skip=False,
@@ -148,7 +148,7 @@ def build_net(type, opts):
                            manner='0',
                            ot_choice='within2')
         module4_ot_loss = OptTrans(ch_x=32*16, ch_y=32*8,
-                                   spatial_x=4, spatial_y=8, batch_size=opts.batch_size_train)
+                                   spatial_x=4, spatial_y=8, remove_bias=opts.remove_bias)
 
         # output after module4: bs, 32*16, 4, 4
         final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=10,
