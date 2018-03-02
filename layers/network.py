@@ -182,7 +182,8 @@ class CapNet(nn.Module):
     def forward(self, x, target=None,
                 curr_iter=0, vis=None, phase='train'):
         "activation resides in v0; ot_loss in v2"
-        stats, output, start, activation, ot_loss = [], [], [], [], 0
+        # set ot_loss = [] (NOT 0) when multiple-gpus
+        stats, output, start, activation, ot_loss = [], [], [], [], []
         if self.measure_time:
             torch.cuda.synchronize()
             start = time.perf_counter()
@@ -247,6 +248,7 @@ class CapNet(nn.Module):
             x = self.module2(x)
 
             if self.ot_loss:
+                ot_loss = 0
                 if phase == 'train':
                     x, out_list = self.module3(x)
                     ot_loss += self.module3_ot_loss(out_list[1], out_list[0].detach())
