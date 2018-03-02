@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 import torch.nn as nn
+from torch.autograd import Variable
 
 
 # residual connections for cap_model=v1_x
@@ -9,6 +10,13 @@ connect_list = {
     'all':          [True, True, True, True, True, True, True, True],
     'default':      [False, False, False, False, False, False, False, False],
 }
+
+
+def pad_matrix(tensor, size):
+    smaller_size = tensor.size(0)
+    zeros = Variable(torch.zeros(size, size))
+    zeros[0:smaller_size, 0:smaller_size] = tensor
+    return zeros
 
 
 def weights_init_cap(m):
@@ -60,7 +68,7 @@ def compute_KL(mean, std):
 
 
 def compute_stats(target, pred, v, non_target_j=False, KL_manner=-1):
-    # TODO: unoptimized version, compute per sample
+    # TODO(low): unoptimized version, compute per sample
     """for KL (train) or for draw_hist (test)"""
     eps = 1e-12
     batch_cos_dist = []
