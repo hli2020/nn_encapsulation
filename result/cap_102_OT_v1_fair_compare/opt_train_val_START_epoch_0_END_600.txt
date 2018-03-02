@@ -2258,3 +2258,4 @@ Summary	epoch/iter [296/600] ||	TRAIN, Top1_err: 0.0280, Top5_err: 0.0000 ||	TES
 
 [cap_102_OT_v1_fair_compare]	epoch/iter [297/600][0/391] ||	Loss: 0.4831, Top1_err: 0.0000, Top5_err: 0.0000 ||	Data/batch time: 0.1706/0.3047
 [cap_102_OT_v1_fair_compare]	epoch/iter [297/600][100/391] ||	Loss: 0.4800, Top1_err: 0.0232, Top5_err: 0.0000 ||	Data/batch time: 0.0025/0.2094
+[cap_102_OT_v1_fair_compare]	epoch/iter [297/600][200/391] ||	Loss: 0.4808, Top1_err: 0.0272, Top5_err: 0.0000 ||	Data/batch time: 0.0016/0.2094
