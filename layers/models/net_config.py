@@ -148,7 +148,8 @@ def build_net(type, opts):
                                    spatial_x=8, spatial_y=8,
                                    remove_bias=opts.remove_bias,
                                    group=group, C_form=opts.C_form,
-                                   no_bp_P_L=opts.no_bp_P_L)
+                                   no_bp_P_L=opts.no_bp_P_L,
+                                   skip_critic=opts.skip_critic)
 
         module4 = CapConv2(ch_in=32*8, ch_out=32*16, groups=32,
                            residual=[True, True], iter_N=2,
@@ -161,7 +162,8 @@ def build_net(type, opts):
                                    spatial_x=4, spatial_y=8,
                                    remove_bias=opts.remove_bias,
                                    group=group, C_form=opts.C_form,
-                                   no_bp_P_L=opts.no_bp_P_L)
+                                   no_bp_P_L=opts.no_bp_P_L,
+                                   skip_critic=opts.skip_critic)
 
         # output after module4: bs, 32*16, 4, 4
         final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=10,
