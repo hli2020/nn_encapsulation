@@ -1,0 +1,192 @@
+Experiment: cap_102_OT_v3
+------------ Train and Test Options -----------------
+C_form: l2
+base_save_folder: result
+batch_size_test: 128
+batch_size_train: 128
+beta1: 0.9
+cap_N: 4
+cap_model: v2
+coeff_dimwise: False
+connect_detail: all
+dataset: cifar10
+debug_mode: False
+device_id: 
+draw_hist: False
+encapsulate_G: False
+experiment_name: cap_102_OT_v3
+fc_manner: default
+file_name: result/cap_102_OT_v3/opt_train_val_START_epoch_0_END_600.txt
+gamma: 0.1
+layerwise: False
+less_data_aug: True
+loss_fac: 1.0
+loss_form: margin
+lr: 0.0001
+manner: 0
+manual_seed: -1
+max_epoch: 600
+measure_time: False
+momentum: 0.9
+more_skip: False
+multi_crop_test: False
+net_config: set_OT
+no_bp_P_L: True
+no_visdom: False
+non_target_j: False
+num_workers: 2
+optim: adam
+ot_loss: True
+ot_loss_fac: 20.0
+phase: train_val
+port_id: 8000
+random_seed: 9472
+remove_bias: False
+s35: False
+save_epoch: 25
+save_folder: result/cap_102_OT_v3
+schedule: [350, 450, 550]
+show_freq: 100
+show_test_after_epoch: 100
+use_cuda: True
+weight_decay: 0.0005
+wider: False
+withCapRoute: False
+------------------ End --------------------
+DataParallel (
+  (module): CapNet(
+    (module0): Sequential(
+      (0): Conv2d (3, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU(inplace)
+    )
+    (module1): CapConv2(
+      (main_conv): CapConv(
+        (conv_adjust_blob_shape): Conv2d (32, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (block): Sequential(
+          (0): Conv2d (32, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32)
+        )
+        (last_bn): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+        (last_relu): ReLU()
+        (last_squash): conv_squash(num_shared=32)
+      )
+      (sub_conv): CapConv(
+        (block): Sequential(
+          (0): Conv2d (64, 64, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+          (2): ReLU(inplace)
+          (3): conv_squash(num_shared=32)
+          (4): Conv2d (64, 64, kernel_size=(1, 1), stride=(1, 1), groups=32)
+        )
+        (last_bn): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+        (last_relu): ReLU()
+        (last_squash): conv_squash(num_shared=32)
+      )
+    )
+    (module2): CapConv2(
+      (main_conv): CapConv(
+        (conv_adjust_blob_shape): Conv2d (64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (block): Sequential(
+          (0): Conv2d (64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=32)
+        )
+        (last_bn): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True)
+        (last_relu): ReLU()
+        (last_squash): conv_squash(num_shared=32)
+      )
+      (sub_conv): CapConv(
+        (block): Sequential(
+          (0): Conv2d (128, 128, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True)
+          (2): ReLU(inplace)
+          (3): conv_squash(num_shared=32)
+          (4): Conv2d (128, 128, kernel_size=(1, 1), stride=(1, 1), groups=32)
+        )
+        (last_bn): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True)
+        (last_relu): ReLU()
+        (last_squash): conv_squash(num_shared=32)
+      )
+    )
+    (module3): CapConv2(
+      (main_conv): CapConv(
+        (conv_adjust_blob_shape): Conv2d (128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (block): Sequential(
+          (0): Conv2d (128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=32)
+        )
+        (last_bn): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+        (last_relu): ReLU()
+        (last_squash): conv_squash(num_shared=32)
+      )
+      (sub_conv): CapConv(
+        (block): Sequential(
+          (0): Conv2d (256, 256, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+          (2): ReLU(inplace)
+          (3): conv_squash(num_shared=32)
+          (4): Conv2d (256, 256, kernel_size=(1, 1), stride=(1, 1), groups=32)
+        )
+        (last_bn): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+        (last_relu): ReLU()
+        (last_squash): conv_squash(num_shared=32)
+      )
+    )
+    (module4): CapConv2(
+      (main_conv): CapConv(
+        (conv_adjust_blob_shape): Conv2d (256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (block): Sequential(
+          (0): Conv2d (256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=32)
+        )
+        (last_bn): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True)
+        (last_relu): ReLU()
+        (last_squash): conv_squash(num_shared=32)
+      )
+      (sub_conv): CapConv(
+        (block): Sequential(
+          (0): Conv2d (512, 512, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True)
+          (2): ReLU(inplace)
+          (3): conv_squash(num_shared=32)
+          (4): Conv2d (512, 512, kernel_size=(1, 1), stride=(1, 1), groups=32)
+        )
+        (last_bn): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True)
+        (last_relu): ReLU()
+        (last_squash): conv_squash(num_shared=32)
+      )
+    )
+    (final_cls): CapFC(in_cap_num=512, out_cap_num=10, cap_dim=16, fc_manner=default)
+    (module3_ot_loss): OptTrans(
+      (G_net): Sequential(
+        (0): ConvTranspose2d (256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+        (2): ReLU()
+      )
+      (critic): Sequential(
+        (0): Conv2d (256, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+        (2): ReLU()
+        (3): Conv2d (64, 1, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (4): BatchNorm2d(1, eps=1e-05, momentum=0.1, affine=True)
+        (5): ReLU()
+      )
+    )
+    (module4_ot_loss): OptTrans(
+      (G_net): Sequential(
+        (0): ConvTranspose2d (512, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), output_padding=(1, 1))
+        (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+        (2): ReLU()
+      )
+      (critic): Sequential(
+        (0): Conv2d (256, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+        (2): ReLU()
+        (3): Conv2d (64, 1, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (4): BatchNorm2d(1, eps=1e-05, momentum=0.1, affine=True)
+        (5): ReLU()
+      )
+    )
+  ), weights=((32, 3, 3, 3), (32,), (32,), (32,), (64, 32, 3, 3), (64,), (64, 1, 3, 3), (64,), (64,), (64,), (64, 2, 1, 1), (64,), (64,), (64,), (64, 2, 1, 1), (64,), (64,), (64,), (128, 64, 3, 3), (128,), (128, 2, 3, 3), (128,), (128,), (128,), (128, 4, 1, 1), (128,), (128,), (128,), (128, 4, 1, 1), (128,), (128,), (128,), (256, 128, 3, 3), (256,), (256, 4, 3, 3), (256,), (256,), (256,), (256, 8, 1, 1), (256,), (256,), (256,), (256, 8, 1, 1), (256,), (256,), (256,), (512, 256, 3, 3), (512,), (512, 8, 3, 3), (512,), (512,), (512,), (512, 16, 1, 1), (512,), (512,), (512,), (512, 16, 1, 1), (512,), (512,), (512,), (16, 512, 10), (256, 256, 3, 3), (256,), (256,), (256,), (64, 256, 3, 3), (64,), (64,), (64,), (1, 64, 3, 3), (1,), (1,), (1,), (512, 256, 3, 3), (256,), (256,), (256,), (64, 256, 3, 3), (64,), (64,), (64,), (1, 64, 3, 3), (1,), (1,), (1,)), parameters=3797382
+)
+Total param num # 14.485863 Mb
+
+init learning rate 0.0001000000 at iter 0
+
+[cap_102_OT_v3]	epoch/iter [0/600][0/391] ||	Loss: 26.5145, Top1_err: 91.4062, Top5_err: 50.7812 ||	Data/batch time: 0.0502/3.0090
