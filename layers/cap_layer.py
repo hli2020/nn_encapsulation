@@ -322,6 +322,20 @@ class CapConv(nn.Module):
             | + | (skip connection)
             |   | BN-ReLU-Squash
         """
+    """
+        the basic capConv block
+        if residual is true, use skip connection
+
+            input
+            |   | conv2d
+            |   | BN-ReLU-Squash
+            |   | conv2d
+            |   | BN-ReLU-Squash
+            |   | ... (N times)
+            |   | conv2d
+            | + | (skip connection)
+            |   | BN-ReLU-Squash
+        """
     def __init__(self, ch_num, groups,
                  N=1, ch_out=-1,
                  kernel_size=(1,), stride=1, pad=(0,), residual=False,

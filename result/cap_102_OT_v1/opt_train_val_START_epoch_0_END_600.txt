@@ -10,7 +10,7 @@ coeff_dimwise: False
 connect_detail: all
 dataset: cifar10
 debug_mode: False
-device_id: 0
+device_id: 
 draw_hist: False
 experiment_name: cap_102_OT_v1
 fc_manner: default
@@ -34,10 +34,15 @@ non_target_j: False
 num_workers: 2
 optim: adam
 ot_loss: True
-ot_loss_fac: 1.0
+ot_loss_fac: 10.0
 phase: train_val
 port_id: 8000
+<<<<<<< HEAD
 random_seed: 7684
+=======
+random_seed: 540
+remove_bias: False
+>>>>>>> 242e517547c4da91f62cb77b3979eaec5063b20c
 s35: False
 save_epoch: 25
 save_folder: result/cap_102_OT_v1
@@ -162,6 +167,7 @@ DataParallel (
         (4): BatchNorm2d(1, eps=1e-05, momentum=0.1, affine=True)
         (5): ReLU()
       )
+<<<<<<< HEAD
       (tiny_linear_down): Sequential(
         (0): Linear(in_features=128, out_features=128, bias=True)
         (1): ReLU()
@@ -170,6 +176,8 @@ DataParallel (
         (0): Linear(in_features=128, out_features=128, bias=True)
         (1): ReLU()
       )
+=======
+>>>>>>> 242e517547c4da91f62cb77b3979eaec5063b20c
     )
     (module4_ot_loss): OptTrans(
       (G_net): Sequential(
@@ -185,6 +193,7 @@ DataParallel (
         (4): BatchNorm2d(1, eps=1e-05, momentum=0.1, affine=True)
         (5): ReLU()
       )
+<<<<<<< HEAD
       (tiny_linear_down): Sequential(
         (0): Linear(in_features=128, out_features=128, bias=True)
         (1): ReLU()
@@ -193,13 +202,16 @@ DataParallel (
         (0): Linear(in_features=128, out_features=128, bias=True)
         (1): ReLU()
       )
+=======
+>>>>>>> 242e517547c4da91f62cb77b3979eaec5063b20c
     )
-  ), weights=((32, 3, 3, 3), (32,), (32,), (32,), (64, 32, 3, 3), (64,), (64, 1, 3, 3), (64,), (64,), (64,), (64, 2, 1, 1), (64,), (64,), (64,), (64, 2, 1, 1), (64,), (64,), (64,), (128, 64, 3, 3), (128,), (128, 2, 3, 3), (128,), (128,), (128,), (128, 4, 1, 1), (128,), (128,), (128,), (128, 4, 1, 1), (128,), (128,), (128,), (256, 128, 3, 3), (256,), (256, 4, 3, 3), (256,), (256,), (256,), (256, 8, 1, 1), (256,), (256,), (256,), (256, 8, 1, 1), (256,), (256,), (256,), (512, 256, 3, 3), (512,), (512, 8, 3, 3), (512,), (512,), (512,), (512, 16, 1, 1), (512,), (512,), (512,), (512, 16, 1, 1), (512,), (512,), (512,), (16, 512, 10), (256, 256, 3, 3), (256,), (256,), (256,), (64, 256, 3, 3), (64,), (64,), (64,), (1, 64, 3, 3), (1,), (1,), (1,), (128, 128), (128,), (128, 128), (128,), (512, 256, 3, 3), (256,), (256,), (256,), (64, 256, 3, 3), (64,), (64,), (64,), (1, 64, 3, 3), (1,), (1,), (1,), (128, 128), (128,), (128, 128), (128,)), parameters=3863430
+  ), weights=((32, 3, 3, 3), (32,), (32,), (32,), (64, 32, 3, 3), (64,), (64, 1, 3, 3), (64,), (64,), (64,), (64, 2, 1, 1), (64,), (64,), (64,), (64, 2, 1, 1), (64,), (64,), (64,), (128, 64, 3, 3), (128,), (128, 2, 3, 3), (128,), (128,), (128,), (128, 4, 1, 1), (128,), (128,), (128,), (128, 4, 1, 1), (128,), (128,), (128,), (256, 128, 3, 3), (256,), (256, 4, 3, 3), (256,), (256,), (256,), (256, 8, 1, 1), (256,), (256,), (256,), (256, 8, 1, 1), (256,), (256,), (256,), (512, 256, 3, 3), (512,), (512, 8, 3, 3), (512,), (512,), (512,), (512, 16, 1, 1), (512,), (512,), (512,), (512, 16, 1, 1), (512,), (512,), (512,), (16, 512, 10), (256, 256, 3, 3), (256,), (256,), (256,), (64, 256, 3, 3), (64,), (64,), (64,), (1, 64, 3, 3), (1,), (1,), (1,), (512, 256, 3, 3), (256,), (256,), (256,), (64, 256, 3, 3), (64,), (64,), (64,), (1, 64, 3, 3), (1,), (1,), (1,)), parameters=3797382
 )
-Total param num # 14.737816 Mb
+Total param num # 14.485863 Mb
 
 init learning rate 0.0001000000 at iter 0
 
+<<<<<<< HEAD
 [cap_102_OT_v1]	epoch/iter [0/600][0/391] ||	Loss: 28.8681, Top1_err: 96.0938, Top5_err: 57.0312 ||	Data/batch time: 0.1571/2.3406
 [cap_102_OT_v1]	epoch/iter [0/600][100/391] ||	Loss: 23.2797, Top1_err: 71.3567, Top5_err: 23.0662 ||	Data/batch time: 0.0023/0.2810
 [cap_102_OT_v1]	epoch/iter [0/600][200/391] ||	Loss: 21.8249, Top1_err: 65.4890, Top5_err: 17.9221 ||	Data/batch time: 0.0014/0.2715
@@ -2324,3 +2336,14 @@ Summary	epoch/iter [298/600] ||	TRAIN, Top1_err: 0.0360, Top5_err: 0.0000 ||	TES
 [cap_102_OT_v1]	epoch/iter [299/600][0/391] ||	Loss: 0.3575, Top1_err: 0.0000, Top5_err: 0.0000 ||	Data/batch time: 0.1698/0.3797
 [cap_102_OT_v1]	epoch/iter [299/600][100/391] ||	Loss: 0.4455, Top1_err: 0.0232, Top5_err: 0.0000 ||	Data/batch time: 0.0026/0.2632
 [cap_102_OT_v1]	epoch/iter [299/600][200/391] ||	Loss: 0.4530, Top1_err: 0.0155, Top5_err: 0.0000 ||	Data/batch time: 0.0018/0.2622
+=======
+[cap_102_OT_v1]	epoch/iter [0/600][0/391] ||	Loss: 525.5266, Top1_err: 88.2812, Top5_err: 51.5625 ||	Data/batch time: 0.0550/2.9440
+[cap_102_OT_v1]	epoch/iter [0/600][100/391] ||	Loss: 150.6022, Top1_err: 82.7738, Top5_err: 38.2271 ||	Data/batch time: 0.0008/0.2412
+[cap_102_OT_v1]	epoch/iter [0/600][200/391] ||	Loss: 105.9337, Top1_err: 79.5243, Top5_err: 32.3927 ||	Data/batch time: 0.0006/0.2265
+[cap_102_OT_v1]	epoch/iter [0/600][300/391] ||	Loss: 87.3907, Top1_err: 76.8272, Top5_err: 29.0750 ||	Data/batch time: 0.0005/0.2251
+[cap_102_OT_v1]	epoch/iter [0/600][390/391] ||	Loss: 77.6530, Top1_err: 75.0960, Top5_err: 26.9680 ||	Data/batch time: 0.0005/0.2273
+Summary	epoch/iter [0/600] ||	TRAIN, Top1_err: 75.0960, Top5_err: 26.9680 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+model saved at result/cap_102_OT_v1/epoch_1.pth
+[cap_102_OT_v1]	epoch/iter [1/600][0/391] ||	Loss: 40.2597, Top1_err: 65.6250, Top5_err: 18.7500 ||	Data/batch time: 0.0762/0.3508
+>>>>>>> 242e517547c4da91f62cb77b3979eaec5063b20c
