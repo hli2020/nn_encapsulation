@@ -4291,3 +4291,4 @@ Summary	epoch/iter [542/600] ||	TRAIN, Top1_err: 0.0400, Top5_err: 0.0000 ||	TES
 Summary	epoch/iter [543/600] ||	TRAIN, Top1_err: 0.0380, Top5_err: 0.0000 ||	TEST, Top1_err: 11.0200, Top5_err: 2.2900 ||
 
 [cap_102_v4]	epoch/iter [544/600][0/391] ||	Loss: 0.0004, Top1_err: 0.0000, Top5_err: 0.0000 ||	Data/batch time: 0.2085/0.9077
+[cap_102_v4]	epoch/iter [544/600][100/391] ||	Loss: 0.0007, Top1_err: 0.0541, Top5_err: 0.0000 ||	Data/batch time: 0.0028/0.6847
