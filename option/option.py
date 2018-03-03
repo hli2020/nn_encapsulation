@@ -78,9 +78,15 @@ class Options(object):
         self.parser.add_argument('--max_epoch', default=600, type=int, help='Number of training epoches')
         self.parser.add_argument('--schedule', default=[200, 300, 400], nargs='+', type=int)
         # ot loss
+        # TODO: if net_config=set_OT, no need to set ot_loss below
         self.parser.add_argument('--ot_loss', action='store_true')
         self.parser.add_argument('--ot_loss_fac', default=1.0, type=float)
+        # the following is defined on a case-by-case basis(net_config.py, like 'set_OT')
+        self.parser.add_argument('--withCapRoute', action='store_true')
         self.parser.add_argument('--remove_bias', action='store_true')
+        self.parser.add_argument('--encapsulate_G', action='store_true')
+        self.parser.add_argument('--C_form', type=str, default='l2')
+        self.parser.add_argument('--no_bp_P_L', action='store_true')
         # cls loss
         self.parser.add_argument('--loss_fac', default=1.0, type=float)  # make loss larger
         self.parser.add_argument('--loss_form', default='margin', type=str, help='[ CE | spread | margin ]')
