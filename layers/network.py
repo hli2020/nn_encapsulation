@@ -181,7 +181,7 @@ class CapNet(nn.Module):
 
     def forward(self, x, target=None,
                 curr_iter=0, vis=None, phase='train'):
-        "activation resides in v0; ot_loss in v2"
+        "activation resides in v0; ot_loss in v2; phase is for OT_loss, don't compute it during test"
         # set ot_loss = [] (NOT 0) when multiple-gpus
         stats, output, start, activation, ot_loss = [], [], [], [], []
         if self.measure_time:
@@ -251,7 +251,8 @@ class CapNet(nn.Module):
                 ot_loss = 0
                 if phase == 'train':
                     x, out_list = self.module3(x)
-                    ot_loss += self.module3_ot_loss(out_list[1], out_list[0].detach())
+                    # TODO: detach or not on "y" variable???
+                    ot_loss += self.module3_ot_loss(out_list[1], out_list[0])
                 elif phase == 'test':
                     x, _ = self.module3(x)
             else:
@@ -260,7 +261,7 @@ class CapNet(nn.Module):
             if self.ot_loss:
                 if phase == 'train':
                     x, out_list = self.module4(x)
-                    ot_loss += self.module4_ot_loss(out_list[1], out_list[0].detach())
+                    ot_loss += self.module4_ot_loss(out_list[1], out_list[0])
                 elif phase == 'test':
                     x, _ = self.module4(x)
             else:

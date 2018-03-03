@@ -64,7 +64,9 @@ def train(trainloader, model, criterion, optimizer, opt, visual, epoch):
         #     KL_losses.update(loss_KL.data[0], inputs.size(0))
         #     loss += loss_KL
         if opt.ot_loss:
-            loss += opt.ot_loss_fac * ot_loss
+            curr_ot_loss = opt.ot_loss_fac * torch.sum(ot_loss)
+            # print('ot_loss is {:.4f}'.format(curr_ot_loss))
+            loss += curr_ot_loss
 
         loss *= opt.loss_fac
         # measure accuracy and record loss
