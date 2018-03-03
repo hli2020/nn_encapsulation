@@ -85,7 +85,7 @@ class Options(object):
         self.parser.add_argument('--withCapRoute', action='store_true')
         self.parser.add_argument('--remove_bias', action='store_true')
         self.parser.add_argument('--encapsulate_G', action='store_true')
-        self.parser.add_argument('--C_form', type=str, default='cosine', help='l2 | cosine')
+        self.parser.add_argument('--C_form', type=str, default='l2', help='l2 | cosine')
         self.parser.add_argument('--skip_critic', action='store_true')
         self.parser.add_argument('--no_bp_P_L', action='store_true')
         # cls loss
