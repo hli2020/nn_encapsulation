@@ -335,13 +335,16 @@ class CapConv(nn.Module):
         super(CapConv, self).__init__()
         ch_num_in = ch_num
         ch_num_out = ch_num if ch_out == -1 else ch_out
-        wider_conv = True if len(kernel_size) >= 2 else False
 
         layers = nn.ModuleList([])
         for i in range(N):
-            layers.append(_make_core_conv(manner=manner,
-                                          ch_num_in=ch_num_in, ch_num_out=ch_num_out,
-                                          kernel_size=kernel_size, stride=stride, groups=groups, pad=pad))
+            layers.append(
+                _make_core_conv(
+                    manner=manner, use_capBN=False, skip_relu=False,
+                    ch_num_in=ch_num_in, ch_num_out=ch_num_out,
+                    kernel_size=kernel_size, stride=stride, groups=groups, pad=pad
+                )
+            )
             if use_capBN:
                 layers.append(nn.BatchNorm3d(groups))
             else:
@@ -349,6 +352,7 @@ class CapConv(nn.Module):
             if not skip_relu:
                 layers.append(nn.ReLU(True))
             layers.append(conv_squash(groups))
+
         self.block = layers
 
         if residual:
@@ -375,7 +379,8 @@ class CapConv(nn.Module):
 
         for i in range(len(self.block)):
             if i in self.insert_input_ls:
-                assert isinstance(self.block[i], basic_conv)
+                assert isinstance(self.block[i], basic_conv) \
+                       or isinstance(self.block[i], capConvRoute3)
                 if self.layerwise:
                     # only for sub_conv whose N is greater than 1
                     x_input = x
@@ -412,10 +417,9 @@ class CapConv2(nn.Module):
                  residual, iter_N,
                  no_downsample=False,               # for main_conv
                  wider_main_conv=False,             # for main_conv
-                 layerwise_skip_connect=True,       # mostly for sub_conv
+                 layerwise_skip_connect=True,       # for sub_conv
                  manner='0',                        # for both
                  ot_choice=None,                    # send out intermediate outputs
-                 more_skip=False,                   # ALMOST DEPRECATED
                  use_capBN=False, skip_relu=False,
                  ):
 
@@ -452,27 +456,22 @@ class CapConv2(nn.Module):
             within: between input and output of sub_conv
             within2: between input of main_conv and the HALF output of sub_conv
         """
+        out_list = []
         if self.ot_choice == 'within2':
-            out_list = []
             out_list.append(input)      # as ground truth "y"
-
         out = self.main_conv(input)
-
         if self.ot_choice == 'within':
-            out_list = []
             out_list.append(out)        # as ground truth "y"
 
         if self.ot_choice == 'within':
             out = self.sub_conv(out)
             out_list.append(out)        # as latent variable "z"
-            return out, out_list
         elif self.ot_choice == 'within2':
             out, ot_out = self.sub_conv(out, send_ot_output=True)
             out_list.append(ot_out)     # as latent variable "z"
-            return out, out_list
         else:
             out = self.sub_conv(out)
-            return out
+        return out, out_list
 
 
 class CapFC(nn.Module):
@@ -550,29 +549,28 @@ def normalize_cap(input, factor):
 
 def _make_core_conv(
         ch_num_in, ch_num_out, kernel_size, stride, groups, pad,
-        manner='0'):
+        manner='0', use_capBN=False, skip_relu=False,):
     """
         used in convCap/convCap2 block
         kernel_size, pad, should be tuple type
     """
     conv_opt =[]
     if manner == '0':
-        # TODO (easy): merge wider case with capRoute* below
         conv_opt = basic_conv(
             ch_num_in, ch_num_out, ksize=kernel_size,
             stride=stride, group=groups, pad=pad)
-    elif manner == '1':
-        conv_opt = capConvRoute1(ch_num_in, ch_num_out,
-                                 ksize=kernel_size, stride=stride,
-                                 group=groups, pad=pad)
-    elif manner == '2':
-        conv_opt = capConvRoute2(ch_num_in, ch_num_out,
-                                 ksize=kernel_size, stride=stride,
-                                 group=groups, pad=pad)
+
     elif manner == '3':
-        conv_opt = capConvRoute3(ch_num_in, ch_num_out,
-                                 ksize=kernel_size, stride=stride,
-                                 group=groups, pad=pad)
+        conv_opt = capConvRoute3(
+            ch_num_in, ch_num_out, ksize=kernel_size,
+            stride=stride, group=groups, pad=pad,
+            use_capBN=use_capBN, skip_relu=skip_relu,)
+    elif manner == '4':
+        conv_opt = capConvRoute4(
+            ch_num_in, ch_num_out, ksize=kernel_size,
+            stride=stride, group=groups, pad=pad,
+            use_capBN=use_capBN, skip_relu=skip_relu,)
+
     return conv_opt
 
 
@@ -603,87 +601,27 @@ def squash(vec, manner='paper'):
     return torch.mul(vec, coeff2)
 
 
-# ALMOST DEPRECATED
-class capConvRoute1(nn.Module):
-    """
-        initial version of convCap with routing;
-        used in '_make_core_conv' method to build basic convCap
-    """
+class capConvRoute3(nn.Module):
     def __init__(self,
                  ch_num_in, ch_num_out,
-                 ksize, pad, stride, group):
-        super(capConvRoute1, self).__init__()
+                 ksize, pad, stride, group,
+                 use_capBN=False, skip_relu=False,):
+
+        super(capConvRoute3, self).__init__()
         self.expand_factor = int(ch_num_out/group)  # just the out_cap_dim
-        self.group = group
 
-        self.main_cap = nn.Sequential(*[
-            nn.Conv2d(ch_num_in, ch_num_out, kernel_size=ksize[0],
-                      stride=stride, groups=group, padding=pad[0]),
+        self.main_cap = nn.ModuleList([
+            # could be wider
+            basic_conv(ch_num_in, ch_num_out,
+                       ksize=ksize, stride=stride, group=group, pad=pad),
             nn.BatchNorm2d(ch_num_out),
-            nn.ReLU(),
-            conv_squash(group)
         ])
-        # take the output of main_cap as coeff's input
-        self.main_cap_coeff = nn.Conv2d(
-            ch_num_out, group, kernel_size=3,
-            stride=1, padding=1, groups=group)
-        # res_cap: take the input as input; NO GROUPING
-        self.res_cap = nn.Sequential(*[
-            nn.Conv2d(ch_num_in, ch_num_out, kernel_size=ksize[0],
-                      stride=stride, padding=pad[0]),
-            nn.BatchNorm2d(ch_num_out),
-            nn.ReLU(),
-            conv_squash(group)
-        ])
+        if not skip_relu:
+            self.main_cap.append(nn.ReLU())
+        self.main_cap.append(conv_squash(group))
 
-    def forward(self, x):
-        main_out = self.main_cap(x)
-        main_coeff = self.main_cap_coeff(main_out)
-        main_coeff = torch.cat(
-            [main_coeff[:, i, :, :].unsqueeze(dim=1).repeat(1, self.expand_factor, 1, 1)
-             for i in range(self.group)], dim=1)
-
-        res_out = self.res_cap(x)
-        res_coeff = 1 - main_coeff
-        out = main_out * main_coeff + res_out * res_coeff
-        return out
-
-
-# ALMOST DEPRECATED
-class capConvRoute2(capConvRoute1):
-    def __init__(self,
-                 ch_num_in, ch_num_out,
-                 ksize, pad, stride, group):
-        super(capConvRoute2, self).__init__(
-            ch_num_in, ch_num_out, ksize, pad, stride, group)
-        # take input x as the coeff's input!
-        self.main_cap_coeff = nn.Conv2d(
-            ch_num_in, group, kernel_size=ksize[0],
-            stride=stride, groups=group, padding=pad[0])
-
-    def forward(self, x):
-        main_out = self.main_cap(x)
-        main_coeff = self.main_cap_coeff(x)
-        main_coeff = torch.cat(
-            [main_coeff[:, i, :, :].unsqueeze(dim=1).repeat(1, self.expand_factor, 1, 1)
-             for i in range(self.group)], dim=1)
-
-        res_out = self.res_cap(x)
-        res_coeff = 1 - main_coeff
-        out = main_out * main_coeff + res_out * res_coeff
-        return out
-
-
-class capConvRoute3(capConvRoute1):
-    def __init__(self,
-                 ch_num_in, ch_num_out,
-                 ksize, pad, stride, group):
-        super(capConvRoute3, self).__init__(
-            ch_num_in, ch_num_out, ksize, pad, stride, group)
-
-        # use main_cap in the parent class
         # res_cap: ksize is larger than main_cap; NO GROUPING
-        self.res_cap = nn.Sequential(*[
+        self.res_cap = nn.ModuleList([
             nn.Conv2d(ch_num_in, ch_num_out, kernel_size=ksize[0]+4,
                       stride=stride, padding=pad[0]+2),
             nn.BatchNorm2d(ch_num_out),
@@ -696,13 +634,17 @@ class capConvRoute3(capConvRoute1):
             ch_num_out, group, kernel_size=3, stride=1, padding=1, groups=group)
 
     def forward(self, x):
+        "consider the output of capsule combination as a simple convolution output"
         # co-efficients are communicated in a X-shape
-        main_out = self.main_cap(x)
+        main_out, res_out = x, x
+        for module in self.main_cap:
+            main_out = module(main_out)
         res_coeff = self.main_cap_coeff(main_out)
         res_coeff = res_coeff.unsqueeze(dim=2).repeat(1, 1, self.expand_factor, 1, 1)
         res_coeff = res_coeff.view(res_coeff.size(0), -1, res_coeff.size(3), res_coeff.size(4))
 
-        res_out = self.res_cap(x)
+        for module in self.res_cap:
+            res_out = module(res_out)
         main_coeff = self.res_cap_coeff(res_out)
         # t = time.time()
         main_coeff = main_coeff.unsqueeze(dim=2).repeat(1, 1, self.expand_factor, 1, 1)
@@ -713,6 +655,33 @@ class capConvRoute3(capConvRoute1):
         #     [main_coeff[:, i, :, :].unsqueeze(dim=1).repeat(1, self.expand_factor, 1, 1)
         #      for i in range(self.group)], dim=1)
         # print('time is {:.5f}'.format(time.time() - t))
+        out = main_out * main_coeff + res_out * res_coeff
+        return out
+
+
+class capConvRoute4(capConvRoute3):
+    def __init__(self,
+                 ch_num_in, ch_num_out,
+                 ksize, pad, stride, group,
+                 use_capBN=False, skip_relu=False,):
+        super(capConvRoute4, self).__init__(
+                ch_num_in, ch_num_out, ksize, pad, stride, group,
+                use_capBN=use_capBN, skip_relu=skip_relu)
+
+    def forward(self, x):
+        main_out, res_out = x, x
+        for module in self.main_cap:
+            main_out = module(main_out)
+        main_coeff = self.main_cap_coeff(main_out)
+        main_coeff = main_coeff.unsqueeze(dim=2).repeat(1, 1, self.expand_factor, 1, 1)
+        main_coeff = main_coeff.view(main_coeff.size(0), -1, main_coeff.size(3), main_coeff.size(4))
+
+        for module in self.res_cap:
+            res_out = module(res_out)
+        res_coeff = self.res_cap_coeff(res_out)
+        # t = time.time()
+        res_coeff = res_coeff.unsqueeze(dim=2).repeat(1, 1, self.expand_factor, 1, 1)
+        res_coeff = res_coeff.view(res_coeff.size(0), -1, res_coeff.size(3), res_coeff.size(4))
         out = main_out * main_coeff + res_out * res_coeff
         return out
 
