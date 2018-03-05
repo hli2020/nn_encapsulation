@@ -47,7 +47,7 @@ class Options(object):
         self.parser.add_argument('--comp_cap', action='store_true')
         # NOTE: add a net_config param to control each module of the configs listed below;
         # if net_config == 'default', all configs below matter; otherwise, see details in 'network.py'
-        self.parser.add_argument('--net_config', default='default', type=str,
+        self.parser.add_argument('--net_config', default='set4', type=str,
                                  help='[default | set1 |...| set_OT]')
         # valid for cap_model=v1_x and above
         self.parser.add_argument('--cap_N', default=4, type=int, help='multiple capLayers')
@@ -59,8 +59,8 @@ class Options(object):
         # self.parser.add_argument('--more_skip', action='store_true')
         self.parser.add_argument('--layerwise', action='store_true')
         self.parser.add_argument('--wider', action='store_true')
-        # manner=0, 1, 2, 3 ... where 1&2 almost DEPRECATED
-        self.parser.add_argument('--manner', default='0', type=str)     # capRoute scheme
+        # capRoute scheme, manner=0, 3, 4, ...
+        self.parser.add_argument('--manner', default='3', type=str, help='str')     #
         self.parser.add_argument('--coeff_dimwise', action='store_true')  # TODO
         self.parser.add_argument('--use_capBN', action='store_true')
         self.parser.add_argument('--skip_relu', action='store_true')
@@ -156,7 +156,7 @@ class Options(object):
                             'b_init', 'squash_manner', 'comp_cap'])
         if self.opt.cap_model[0:2] != 'v1' and self.opt.cap_model[0:2] != 'v2':
             options.extend(['cap_N', 'connect_detail', 'fc_manner',
-                            'more_skip', 'layerwise', 'wider', 'manner'])
+                            'layerwise', 'wider', 'manner'])
         if self.opt.loss_form != 'spread':
             options.extend(['fix_m'])
 
