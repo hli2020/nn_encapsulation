@@ -1,0 +1,281 @@
+Experiment: cap_102_v4_2
+------------ Train and Test Options -----------------
+C_form: l2
+base_save_folder: result
+batch_size_test: 128
+batch_size_train: 128
+beta1: 0.9
+cap_N: 4
+cap_model: v2
+coeff_dimwise: False
+connect_detail: all
+dataset: cifar10
+debug_mode: True
+device_id: 
+draw_hist: False
+encapsulate_G: False
+experiment_name: cap_102_v4_2
+fc_manner: default
+file_name: result/cap_102_v4_2/opt_train_val_START_epoch_0_END_600.txt
+gamma: 0.1
+layerwise: True
+less_data_aug: True
+loss_fac: 1.0
+loss_form: margin
+lr: 0.0001
+manner: 0
+manual_seed: -1
+max_epoch: 600
+measure_time: False
+momentum: 0.9
+multi_crop_test: False
+net_config: default
+no_bp_P_L: False
+no_visdom: False
+non_target_j: False
+num_workers: 2
+optim: adam
+ot_loss: False
+ot_loss_fac: 1.0
+phase: train_val
+port_id: 8000
+random_seed: 7695
+remove_bias: False
+s35: False
+save_epoch: 1
+save_folder: result/cap_102_v4_2
+schedule: [200, 300, 400]
+show_freq: 1
+show_test_after_epoch: 0
+skip_critic: False
+skip_relu: True
+use_capBN: False
+use_cuda: True
+weight_decay: 0.0005
+wider: True
+withCapRoute: False
+------------------ End --------------------
+CapNet (
+  (module0): Sequential (
+    (0): Conv2d (3, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)), weights=((32, 3, 3, 3), (32,)), parameters=896
+    (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True), weights=((32,), (32,)), parameters=64
+    (2): ReLU(inplace), weights=(), parameters=0
+  ), weights=((32, 3, 3, 3), (32,), (32,), (32,)), parameters=960
+  (module1): CapConv2(
+    (main_conv): CapConv(
+      (block): ModuleList(
+        (0): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (32, 64, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=32)
+            (1): Conv2d (32, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32)
+            (2): Conv2d (32, 64, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          )
+        )
+        (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+        (2): conv_squash(num_shared=32)
+      )
+      (conv_adjust_blob_shape): Conv2d (32, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+    (sub_conv): CapConv(
+      (block): ModuleList(
+        (0): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (64, 64, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          )
+        )
+        (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+        (2): conv_squash(num_shared=32)
+        (3): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (64, 64, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          )
+        )
+        (4): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+        (5): conv_squash(num_shared=32)
+        (6): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (64, 64, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          )
+        )
+        (7): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+        (8): conv_squash(num_shared=32)
+        (9): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (64, 64, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          )
+        )
+        (10): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+        (11): conv_squash(num_shared=32)
+      )
+    )
+  ), weights=((64, 1, 5, 5), (64,), (64, 1, 3, 3), (64,), (64, 1, 1, 1), (64,), (64,), (64,), (64, 32, 3, 3), (64,), (64, 2, 1, 1), (64,), (64,), (64,), (64, 2, 1, 1), (64,), (64,), (64,), (64, 2, 1, 1), (64,), (64,), (64,), (64, 2, 1, 1), (64,), (64,), (64,)), parameters=22336
+  (module2): CapConv2(
+    (main_conv): CapConv(
+      (block): ModuleList(
+        (0): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (64, 128, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2), groups=32)
+            (1): Conv2d (64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=32)
+            (2): Conv2d (64, 128, kernel_size=(1, 1), stride=(2, 2), groups=32)
+          )
+        )
+        (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True)
+        (2): conv_squash(num_shared=32)
+      )
+      (conv_adjust_blob_shape): Conv2d (64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+    )
+    (sub_conv): CapConv(
+      (block): ModuleList(
+        (0): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (128, 128, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          )
+        )
+        (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True)
+        (2): conv_squash(num_shared=32)
+        (3): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (128, 128, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          )
+        )
+        (4): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True)
+        (5): conv_squash(num_shared=32)
+        (6): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (128, 128, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          )
+        )
+        (7): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True)
+        (8): conv_squash(num_shared=32)
+        (9): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (128, 128, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          )
+        )
+        (10): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True)
+        (11): conv_squash(num_shared=32)
+      )
+    )
+  ), weights=((128, 2, 5, 5), (128,), (128, 2, 3, 3), (128,), (128, 2, 1, 1), (128,), (128,), (128,), (128, 64, 3, 3), (128,), (128, 4, 1, 1), (128,), (128,), (128,), (128, 4, 1, 1), (128,), (128,), (128,), (128, 4, 1, 1), (128,), (128,), (128,), (128, 4, 1, 1), (128,), (128,), (128,)), parameters=87040
+  (module3): CapConv2(
+    (main_conv): CapConv(
+      (block): ModuleList(
+        (0): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (128, 256, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2), groups=32)
+            (1): Conv2d (128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=32)
+            (2): Conv2d (128, 256, kernel_size=(1, 1), stride=(2, 2), groups=32)
+          )
+        )
+        (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+        (2): conv_squash(num_shared=32)
+      )
+      (conv_adjust_blob_shape): Conv2d (128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+    )
+    (sub_conv): CapConv(
+      (block): ModuleList(
+        (0): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (256, 256, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          )
+        )
+        (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+        (2): conv_squash(num_shared=32)
+        (3): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (256, 256, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          )
+        )
+        (4): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+        (5): conv_squash(num_shared=32)
+        (6): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (256, 256, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          )
+        )
+        (7): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+        (8): conv_squash(num_shared=32)
+        (9): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (256, 256, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          )
+        )
+        (10): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+        (11): conv_squash(num_shared=32)
+      )
+    )
+  ), weights=((256, 4, 5, 5), (256,), (256, 4, 3, 3), (256,), (256, 4, 1, 1), (256,), (256,), (256,), (256, 128, 3, 3), (256,), (256, 8, 1, 1), (256,), (256,), (256,), (256, 8, 1, 1), (256,), (256,), (256,), (256, 8, 1, 1), (256,), (256,), (256,), (256, 8, 1, 1), (256,), (256,), (256,)), parameters=343552
+  (module4): CapConv2(
+    (main_conv): CapConv(
+      (block): ModuleList(
+        (0): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (256, 512, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2), groups=32)
+            (1): Conv2d (256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=32)
+            (2): Conv2d (256, 512, kernel_size=(1, 1), stride=(2, 2), groups=32)
+          )
+        )
+        (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True)
+        (2): conv_squash(num_shared=32)
+      )
+      (conv_adjust_blob_shape): Conv2d (256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+    )
+    (sub_conv): CapConv(
+      (block): ModuleList(
+        (0): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (512, 512, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          )
+        )
+        (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True)
+        (2): conv_squash(num_shared=32)
+        (3): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (512, 512, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          )
+        )
+        (4): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True)
+        (5): conv_squash(num_shared=32)
+        (6): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (512, 512, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          )
+        )
+        (7): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True)
+        (8): conv_squash(num_shared=32)
+        (9): basic_conv(
+          (conv): ModuleList(
+            (0): Conv2d (512, 512, kernel_size=(1, 1), stride=(1, 1), groups=32)
+          )
+        )
+        (10): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True)
+        (11): conv_squash(num_shared=32)
+      )
+    )
+  ), weights=((512, 8, 5, 5), (512,), (512, 8, 3, 3), (512,), (512, 8, 1, 1), (512,), (512,), (512,), (512, 256, 3, 3), (512,), (512, 16, 1, 1), (512,), (512,), (512,), (512, 16, 1, 1), (512,), (512,), (512,), (512, 16, 1, 1), (512,), (512,), (512,), (512, 16, 1, 1), (512,), (512,), (512,)), parameters=1364992
+  (final_cls): CapFC(in_cap_num=512, out_cap_num=10, cap_dim=16, fc_manner=default), weights=((16, 512, 10),), parameters=81920
+)
+Total param num # 7.250977 Mb
+
+init learning rate 0.0001000000 at iter 0
+
+[cap_102_v4_2]	epoch/iter [0/600][0/391] ||	Loss: 0.5509, Top1_err: 90.6250, Top5_err: 51.5625 ||	Data/batch time: 0.0489/1.3048
+[cap_102_v4_2]	epoch/iter [0/600][1/391] ||	Loss: 0.5422, Top1_err: 89.0625, Top5_err: 49.6094 ||	Data/batch time: 0.0289/0.8336
+[cap_102_v4_2]	epoch/iter [0/600][2/391] ||	Loss: 0.5354, Top1_err: 88.0208, Top5_err: 46.0938 ||	Data/batch time: 0.0214/0.6865
+[cap_102_v4_2]	epoch/iter [0/600][3/391] ||	Loss: 0.5248, Top1_err: 85.3516, Top5_err: 41.9922 ||	Data/batch time: 0.0179/0.6139
+[cap_102_v4_2]	epoch/iter [0/600][4/391] ||	Loss: 0.5191, Top1_err: 83.5938, Top5_err: 40.7812 ||	Data/batch time: 0.0164/0.5698
+[cap_102_v4_2]	epoch/iter [0/600][5/391] ||	Loss: 0.5142, Top1_err: 83.3333, Top5_err: 39.4531 ||	Data/batch time: 0.0148/0.5399
+[cap_102_v4_2]	epoch/iter [0/600][6/391] ||	Loss: 0.5110, Top1_err: 82.2545, Top5_err: 38.0580 ||	Data/batch time: 0.0137/0.5186
+[cap_102_v4_2]	epoch/iter [0/600][7/391] ||	Loss: 0.5082, Top1_err: 80.9570, Top5_err: 36.7188 ||	Data/batch time: 0.0129/0.5037
+[cap_102_v4_2]	epoch/iter [0/600][8/391] ||	Loss: 0.5051, Top1_err: 80.1215, Top5_err: 35.9375 ||	Data/batch time: 0.0122/0.4912
+[cap_102_v4_2]	epoch/iter [0/600][9/391] ||	Loss: 0.5027, Top1_err: 79.6875, Top5_err: 35.7812 ||	Data/batch time: 0.0117/0.4810
+[cap_102_v4_2]	epoch/iter [0/600][10/391] ||	Loss: 0.5001, Top1_err: 79.4744, Top5_err: 35.0142 ||	Data/batch time: 0.0113/0.4727
+[cap_102_v4_2]	epoch/iter [0/600][11/391] ||	Loss: 0.4988, Top1_err: 79.3620, Top5_err: 34.1146 ||	Data/batch time: 0.0109/0.4665
+[cap_102_v4_2]	epoch/iter [0/600][12/391] ||	Loss: 0.4974, Top1_err: 78.9062, Top5_err: 33.1731 ||	Data/batch time: 0.0105/0.4607
+[cap_102_v4_2]	epoch/iter [0/600][13/391] ||	Loss: 0.4966, Top1_err: 78.7946, Top5_err: 32.8125 ||	Data/batch time: 0.0103/0.4557
+[cap_102_v4_2]	epoch/iter [0/600][14/391] ||	Loss: 0.4948, Top1_err: 78.3854, Top5_err: 32.2917 ||	Data/batch time: 0.0102/0.4516
+[cap_102_v4_2]	epoch/iter [0/600][15/391] ||	Loss: 0.4930, Top1_err: 77.8320, Top5_err: 31.9336 ||	Data/batch time: 0.0100/0.4482
+[cap_102_v4_2]	epoch/iter [0/600][16/391] ||	Loss: 0.4926, Top1_err: 77.8493, Top5_err: 31.3419 ||	Data/batch time: 0.0098/0.4450
+[cap_102_v4_2]	epoch/iter [0/600][17/391] ||	Loss: 0.4905, Top1_err: 77.1701, Top5_err: 30.7292 ||	Data/batch time: 0.0097/0.4420
+[cap_102_v4_2]	epoch/iter [0/600][18/391] ||	Loss: 0.4890, Top1_err: 76.7681, Top5_err: 30.1809 ||	Data/batch time: 0.0103/0.4396
+[cap_102_v4_2]	epoch/iter [0/600][19/391] ||	Loss: 0.4883, Top1_err: 76.5625, Top5_err: 29.6875 ||	Data/batch time: 0.0101/0.4379

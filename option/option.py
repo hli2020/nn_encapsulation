@@ -27,7 +27,6 @@ class Options(object):
 
         # model params
         self.parser.add_argument('--cap_model', default='v2', type=str, help='v_base, v0, ...')
-
         # only valid for cap_model=v_base
         self.parser.add_argument('--depth', default=14, type=int)
         # only valid for cap_model=v0:
@@ -48,7 +47,7 @@ class Options(object):
         self.parser.add_argument('--comp_cap', action='store_true')
         # NOTE: add a net_config param to control each module of the configs listed below;
         # if net_config == 'default', all configs below matter; otherwise, see details in 'network.py'
-        self.parser.add_argument('--net_config', default='set_OT', type=str,
+        self.parser.add_argument('--net_config', default='default', type=str,
                                  help='[default | set1 |...| set_OT]')
         # valid for cap_model=v1_x and above
         self.parser.add_argument('--cap_N', default=4, type=int, help='multiple capLayers')
@@ -57,12 +56,14 @@ class Options(object):
         # valid for cap_model=v1_2_x and above
         self.parser.add_argument('--fc_manner', default='default', type=str)
         # valid for cap_model=v2_x and above
-        self.parser.add_argument('--more_skip', action='store_true')
+        # self.parser.add_argument('--more_skip', action='store_true')
         self.parser.add_argument('--layerwise', action='store_true')
         self.parser.add_argument('--wider', action='store_true')
         # manner=0, 1, 2, 3 ... where 1&2 almost DEPRECATED
         self.parser.add_argument('--manner', default='0', type=str)     # capRoute scheme
         self.parser.add_argument('--coeff_dimwise', action='store_true')  # TODO
+        self.parser.add_argument('--use_capBN', action='store_true')
+        self.parser.add_argument('--skip_relu', action='store_true')
 
         # train
         self.parser.add_argument('--lr', default=0.0001, type=float, help='initial learning rate')
@@ -85,7 +86,8 @@ class Options(object):
         self.parser.add_argument('--withCapRoute', action='store_true')
         self.parser.add_argument('--remove_bias', action='store_true')
         self.parser.add_argument('--encapsulate_G', action='store_true')
-        self.parser.add_argument('--C_form', type=str, default='l2')
+        self.parser.add_argument('--C_form', type=str, default='l2', help='l2 | cosine')
+        self.parser.add_argument('--skip_critic', action='store_true')
         self.parser.add_argument('--no_bp_P_L', action='store_true')
         # cls loss
         self.parser.add_argument('--loss_fac', default=1.0, type=float)  # make loss larger
