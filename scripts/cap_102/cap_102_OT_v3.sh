@@ -15,7 +15,7 @@ CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
 --no_bp_P_L \
 --debug_mode=False \
 --less_data_aug \
-
+--s35
 
 end=`date +%s`
 runtime=$((end-start))
