@@ -546,3 +546,4 @@ Total param num # 140.574997 Mb
 init learning rate 0.0001000000 at iter 0
 
 [cap_102_OT_v6_1]	epoch/iter [0/600][0/391] ||	Loss: 13.5305, Top1_err: 89.8438, Top5_err: 52.3438 ||	Data/batch time: 0.0672/4.8656
+[cap_102_OT_v6_1]	epoch/iter [0/600][100/391] ||	Loss: 5.7254, Top1_err: 87.0900, Top5_err: 44.2837 ||	Data/batch time: 0.0010/1.2237
