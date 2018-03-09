@@ -545,6 +545,7 @@ Total param num # 140.574997 Mb
 
 init learning rate 0.0001000000 at iter 0
 
+<<<<<<< HEAD
 [cap_102_OT_v6_1]	epoch/iter [0/600][0/391] ||	Loss: 6.3085, Top1_err: 89.8438, Top5_err: 46.0938 ||	Data/batch time: 0.1207/6.1905
 [cap_102_OT_v6_1]	epoch/iter [0/600][100/391] ||	Loss: 1.9800, Top1_err: 87.9100, Top5_err: 45.3434 ||	Data/batch time: 0.0023/1.9353
 [cap_102_OT_v6_1]	epoch/iter [0/600][200/391] ||	Loss: 1.5700, Top1_err: 85.3001, Top5_err: 40.5745 ||	Data/batch time: 0.0016/1.9133
@@ -3254,3 +3255,8 @@ Summary	epoch/iter [378/600] ||	TRAIN, Top1_err: 0.0600, Top5_err: 0.0020 ||	TES
 Summary	epoch/iter [379/600] ||	TRAIN, Top1_err: 0.0600, Top5_err: 0.0000 ||	TEST, Top1_err: 11.1500, Top5_err: 1.7300 ||
 
 [cap_102_OT_v6_1]	epoch/iter [380/600][0/391] ||	Loss: 0.0001, Top1_err: 0.0000, Top5_err: 0.0000 ||	Data/batch time: 0.0890/1.7995
+=======
+[cap_102_OT_v6_1]	epoch/iter [0/600][0/391] ||	Loss: 13.5305, Top1_err: 89.8438, Top5_err: 52.3438 ||	Data/batch time: 0.0672/4.8656
+[cap_102_OT_v6_1]	epoch/iter [0/600][100/391] ||	Loss: 5.7254, Top1_err: 87.0900, Top5_err: 44.2837 ||	Data/batch time: 0.0010/1.2237
+>>>>>>> f035debcefb1b52eb87942afa16c2fe766c49ce7
+[cap_102_OT_v6_1]	epoch/iter [380/600][100/391] ||	Loss: 0.0007, Top1_err: 0.0309, Top5_err: 0.0000 ||	Data/batch time: 0.0017/1.7342

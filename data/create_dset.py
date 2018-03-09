@@ -49,6 +49,10 @@ def create_dataset(opts, phase=None):
         dataset = dset.FashionMNIST(root='data/fmnist', train=phase == 'train',
                                     transform=transform, download=True)
         dataset.num_classes = 10
+    elif name == 'mnist':
+        dataset = dset.MNIST(root='data', train=phase == 'train',
+                             transform=transform, download=True)
+        dataset.num_classes = 10
 
     elif name == 'tiny_imagenet':
 

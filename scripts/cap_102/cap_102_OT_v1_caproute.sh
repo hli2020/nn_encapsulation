@@ -3,13 +3,16 @@
 start=`date +%s`
 
 # train and test
-DEVICE_ID=2
+DEVICE_ID=3
 CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
 --device_id=$DEVICE_ID \
---experiment_name=cap_102_OT_v1_fair_compare_new \
+--experiment_name=cap_102_OT_v1_caproute \
 --cap_model=v2 \
---net_config=set_OT_compare \
---loss_fac=1 \
+--net_config=set_OT \
+--ot_loss \
+--ot_loss_fac=20 \
+--schedule 350 450 550 \
+--withCapRoute \
 --debug_mode=False \
 --less_data_aug \
 

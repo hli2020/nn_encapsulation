@@ -10,7 +10,8 @@ class Options(object):
         self.parser = argparse.ArgumentParser(description='Capsule Network')
         self.parser.add_argument('--experiment_name', default='base')
         self.parser.add_argument('--base_save_folder', default='result')
-        self.parser.add_argument('--dataset', default='cifar10', help='[ cifar10 | tiny_imagenet ]')
+        self.parser.add_argument('--dataset', default='cifar10',
+                                 help='[ cifar10/cifar100/mnist/svhn/fmnist | tiny_imagenet ]')
         self.parser.add_argument('--less_data_aug', action='store_true', help='see create_dset.py')
         # only valid for imagenet
         self.parser.add_argument('--setting', default='top1', type=str, help='[ top1 | top5 | obj_det ]')
@@ -28,7 +29,7 @@ class Options(object):
         # model params
         self.parser.add_argument('--cap_model', default='v2', type=str, help='v_base, v0, ...')
         # only valid for cap_model=v_base
-        self.parser.add_argument('--depth', default=14, type=int)
+        self.parser.add_argument('--depth', default=14, type=int)  # 14 or 20, ...
         # only valid for cap_model=v0:
         self.parser.add_argument('--route', default='dynamic', type=str)
         self.parser.add_argument('--E_step_norm', action='store_true')
@@ -47,7 +48,7 @@ class Options(object):
         self.parser.add_argument('--comp_cap', action='store_true')
         # NOTE: add a net_config param to control each module of the configs listed below;
         # if net_config == 'default', all configs below matter; otherwise, see details in 'network.py'
-        self.parser.add_argument('--net_config', default='set4', type=str,
+        self.parser.add_argument('--net_config', default='default', type=str,
                                  help='[default | set1 |...| set_OT]')
         # valid for cap_model=v1_x and above
         self.parser.add_argument('--cap_N', default=4, type=int, help='multiple capLayers')
@@ -60,7 +61,7 @@ class Options(object):
         self.parser.add_argument('--layerwise', action='store_true')
         self.parser.add_argument('--wider', action='store_true')
         # capRoute scheme, manner=0, 3, 4, ...
-        self.parser.add_argument('--manner', default='3', type=str, help='str')     #
+        self.parser.add_argument('--manner', default='0', type=str, help='str')     #
         self.parser.add_argument('--coeff_dimwise', action='store_true')  # TODO
         self.parser.add_argument('--use_capBN', action='store_true')
         self.parser.add_argument('--skip_relu', action='store_true')

@@ -20,7 +20,7 @@ class CapNet(nn.Module):
         self.use_imagenet = True if opts.dataset == 'tiny_imagenet' else False
         self.cap_model = opts.cap_model
         # self.use_multiple = opts.use_multiple
-        input_ch = 1 if opts.dataset == 'fmnist' else 3
+        input_ch = 1 if opts.dataset == 'fmnist' or opts.dataset == 'mnist' else 3
         self.measure_time = opts.measure_time
         self.ot_loss = opts.ot_loss
 
