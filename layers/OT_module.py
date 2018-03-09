@@ -72,9 +72,9 @@ class OptTrans(nn.Module):
             y = self.critic(y).view(bs, -1)
 
         if self.C_form == 'l2':
-            x_ = x.unsqueeze(dim=2).repeat(1, 1, bs)
-            y_ = y.permute(1, 0).unsqueeze(dim=0)
-            C = torch.norm((x_ - y_), p=2, dim=1)  # C: i, j where i, j are samples
+            x = x.unsqueeze(dim=2).repeat(1, 1, bs)
+            y = y.permute(1, 0).unsqueeze(dim=0)
+            C = torch.norm((x - y), p=2, dim=1)  # C: i, j where i, j are samples
 
         elif self.C_form == 'cosine':
             # # _no = torch.sum(x_ * y_, dim=1)

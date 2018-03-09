@@ -28,10 +28,19 @@ def weights_init_cap(m):
     #     m.bias.data.zero_()
     if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
         nn.init.xavier_normal(m.weight.data)
-        #nn.init.normal(m.bias.data)
-    elif isinstance(m, nn.BatchNorm2d) or isinstance(m, nn.InstanceNorm2d):
+        try:
+            nn.init.normal(m.bias.data)
+        except:
+            # some conv in resnet do not have bias
+            pass
+    elif isinstance(m, nn.BatchNorm2d) \
+            or isinstance(m, nn.InstanceNorm2d) \
+            or isinstance(m, nn.BatchNorm3d)\
+            or isinstance(m, nn.InstanceNorm3d):
         m.weight.data.fill_(1)
         m.bias.data.zero_()
+        # nn.init.normal(m.weight.data)
+        # nn.init.normal(m.bias.data)
     elif isinstance(m, nn.Linear):
         nn.init.xavier_normal(m.weight.data)
         nn.init.normal(m.bias.data)

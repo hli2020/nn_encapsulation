@@ -20,7 +20,7 @@ class CapNet(nn.Module):
         self.use_imagenet = True if opts.dataset == 'tiny_imagenet' else False
         self.cap_model = opts.cap_model
         # self.use_multiple = opts.use_multiple
-        input_ch = 1 if opts.dataset == 'fmnist' else 3
+        input_ch = 1 if opts.dataset == 'fmnist' or opts.dataset == 'mnist' else 3
         self.measure_time = opts.measure_time
         self.ot_loss = opts.ot_loss
 
@@ -130,50 +130,21 @@ class CapNet(nn.Module):
                                        cap_dim=16, fc_manner=opts.fc_manner)
 
         elif self.cap_model == 'v2':
-            connect_detail = connect_list[opts.connect_detail]
+
             self.module0 = nn.Sequential(*[
                 nn.Conv2d(3, 32, kernel_size=3, padding=1),
                 nn.BatchNorm2d(32),
                 nn.ReLU(True)
             ])  # 32 spatial output
-            if opts.net_config == 'default':
-                self.module1 = CapConv2(ch_in=32*1, ch_out=32*2, groups=32,
-                                        residual=connect_detail[0:2], iter_N=opts.cap_N,
-                                        no_downsample=True,
-                                        more_skip=opts.more_skip,
-                                        layerwise_skip_connect=opts.layerwise,
-                                        wider_main_conv=opts.wider,
-                                        manner=opts.manner)
-                self.module2 = CapConv2(ch_in=32*2, ch_out=32*4, groups=32,
-                                        residual=connect_detail[2:4], iter_N=opts.cap_N,
-                                        more_skip=opts.more_skip,
-                                        layerwise_skip_connect=opts.layerwise,
-                                        wider_main_conv=opts.wider,
-                                        manner=opts.manner)
-                self.module3 = CapConv2(ch_in=32*4, ch_out=32*8, groups=32,
-                                        residual=connect_detail[4:6], iter_N=opts.cap_N,
-                                        more_skip=opts.more_skip,
-                                        layerwise_skip_connect=opts.layerwise,
-                                        wider_main_conv=opts.wider,
-                                        manner=opts.manner)
-                self.module4 = CapConv2(ch_in=32*8, ch_out=32*16, groups=32,
-                                        residual=connect_detail[6:], iter_N=opts.cap_N,
-                                        more_skip=opts.more_skip,
-                                        layerwise_skip_connect=opts.layerwise,
-                                        wider_main_conv=opts.wider,
-                                        manner=opts.manner)
-                # output after module4: bs, 32*16, 4, 4
-                self.final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes,
-                                       cap_dim=16, fc_manner=opts.fc_manner)
+
+            # specify the network config below
+            if self.ot_loss:
+                self.module1, self.module2, self.module3, self.module4, self.final_cls, \
+                    self.module1_ot_loss, self.module2_ot_loss, self.module3_ot_loss, self.module4_ot_loss = \
+                    build_net(opts.net_config, opts)
             else:
-                "specify the network config below"
-                if self.ot_loss:
-                    self.module1, self.module2, self.module3, self.module4, self.final_cls, \
-                    self.module3_ot_loss, self.module4_ot_loss = \
-                        build_net(opts.net_config, opts)
-                else:
-                    self.module1, self.module2, self.module3, self.module4, self.final_cls, _, _ = \
-                        build_net(opts.net_config, opts)
+                self.module1, self.module2, self.module3, self.module4, self.final_cls, \
+                    _, _, _, _ = build_net(opts.net_config, opts)
 
         # init the network
         for m in self.modules():
@@ -221,7 +192,6 @@ class CapNet(nn.Module):
             if self.measure_time:
                 torch.cuda.synchronize()
                 print('last cap total time: {:.4f}'.format(time.perf_counter() - start))
-
         elif self.cap_model[0:2] == 'v1':
             x = self.layer1(x)
             x = self.cap1_conv(x)
@@ -241,31 +211,25 @@ class CapNet(nn.Module):
                 x = self.cap4_conv(x)
                 x = self.cap4_conv_sub(x)
                 output = self.final_cls(x)
-
         elif self.cap_model == 'v2':
+            ot_loss = 0
             x = self.module0(x)
-            x = self.module1(x)
-            x = self.module2(x)
 
-            if self.ot_loss:
-                ot_loss = 0
-                if phase == 'train':
-                    x, out_list = self.module3(x)
-                    # TODO: detach or not on "y" variable???
-                    ot_loss += self.module3_ot_loss(out_list[1], out_list[0])
-                elif phase == 'test':
-                    x, _ = self.module3(x)
-            else:
-                x = self.module3(x)
+            x, out_list = self.module1(x)
+            if len(out_list) > 0 and phase == 'train':
+                ot_loss += self.module1_ot_loss(out_list[1], out_list[0])
 
-            if self.ot_loss:
-                if phase == 'train':
-                    x, out_list = self.module4(x)
-                    ot_loss += self.module4_ot_loss(out_list[1], out_list[0])
-                elif phase == 'test':
-                    x, _ = self.module4(x)
-            else:
-                x = self.module4(x)
+            x, out_list = self.module2(x)
+            if len(out_list) > 0 and phase == 'train':
+                ot_loss += self.module2_ot_loss(out_list[1], out_list[0])
+
+            x, out_list = self.module3(x)
+            if len(out_list) > 0 and phase == 'train':
+                ot_loss += self.module3_ot_loss(out_list[1], out_list[0])
+
+            x, out_list = self.module4(x)
+            if len(out_list) > 0 and phase == 'train':
+                ot_loss += self.module4_ot_loss(out_list[1], out_list[0])
 
             output = self.final_cls(x)
         else:
@@ -273,7 +237,7 @@ class CapNet(nn.Module):
 
         return output, stats, activation, ot_loss
 
-    def _make_layer(self, block, planes, blocks, stride=1):
+    def _make_layer(self, block, planes, blocks, stride=1, use_groupBN=False):
         """make resnet sub-layers"""
         downsample = None
         if stride != 1 or self.inplanes != planes * block.expansion:
