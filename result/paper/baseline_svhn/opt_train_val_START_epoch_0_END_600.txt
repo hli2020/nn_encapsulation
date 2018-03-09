@@ -1,0 +1,147 @@
+Experiment: baseline_svhn
+------------ Train and Test Options -----------------
+C_form: l2
+base_save_folder: result/paper
+batch_size_test: 128
+batch_size_train: 128
+beta1: 0.9
+cap_model: v_base
+coeff_dimwise: False
+dataset: svhn
+debug_mode: True
+depth: 14
+device_id: 
+draw_hist: False
+encapsulate_G: False
+experiment_name: baseline_svhn
+file_name: result/paper/baseline_svhn/opt_train_val_START_epoch_0_END_600.txt
+gamma: 0.1
+less_data_aug: True
+loss_fac: 1.0
+loss_form: CE
+lr: 0.0001
+manual_seed: -1
+max_epoch: 600
+measure_time: False
+momentum: 0.9
+multi_crop_test: False
+net_config: default
+no_bp_P_L: False
+no_visdom: False
+non_target_j: False
+num_workers: 2
+optim: rmsprop
+ot_loss: False
+ot_loss_fac: 1.0
+phase: train_val
+port_id: 9000
+random_seed: 2977
+remove_bias: False
+s35: True
+save_epoch: 1
+save_folder: result/paper/baseline_svhn
+schedule: [200, 300, 400]
+show_freq: 1
+show_test_after_epoch: 0
+skip_critic: False
+skip_relu: False
+use_capBN: False
+use_cuda: False
+weight_decay: 0.0005
+withCapRoute: False
+------------------ End --------------------
+CapNet (
+  (conv1): Conv2d (3, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False), weights=((16, 3, 3, 3),), parameters=432
+  (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True), weights=((16,), (16,)), parameters=32
+  (relu): ReLU(inplace), weights=(), parameters=0
+  (layer1): Sequential (
+    (0): BasicBlock(
+      (conv1): Conv2d (16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU(inplace)
+      (conv2): Conv2d (16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+    ), weights=((16, 16, 3, 3), (16,), (16,), (16, 16, 3, 3), (16,), (16,)), parameters=4672
+    (1): BasicBlock(
+      (conv1): Conv2d (16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU(inplace)
+      (conv2): Conv2d (16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True)
+    ), weights=((16, 16, 3, 3), (16,), (16,), (16, 16, 3, 3), (16,), (16,)), parameters=4672
+  ), weights=((16, 16, 3, 3), (16,), (16,), (16, 16, 3, 3), (16,), (16,), (16, 16, 3, 3), (16,), (16,), (16, 16, 3, 3), (16,), (16,)), parameters=9344
+  (layer2): Sequential (
+    (0): BasicBlock(
+      (conv1): Conv2d (16, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU(inplace)
+      (conv2): Conv2d (32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (downsample): Sequential(
+        (0): Conv2d (16, 32, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      )
+    ), weights=((32, 16, 3, 3), (32,), (32,), (32, 32, 3, 3), (32,), (32,), (32, 16, 1, 1), (32,), (32,)), parameters=14528
+    (1): BasicBlock(
+      (conv1): Conv2d (32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU(inplace)
+      (conv2): Conv2d (32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True)
+    ), weights=((32, 32, 3, 3), (32,), (32,), (32, 32, 3, 3), (32,), (32,)), parameters=18560
+  ), weights=((32, 16, 3, 3), (32,), (32,), (32, 32, 3, 3), (32,), (32,), (32, 16, 1, 1), (32,), (32,), (32, 32, 3, 3), (32,), (32,), (32, 32, 3, 3), (32,), (32,)), parameters=33088
+  (layer3): Sequential (
+    (0): BasicBlock(
+      (conv1): Conv2d (32, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU(inplace)
+      (conv2): Conv2d (64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (downsample): Sequential(
+        (0): Conv2d (32, 64, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      )
+    ), weights=((64, 32, 3, 3), (64,), (64,), (64, 64, 3, 3), (64,), (64,), (64, 32, 1, 1), (64,), (64,)), parameters=57728
+    (1): BasicBlock(
+      (conv1): Conv2d (64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+      (relu): ReLU(inplace)
+      (conv2): Conv2d (64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True)
+    ), weights=((64, 64, 3, 3), (64,), (64,), (64, 64, 3, 3), (64,), (64,)), parameters=73984
+  ), weights=((64, 32, 3, 3), (64,), (64,), (64, 64, 3, 3), (64,), (64,), (64, 32, 1, 1), (64,), (64,), (64, 64, 3, 3), (64,), (64,), (64, 64, 3, 3), (64,), (64,)), parameters=131712
+  (avgpool): AvgPool2d(kernel_size=8, stride=1, padding=0, ceil_mode=False, count_include_pad=True), weights=(), parameters=0
+  (fc): Linear(in_features=64, out_features=10), weights=((10, 64), (10,)), parameters=650
+)
+Total param num # 0.668556 Mb
+
+init learning rate 0.0001000000 at iter 0
+
+[baseline_svhn]	epoch/iter [0/600][0/573] ||	Loss: 3.3224, Top1_err: 95.3125, Top5_err: 62.5000 ||	Data/batch time: 0.0437/0.6795
+[baseline_svhn]	epoch/iter [0/600][1/573] ||	Loss: 3.1608, Top1_err: 94.5312, Top5_err: 57.8125 ||	Data/batch time: 0.0270/0.6407
+[baseline_svhn]	epoch/iter [0/600][2/573] ||	Loss: 3.1451, Top1_err: 93.7500, Top5_err: 59.6354 ||	Data/batch time: 0.0209/0.6164
+[baseline_svhn]	epoch/iter [0/600][3/573] ||	Loss: 3.0839, Top1_err: 93.5547, Top5_err: 59.1797 ||	Data/batch time: 0.0174/0.6092
+[baseline_svhn]	epoch/iter [0/600][4/573] ||	Loss: 3.0799, Top1_err: 93.9062, Top5_err: 60.0000 ||	Data/batch time: 0.0157/0.6094
+[baseline_svhn]	epoch/iter [0/600][5/573] ||	Loss: 3.0371, Top1_err: 93.2292, Top5_err: 59.8958 ||	Data/batch time: 0.0145/0.6064
+[baseline_svhn]	epoch/iter [0/600][6/573] ||	Loss: 2.9901, Top1_err: 93.0804, Top5_err: 58.7054 ||	Data/batch time: 0.0136/0.5959
+[baseline_svhn]	epoch/iter [0/600][7/573] ||	Loss: 2.9278, Top1_err: 92.4805, Top5_err: 57.4219 ||	Data/batch time: 0.0129/0.5926
+[baseline_svhn]	epoch/iter [0/600][8/573] ||	Loss: 2.8673, Top1_err: 91.7535, Top5_err: 55.9028 ||	Data/batch time: 0.0125/0.5849
+[baseline_svhn]	epoch/iter [0/600][9/573] ||	Loss: 2.8264, Top1_err: 91.3281, Top5_err: 55.0781 ||	Data/batch time: 0.0121/0.5809
+[baseline_svhn]	epoch/iter [0/600][10/573] ||	Loss: 2.8043, Top1_err: 90.8381, Top5_err: 54.5455 ||	Data/batch time: 0.0117/0.5776
+[baseline_svhn]	epoch/iter [0/600][11/573] ||	Loss: 2.7734, Top1_err: 90.4297, Top5_err: 53.7760 ||	Data/batch time: 0.0114/0.5720
+[baseline_svhn]	epoch/iter [0/600][12/573] ||	Loss: 2.7469, Top1_err: 90.0240, Top5_err: 52.9447 ||	Data/batch time: 0.0112/0.5695
+[baseline_svhn]	epoch/iter [0/600][13/573] ||	Loss: 2.7159, Top1_err: 89.5647, Top5_err: 51.7857 ||	Data/batch time: 0.0110/0.5666
+[baseline_svhn]	epoch/iter [0/600][14/573] ||	Loss: 2.6908, Top1_err: 88.9583, Top5_err: 51.1979 ||	Data/batch time: 0.0111/0.5650
+[baseline_svhn]	epoch/iter [0/600][15/573] ||	Loss: 2.6621, Top1_err: 88.2812, Top5_err: 50.0488 ||	Data/batch time: 0.0109/0.5635
+[baseline_svhn]	epoch/iter [0/600][16/573] ||	Loss: 2.6370, Top1_err: 87.9136, Top5_err: 49.0349 ||	Data/batch time: 0.0108/0.5623
+[baseline_svhn]	epoch/iter [0/600][17/573] ||	Loss: 2.6173, Top1_err: 87.4566, Top5_err: 48.1337 ||	Data/batch time: 0.0106/0.5607
+[baseline_svhn]	epoch/iter [0/600][18/573] ||	Loss: 2.5993, Top1_err: 87.0066, Top5_err: 47.8618 ||	Data/batch time: 0.0105/0.5596
+[baseline_svhn]	epoch/iter [0/600][19/573] ||	Loss: 2.5870, Top1_err: 87.0312, Top5_err: 47.5391 ||	Data/batch time: 0.0104/0.5605
+[baseline_svhn]	epoch/iter [0/600][20/573] ||	Loss: 2.5748, Top1_err: 86.4955, Top5_err: 47.2470 ||	Data/batch time: 0.0103/0.5613
+[baseline_svhn]	epoch/iter [0/600][21/573] ||	Loss: 2.5634, Top1_err: 86.3281, Top5_err: 46.8750 ||	Data/batch time: 0.0103/0.5623
+[baseline_svhn]	epoch/iter [0/600][22/573] ||	Loss: 2.5525, Top1_err: 86.0394, Top5_err: 46.5353 ||	Data/batch time: 0.0102/0.5629
+[baseline_svhn]	epoch/iter [0/600][23/573] ||	Loss: 2.5400, Top1_err: 85.7096, Top5_err: 46.2240 ||	Data/batch time: 0.0101/0.5620
+[baseline_svhn]	epoch/iter [0/600][24/573] ||	Loss: 2.5272, Top1_err: 85.4062, Top5_err: 45.8750 ||	Data/batch time: 0.0100/0.5612
+[baseline_svhn]	epoch/iter [0/600][25/573] ||	Loss: 2.5144, Top1_err: 85.1262, Top5_err: 45.3125 ||	Data/batch time: 0.0099/0.5597
+[baseline_svhn]	epoch/iter [0/600][26/573] ||	Loss: 2.5042, Top1_err: 84.8380, Top5_err: 44.7917 ||	Data/batch time: 0.0099/0.5576
+[baseline_svhn]	epoch/iter [0/600][27/573] ||	Loss: 2.4965, Top1_err: 84.7935, Top5_err: 44.5871 ||	Data/batch time: 0.0098/0.5559

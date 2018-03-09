@@ -347,6 +347,8 @@ class CapConv(nn.Module):
             )
             if use_capBN:
                 layers.append(nn.BatchNorm3d(groups))
+                # layers.append(nn.BatchNorm3d(1))
+                # layers.append(nn.BatchNorm3d(ch_num_out))
             else:
                 layers.append(nn.BatchNorm2d(ch_num_out))
             if not skip_relu:
@@ -373,7 +375,7 @@ class CapConv(nn.Module):
         self.groups = groups
 
     def forward(self, x, send_ot_output=False):
-
+        "send_ot_output is to compute OT loss as input"
         if not self.layerwise:
             x_original = x
 
@@ -395,6 +397,8 @@ class CapConv(nn.Module):
             else:
                 if isinstance(self.block[i], nn.BatchNorm3d):
                     x = x.view(x.size(0), self.groups, -1, x.size(2), x.size(3))
+                    # x = x.view(x.size(0), x.size(1), 1, x.size(2), x.size(3))
+                    # x = x.view(x.size(0), 1, -1, x.size(2), x.size(3))
                 x = self.block[i](x)
                 if isinstance(self.block[i], nn.BatchNorm3d):
                     x = x.view(x.size(0), -1, x.size(3), x.size(4))
