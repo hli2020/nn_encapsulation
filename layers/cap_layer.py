@@ -17,17 +17,20 @@ LOOK_INTO_DETAILS = False
 
 class CapLayer(nn.Module):
     """
-        The original capsule implementation in the NIPS paper;
+        The original capsule implementation in the NIPS/ICLR paper;
         and detailed ablative analysis on it.
     """
     def __init__(self, opts, num_in_caps, num_out_caps,
-                 out_dim, in_dim, num_shared, route):
+                 out_dim, in_dim, num_shared, route, as_conv_output=False):
         super(CapLayer, self).__init__()
-
-        self.route = route
-        self.measure_time = opts.measure_time
         self.which_sample, self.which_j = 0, 0
         self.non_target_j = opts.non_target_j
+        self.use_KL = False     # opts.use_KL
+        self.KL_manner = False  # opts.KL_manner
+
+        self.as_conv_output = as_conv_output
+        self.route = route
+        self.measure_time = opts.measure_time
 
         self.out_dim = out_dim
         self.in_dim = in_dim
@@ -36,11 +39,6 @@ class CapLayer(nn.Module):
         self.comp_cap = opts.comp_cap
         self.num_out_caps = num_out_caps
         self.num_in_caps = num_in_caps
-
-        self.use_KL = False     # opts.use_KL
-        self.KL_manner = False  # opts.KL_manner
-        self.add_cap_BN_relu = opts.add_cap_BN_relu
-        self.add_cap_dropout = opts.add_cap_dropout
         self.squash_manner = opts.squash_manner
 
         if self.comp_cap:
@@ -51,13 +49,8 @@ class CapLayer(nn.Module):
             self.fc_time = opts.fc_time
         else:
             self.W = nn.Conv2d(num_shared*in_dim, num_shared*num_out_caps*out_dim,
-                               kernel_size=1, stride=1, groups=num_shared)
-        if self.add_cap_dropout:
-            self.cap_droput = nn.Dropout2d(p=opts.dropout_p)
-        if self.add_cap_BN_relu:
-            # self.cap_BN = nn.BatchNorm2d(out_dim)
-            self.cap_BN = nn.InstanceNorm2d(out_dim, affine=True)
-            self.cap_relu = nn.ReLU(True)
+                               kernel_size=1, stride=1, groups=num_shared, bias=True)
+
         if self.route == 'EM':
             self.beta_v = Parameter(torch.Tensor(self.num_out_caps))
             self.beta_a = Parameter(torch.Tensor(self.num_out_caps))
@@ -72,9 +65,9 @@ class CapLayer(nn.Module):
                 target=None, curr_iter=None, draw_hist=None,
                 activate=None):
         """
-            target, curr_iter, draw_hist are for debugging or stats collection purpose only;
-            'activate' is the activation of previous layer, a_i (i being # of input capsules)
-            'epoch' is for inverse temperature to compute lambda
+            Input:
+                target, curr_iter, draw_hist are for debugging or stats collection purpose only;
+                'activate' is the activation of previous layer: a_i (i being # of input capsules)
             return:
                 v, stats, activation (a_j)
         """
@@ -97,7 +90,7 @@ class CapLayer(nn.Module):
             x = self.drop1(x)
             v = self.fc2(x)
         else:
-            # 1. affine mapping (get 'pred')
+            # 1. affine mapping (get 'pred', \hat{v}_j|i)
             if self.measure_time:
                 torch.cuda.synchronize()
                 start = time.perf_counter()
@@ -160,14 +153,16 @@ class CapLayer(nn.Module):
             batch_cos_dist, batch_i_length, batch_cos_v, avg_len,
             mean, std
         ]
+        if self.as_conv_output:
+            v = v.view(v.size(0), -1, spatial_size, spatial_size, v.size(2))
+            v = v.permute(0, 1, 4, 2, 3).contiguous()
+            v = v.view(v.size(0), -1, v.size(3), v.size(4))
         return v, stats, activation
 
     def dynamic(self, bs, pred, pred_list):
         # create b on the fly
         # if opts.b_init == 'rand':
         #     self.b = Variable(torch.rand(num_out_caps, num_in_caps), requires_grad=False)
-        # elif opts.b_init == 'zero':
-        #     self.b = Variable(torch.zeros(num_out_caps, num_in_caps), requires_grad=False)
         # elif opts.b_init == 'learn':
         #     self.b = Variable(torch.zeros(num_out_caps, num_in_caps), requires_grad=True)
         b = Variable(torch.zeros(bs, self.num_out_caps, self.num_in_caps),

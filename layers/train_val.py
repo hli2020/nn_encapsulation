@@ -40,7 +40,7 @@ def train(trainloader, model, criterion, optimizer, opt, visual, epoch):
         # 'activation' is for EM routing
         outputs, stats, activation, ot_info = \
             model(inputs, targets)  # 128 x 10 x 16
-        ot_flag, ot_loss = ot_loss[0], ot_loss[1]
+        ot_flag, ot_loss = ot_info[0], ot_info[1]
         try:
             outputs = outputs.norm(dim=2)
         except RuntimeError:

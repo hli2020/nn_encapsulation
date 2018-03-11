@@ -1,0 +1,143 @@
+Experiment: encapnet_m^2
+------------ Train and Test Options -----------------
+C_form: l2
+base_save_folder: result/paper
+batch_size_test: 128
+batch_size_train: 128
+beta1: 0.9
+cap_N: 4
+coeff_dimwise: False
+connect_detail: all
+dataset: cifar10
+debug_mode: False
+device_id: [1]
+draw_hist: False
+encapsulate_G: False
+experiment_name: encapnet_m^2
+fc_manner: default
+file_name: result/paper/encapnet_m^2/opt_train_val_START_epoch_0_END_600.txt
+gamma: 0.1
+layerwise: False
+less_data_aug: True
+loss_fac: 1.0
+loss_form: margin
+lr: 0.0001
+manner: 3
+manual_seed: -1
+max_epoch: 600
+measure_time: False
+momentum: 0.9
+multi_crop_test: False
+net_config: encapnet_table1
+no_bp_P_L: False
+no_visdom: False
+non_target_j: False
+num_workers: 2
+optim: adam
+ot_loss_fac: 1.0
+phase: train_val
+port_id: 8000
+random_seed: 993
+remove_bias: False
+s35: False
+save_epoch: 25
+save_folder: result/paper/encapnet_m^2
+schedule: [200, 300, 400]
+show_freq: 100
+show_test_after_epoch: 100
+skip_critic: False
+skip_relu: False
+use_capBN: False
+use_cuda: True
+weight_decay: 0.0005
+wider: False
+withCapRoute: False
+------------------ End --------------------
+EncapNet (
+  (module0): Sequential (
+    (0): Conv2d (3, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)), weights=((32, 3, 3, 3), (32,)), parameters=896
+    (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True), weights=((32,), (32,)), parameters=64
+    (2): ReLU(inplace), weights=(), parameters=0
+  ), weights=((32, 3, 3, 3), (32,), (32,), (32,)), parameters=960
+  (module1): Sequential (
+    (0): Conv2d (32, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)), weights=((64, 32, 3, 3), (64,)), parameters=18496
+    (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True), weights=((64,), (64,)), parameters=128
+    (2): ReLU(inplace), weights=(), parameters=0
+  ), weights=((64, 32, 3, 3), (64,), (64,), (64,)), parameters=18624
+  (module2): Sequential (
+    (0): Conv2d (64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1)), weights=((128, 64, 3, 3), (128,)), parameters=73856
+    (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True), weights=((128,), (128,)), parameters=256
+    (2): ReLU(inplace), weights=(), parameters=0
+  ), weights=((128, 64, 3, 3), (128,), (128,), (128,)), parameters=74112
+  (module3): Sequential (
+    (0): Conv2d (128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1)), weights=((256, 128, 3, 3), (256,)), parameters=295168
+    (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True), weights=((256,), (256,)), parameters=512
+    (2): ReLU(inplace), weights=(), parameters=0
+  ), weights=((256, 128, 3, 3), (256,), (256,), (256,)), parameters=295680
+  (module4): CapConv(
+    (block): ModuleList(
+      (0): capConvRoute3(
+        (main_cap): ModuleList(
+          (0): basic_conv(
+            (conv): ModuleList(
+              (0): Conv2d (256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=32)
+            )
+          )
+          (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True)
+          (2): ReLU()
+          (3): conv_squash(num_shared=32)
+        )
+        (res_cap): ModuleList(
+          (0): Conv2d (256, 512, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3))
+          (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True)
+          (2): ReLU()
+          (3): conv_squash(num_shared=32)
+        )
+        (main_cap_coeff): Conv2d (512, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32)
+        (res_cap_coeff): Conv2d (512, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32)
+      )
+      (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True)
+      (2): ReLU(inplace)
+      (3): conv_squash(num_shared=32)
+    )
+    (conv_adjust_blob_shape): Conv2d (256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+  ), weights=((512, 8, 3, 3), (512,), (512,), (512,), (512, 256, 7, 7), (512,), (512,), (512,), (32, 16, 3, 3), (32,), (32, 16, 3, 3), (32,), (512,), (512,), (512, 256, 3, 3), (512,)), parameters=7652928
+  (final_cls): CapFC(in_cap_num=512, out_cap_num=10, cap_dim=16, fc_manner=default), weights=((16, 512, 10),), parameters=81920
+)
+Total param num # 30.991455 Mb
+
+init learning rate 0.0001000000 at iter 0
+
+[encapnet_m^2]	epoch/iter [0/600][0/391] ||	Loss: 0.5623, Top1_err: 91.4062, Top5_err: 51.5625 ||	Data/batch time: 0.0585/1.0625
+[encapnet_m^2]	epoch/iter [0/600][100/391] ||	Loss: 0.4211, Top1_err: 62.8790, Top5_err: 15.2382 ||	Data/batch time: 0.0008/0.0874
+[encapnet_m^2]	epoch/iter [0/600][200/391] ||	Loss: 0.3913, Top1_err: 57.2722, Top5_err: 11.8664 ||	Data/batch time: 0.0005/0.0831
+[encapnet_m^2]	epoch/iter [0/600][300/391] ||	Loss: 0.3740, Top1_err: 54.1866, Top5_err: 10.2134 ||	Data/batch time: 0.0004/0.0817
+[encapnet_m^2]	epoch/iter [0/600][390/391] ||	Loss: 0.3635, Top1_err: 52.3600, Top5_err: 9.3180 ||	Data/batch time: 0.0004/0.0818
+Summary	epoch/iter [0/600] ||	TRAIN, Top1_err: 52.3600, Top5_err: 9.3180 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+model saved at result/paper/encapnet_m^2/epoch_1.pth
+[encapnet_m^2]	epoch/iter [1/600][0/391] ||	Loss: 0.3194, Top1_err: 43.7500, Top5_err: 7.0312 ||	Data/batch time: 0.0555/0.0980
+[encapnet_m^2]	epoch/iter [1/600][100/391] ||	Loss: 0.3060, Top1_err: 42.3113, Top5_err: 5.1516 ||	Data/batch time: 0.0008/0.0791
+[encapnet_m^2]	epoch/iter [1/600][200/391] ||	Loss: 0.3027, Top1_err: 41.7949, Top5_err: 4.9246 ||	Data/batch time: 0.0005/0.0825
+[encapnet_m^2]	epoch/iter [1/600][300/391] ||	Loss: 0.2992, Top1_err: 41.2298, Top5_err: 4.8484 ||	Data/batch time: 0.0004/0.0842
+[encapnet_m^2]	epoch/iter [1/600][390/391] ||	Loss: 0.2957, Top1_err: 40.6420, Top5_err: 4.7480 ||	Data/batch time: 0.0004/0.0850
+Summary	epoch/iter [1/600] ||	TRAIN, Top1_err: 40.6420, Top5_err: 4.7480 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+[encapnet_m^2]	epoch/iter [2/600][0/391] ||	Loss: 0.3051, Top1_err: 42.1875, Top5_err: 8.5938 ||	Data/batch time: 0.0562/0.1017
+[encapnet_m^2]	epoch/iter [2/600][100/391] ||	Loss: 0.2667, Top1_err: 36.0613, Top5_err: 3.2720 ||	Data/batch time: 0.0008/0.0874
+[encapnet_m^2]	epoch/iter [2/600][200/391] ||	Loss: 0.2655, Top1_err: 35.7198, Top5_err: 3.1950 ||	Data/batch time: 0.0005/0.0869
+[encapnet_m^2]	epoch/iter [2/600][300/391] ||	Loss: 0.2634, Top1_err: 35.3457, Top5_err: 3.2262 ||	Data/batch time: 0.0004/0.0867
+[encapnet_m^2]	epoch/iter [2/600][390/391] ||	Loss: 0.2609, Top1_err: 34.8500, Top5_err: 3.2100 ||	Data/batch time: 0.0004/0.0867
+Summary	epoch/iter [2/600] ||	TRAIN, Top1_err: 34.8500, Top5_err: 3.2100 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+[encapnet_m^2]	epoch/iter [3/600][0/391] ||	Loss: 0.2339, Top1_err: 34.3750, Top5_err: 0.7812 ||	Data/batch time: 0.0566/0.1002
+[encapnet_m^2]	epoch/iter [3/600][100/391] ||	Loss: 0.2397, Top1_err: 31.2345, Top5_err: 2.5835 ||	Data/batch time: 0.0008/0.0869
+[encapnet_m^2]	epoch/iter [3/600][200/391] ||	Loss: 0.2369, Top1_err: 30.9507, Top5_err: 2.5886 ||	Data/batch time: 0.0005/0.0867
+[encapnet_m^2]	epoch/iter [3/600][300/391] ||	Loss: 0.2358, Top1_err: 30.8165, Top5_err: 2.6241 ||	Data/batch time: 0.0004/0.0866
+[encapnet_m^2]	epoch/iter [3/600][390/391] ||	Loss: 0.2339, Top1_err: 30.6400, Top5_err: 2.5740 ||	Data/batch time: 0.0004/0.0865
+Summary	epoch/iter [3/600] ||	TRAIN, Top1_err: 30.6400, Top5_err: 2.5740 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+[encapnet_m^2]	epoch/iter [4/600][0/391] ||	Loss: 0.2010, Top1_err: 21.0938, Top5_err: 1.5625 ||	Data/batch time: 0.0626/0.1062
+[encapnet_m^2]	epoch/iter [4/600][100/391] ||	Loss: 0.2156, Top1_err: 27.8079, Top5_err: 1.9028 ||	Data/batch time: 0.0009/0.0866
+[encapnet_m^2]	epoch/iter [4/600][200/391] ||	Loss: 0.2145, Top1_err: 27.7907, Top5_err: 1.9628 ||	Data/batch time: 0.0005/0.0866
+[encapnet_m^2]	epoch/iter [4/600][300/391] ||	Loss: 0.2143, Top1_err: 27.7461, Top5_err: 1.9856 ||	Data/batch time: 0.0004/0.0870

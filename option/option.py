@@ -30,7 +30,7 @@ class Options(object):
         # model params
         # if net_config == 'xx_default', all configs below matter;
         # otherwise, see details in 'net_config.py'
-        self.parser.add_argument('--net_config', default='set4', type=str,
+        self.parser.add_argument('--net_config', default='capnet_default', type=str,
                                  help='[xx_default | set1 |...| set_OT]')
         # RESNET
         self.parser.add_argument('--depth', default=14, type=int)  # 14 or 20, ...
@@ -40,13 +40,6 @@ class Options(object):
         self.parser.add_argument('--E_step_norm', action='store_true')
         self.parser.add_argument('--route_num', default=3, type=int)
         self.parser.add_argument('--primary_cap_num', default=32, type=int)
-        self.parser.add_argument('--pre_ch_num', default=256, type=int)
-
-        self.parser.add_argument('--add_cap_dropout', action='store_true')
-        self.parser.add_argument('--dropout_p', default=0.2, type=float)
-        self.parser.add_argument('--add_cap_BN_relu', action='store_true')
-        self.parser.add_argument('--use_instanceBN', action='store_true')
-
         self.parser.add_argument('--b_init', default='zero', type=str, help='[zero | rand | learn]')
         self.parser.add_argument('--squash_manner', default='paper', type=str, help='[sigmoid|paper]')
         # if comp_cap=True, replace the capLayer with FC layer
@@ -60,7 +53,7 @@ class Options(object):
         self.parser.add_argument('--layerwise', action='store_true')
         self.parser.add_argument('--wider', action='store_true')
         # capRoute scheme, manner=0, 3, 4, ...
-        self.parser.add_argument('--manner', default='0', type=str, help='str')
+        self.parser.add_argument('--manner', default='3', type=str, help='str')
         self.parser.add_argument('--coeff_dimwise', action='store_true')  # TODO(low)
         self.parser.add_argument('--use_capBN', action='store_true')
         self.parser.add_argument('--skip_relu', action='store_true')
@@ -74,8 +67,8 @@ class Options(object):
         self.parser.add_argument('--gamma', default=0.1, type=float)  # for step lr scheme
         self.parser.add_argument('--beta1', type=float, default=0.9, help='momentum term of adam')
 
-        self.parser.add_argument('--batch_size_train', default=128, type=int)
-        self.parser.add_argument('--batch_size_test', default=128, type=int)
+        self.parser.add_argument('--batch_size_train', default=2, type=int)
+        # self.parser.add_argument('--batch_size_test', default=128, type=int)
         self.parser.add_argument('--max_epoch', default=600, type=int, help='Number of training epoches')
         self.parser.add_argument('--schedule', default=[200, 300, 400], nargs='+', type=int)
         self.parser.add_argument('--ot_loss_fac', default=1.0, type=float)
@@ -110,6 +103,7 @@ class Options(object):
 
     def setup_config(self):
 
+        self.opt.batch_size_test = self.opt.batch_size_train
         self.opt.device_id = [int(x) for x in self.opt.device_id.split(',')]
         self.opt.save_folder = os.path.join(
             self.opt.base_save_folder, self.opt.experiment_name)
@@ -147,15 +141,19 @@ class Options(object):
         options = []
         if self.opt.dataset != 'tiny_imagenet':
             options.extend(['setting', 'bigger_input'])
-        if self.opt.cap_model != 'v_base':
+
+        if self.opt.net_config[0:6] != 'resnet':
             options.extend(['depth'])
-        if self.opt.cap_model != 'v0':
-            options.extend(['E_step_norm', 'route', 'route_num', 'primary_cap_num', 'pre_ch_num',
-                            'add_cap_dropout', 'dropout_p', 'add_cap_BN_relu', 'use_instanceBN',
+
+        if self.opt.net_config[0:6] != 'capnet':
+            options.extend(['E_step_norm', 'route', 'route_num', 'primary_cap_num',
                             'b_init', 'squash_manner', 'comp_cap'])
-        if self.opt.cap_model[0:2] != 'v1' and self.opt.cap_model[0:2] != 'v2':
+
+        if self.opt.net_config[0:8] != 'encapnet':
             options.extend(['cap_N', 'connect_detail', 'fc_manner',
-                            'layerwise', 'wider', 'manner'])
+                            'layerwise', 'wider', 'manner',
+                            'coeff_dimwise', 'use_capBN', 'skip_relu',
+                            ])
         if self.opt.loss_form != 'spread':
             options.extend(['fix_m'])
 

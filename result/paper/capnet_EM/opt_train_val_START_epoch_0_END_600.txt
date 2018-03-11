@@ -1,0 +1,94 @@
+Experiment: capnet_EM
+------------ Train and Test Options -----------------
+C_form: l2
+E_step_norm: False
+b_init: zero
+base_save_folder: result/paper
+batch_size_test: 2
+batch_size_train: 2
+beta1: 0.9
+comp_cap: False
+dataset: cifar10
+debug_mode: False
+device_id: [1]
+draw_hist: False
+encapsulate_G: False
+experiment_name: capnet_EM
+file_name: result/paper/capnet_EM/opt_train_val_START_epoch_0_END_600.txt
+gamma: 0.1
+less_data_aug: True
+loss_fac: 1.0
+loss_form: margin
+lr: 0.0001
+manual_seed: -1
+max_epoch: 600
+measure_time: False
+momentum: 0.9
+multi_crop_test: False
+net_config: capnet_default
+no_bp_P_L: False
+no_visdom: False
+non_target_j: False
+num_workers: 2
+optim: adam
+ot_loss_fac: 1.0
+phase: train_val
+port_id: 8000
+primary_cap_num: 32
+random_seed: 346
+remove_bias: False
+route: EM
+route_num: 3
+s35: False
+save_epoch: 25
+save_folder: result/paper/capnet_EM
+schedule: [200, 300, 400]
+show_freq: 100
+show_test_after_epoch: 100
+skip_critic: False
+squash_manner: paper
+use_cuda: True
+weight_decay: 0.0005
+withCapRoute: False
+------------------ End --------------------
+EncapNet (
+  (module0): Sequential (
+    (0): Conv2d (3, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)), weights=((32, 3, 3, 3), (32,)), parameters=896
+    (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True), weights=((32,), (32,)), parameters=64
+    (2): ReLU(inplace), weights=(), parameters=0
+  ), weights=((32, 3, 3, 3), (32,), (32,), (32,)), parameters=960
+  (generate_activate): Sequential (
+    (0): Conv2d (256, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)), weights=((32, 256, 3, 3), (32,)), parameters=73760
+    (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True), weights=((32,), (32,)), parameters=64
+    (2): ReLU(), weights=(), parameters=0
+  ), weights=((32, 256, 3, 3), (32,), (32,), (32,)), parameters=73824
+  (module1): Sequential (
+    (0): Conv2d (32, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)), weights=((64, 32, 3, 3), (64,)), parameters=18496
+    (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True), weights=((64,), (64,)), parameters=128
+    (2): ReLU(inplace), weights=(), parameters=0
+  ), weights=((64, 32, 3, 3), (64,), (64,), (64,)), parameters=18624
+  (module2): Sequential (
+    (0): Conv2d (64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1)), weights=((128, 64, 3, 3), (128,)), parameters=73856
+    (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True), weights=((128,), (128,)), parameters=256
+    (2): ReLU(inplace), weights=(), parameters=0
+  ), weights=((128, 64, 3, 3), (128,), (128,), (128,)), parameters=74112
+  (module3): Sequential (
+    (0): Conv2d (128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1)), weights=((256, 128, 3, 3), (256,)), parameters=295168
+    (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True), weights=((256,), (256,)), parameters=512
+    (2): ReLU(inplace), weights=(), parameters=0
+  ), weights=((256, 128, 3, 3), (256,), (256,), (256,)), parameters=295680
+  (module4): CapLayer(
+    (W): Conv2d (256, 1048576, kernel_size=(1, 1), stride=(1, 1), groups=32)
+  ), weights=((2048,), (2048,), (1048576, 8, 1, 1), (1048576,)), parameters=9441280
+  (final_cls): CapLayer(
+    (W): Conv2d (512, 5120, kernel_size=(1, 1), stride=(1, 1), groups=32)
+  ), weights=((10,), (10,), (5120, 16, 1, 1), (5120,)), parameters=87060
+)
+Total param num # 38.114700 Mb
+
+init learning rate 0.0001000000 at iter 0
+
+[capnet_EM]	epoch/iter [0/600][0/25000] ||	Loss: 28.5338, Top1_err: 100.0000, Top5_err: 0.0000 ||	Data/batch time: 0.0371/1.5958
+[capnet_EM]	epoch/iter [0/600][100/25000] ||	Loss: 26.0161, Top1_err: 91.5842, Top5_err: 52.9703 ||	Data/batch time: 0.0006/0.9570
+[capnet_EM]	epoch/iter [0/600][200/25000] ||	Loss: 22.9696, Top1_err: 91.0448, Top5_err: 51.4925 ||	Data/batch time: 0.0005/0.9710
+[capnet_EM]	epoch/iter [0/600][300/25000] ||	Loss: 20.7442, Top1_err: 91.3621, Top5_err: 51.3289 ||	Data/batch time: 0.0004/0.9728

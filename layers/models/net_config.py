@@ -1,4 +1,4 @@
-from layers.cap_layer import CapConv2, CapFC, CapLayer
+from layers.cap_layer import CapConv, CapConv2, CapFC, CapLayer
 from layers.OT_module import OptTrans
 from layers.misc import connect_list
 import torch.nn as nn
@@ -91,92 +91,6 @@ def build_net(type, opts, num_classes):
         final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes,
                           cap_dim=16, fc_manner='default')
 
-    elif type == 'set1':
-        module1 = CapConv2(ch_in=32*1, ch_out=32*2, groups=32,
-                           residual=[True, True], iter_N=4, no_downsample=True,
-                           more_skip=False,
-                           layerwise_skip_connect=False,
-                           wider_main_conv=False,
-                           manner='0')
-        module2 = CapConv2(ch_in=32*2, ch_out=32*4, groups=32,
-                           residual=[True, True], iter_N=3,
-                           more_skip=False,
-                           layerwise_skip_connect=False,
-                           wider_main_conv=False,
-                           manner='0')
-        module3 = CapConv2(ch_in=32*4, ch_out=32*8, groups=32,
-                           residual=[True, True], iter_N=2,
-                           more_skip=False,
-                           layerwise_skip_connect=False,
-                           wider_main_conv=False,
-                           manner='3')
-        module4 = CapConv2(ch_in=32*8, ch_out=32*16, groups=32,
-                           residual=[True, True], iter_N=2,
-                           more_skip=False,
-                           layerwise_skip_connect=False,
-                           wider_main_conv=False,
-                           manner='3')
-        # output after module4: bs, 32*16, 4, 4
-        final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=10,
-                          cap_dim=16, fc_manner='default')
-    elif type == 'set2':
-        module1 = CapConv2(ch_in=32*1, ch_out=32*2, groups=32,
-                           residual=[True, True], iter_N=4, no_downsample=True,
-                           more_skip=True,
-                           layerwise_skip_connect=True,
-                           wider_main_conv=True,
-                           manner='0')
-        module2 = CapConv2(ch_in=32*2, ch_out=32*4, groups=32,
-                           residual=[True, True], iter_N=4,
-                           more_skip=True,
-                           layerwise_skip_connect=True,
-                           wider_main_conv=True,
-                           manner='0')
-        module3 = CapConv2(ch_in=32*4, ch_out=32*8, groups=32,
-                           residual=[True, True], iter_N=3,
-                           more_skip=True,
-                           layerwise_skip_connect=False,
-                           wider_main_conv=False,
-                           manner='3')
-        module4 = CapConv2(ch_in=32*8, ch_out=32*16, groups=32,
-                           residual=[True, True], iter_N=2,
-                           more_skip=True,
-                           layerwise_skip_connect=False,
-                           wider_main_conv=False,
-                           manner='3')
-        # output after module4: bs, 32*16, 4, 4
-        final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=10,
-                          cap_dim=16, fc_manner='default')
-    elif type == 'set3':
-        "For now, wider and manner=3 are not compatible"
-        module1 = CapConv2(ch_in=32*1, ch_out=32*2, groups=32,
-                           residual=[True, True], iter_N=4, no_downsample=True,
-                           more_skip=True,
-                           layerwise_skip_connect=False,
-                           wider_main_conv=True,
-                           manner='0')
-        module2 = CapConv2(ch_in=32*2, ch_out=32*4, groups=32,
-                           residual=[True, True], iter_N=4,
-                           more_skip=True,
-                           layerwise_skip_connect=True,
-                           wider_main_conv=False,
-                           manner='3')
-        module3 = CapConv2(ch_in=32*4, ch_out=32*8, groups=32,
-                           residual=[True, True], iter_N=4,
-                           more_skip=True,
-                           layerwise_skip_connect=False,
-                           wider_main_conv=True,
-                           manner='0')
-        module4 = CapConv2(ch_in=32*8, ch_out=32*16, groups=32,
-                           residual=[True, True], iter_N=4,
-                           more_skip=True,
-                           layerwise_skip_connect=True,
-                           wider_main_conv=False,
-                           manner='3')
-        # output after module4: bs, 32*16, 4, 4
-        final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=10,
-                          cap_dim=16, fc_manner='default')
-
     elif type == 'encapnet_set_OT':
         # set_OT; #67/70, etc.
         # only the last modules uses OT
@@ -223,7 +137,6 @@ def build_net(type, opts, num_classes):
         # output after module4: bs, 32*16, 4, 4
         final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes,
                           cap_dim=16, fc_manner='default')
-
     elif type == 'encapnet_set_OT_compare':
         module1 = CapConv2(ch_in=32*1, ch_out=32*2, groups=32,
                            residual=[True, True], iter_N=2, no_downsample=True,
@@ -304,28 +217,69 @@ def build_net(type, opts, num_classes):
         assert (opts.depth - 2) % 6 == 0, 'depth should be 6n+2'
         n = (opts.depth - 2) / 6
         block = Bottleneck if opts.depth >= 44 else BasicBlock
-
-        if opts.dataset == 'tiny_imagenet':
-            if opts.bigger_input:
-                stride_num, fc_num, pool_stride, pool_kernel = 2, 64*4*4, 7, 7
-            else:
-                stride_num, fc_num, pool_stride, pool_kernel = 2, 64*2*2, 8, 8
-        else:
-            stride_num, fc_num, pool_stride, pool_kernel = 1, 64, 1, 8
-
-        module1 = nn.Sequential(*[
-            nn.Conv2d(input_ch, 16, kernel_size=3, padding=1, bias=False, stride=stride_num),
-            nn.BatchNorm2d(16),
-            nn.ReLU(inplace=True)
-        ])
+        # if opts.dataset == 'tiny_imagenet':
+        #     if opts.bigger_input:
+        #         stride_num, fc_num, pool_stride, pool_kernel = 2, 64*4*4, 7, 7
+        #     else:
+        #         stride_num, fc_num, pool_stride, pool_kernel = 2, 64*2*2, 8, 8
+        # else:
+        stride_num, fc_num, pool_stride, pool_kernel = 1, 64, 1, 8
 
         inplanes = 16
-        module2 = _make_layer(inplanes, block, 16, n)
-        module3 = _make_layer(inplanes, block, 32, n, stride=2)
+        module1 = _make_layer(inplanes, block, 16, n)
+        module2 = _make_layer(inplanes, block, 32, n, stride=2)
+        module3 = _make_layer(inplanes, block, 64, n, stride=2)
+        module4 = nn.AvgPool2d(pool_kernel, stride=pool_stride)
+        final_cls = nn.Linear(fc_num, num_classes)
+
+    elif type == 'resnet_same_shape':
+        module1 = nn.Sequential(*[
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(True)
+        ])  # 32 spatial output
+        module2 = nn.Sequential(*[
+            nn.Conv2d(64, 128, kernel_size=3, padding=1, stride=2),
+            nn.BatchNorm2d(128),
+            nn.ReLU(True)
+        ])  # 16 spatial output
+        module3 = nn.Sequential(*[
+            nn.Conv2d(128, 256, kernel_size=3, padding=1, stride=2),
+            nn.BatchNorm2d(256),
+            nn.ReLU(True)
+        ])  # 8 spatial output
         module4 = nn.Sequential(*[
-            _make_layer(inplanes, block, 64, n, stride=2),
-            nn.AvgPool2d(pool_kernel, stride=pool_stride),
-        ])
+            nn.Conv2d(256, 512, kernel_size=3, padding=1, stride=1),
+            nn.BatchNorm2d(512),
+            nn.ReLU(True),
+            nn.AvgPool2d(8),
+        ])  # 8 spatial output
+        fc_num = 512
+        final_cls = nn.Linear(fc_num, num_classes)
+
+    elif type == 'resnet_similar_param':
+        module1 = nn.Sequential(*[
+            nn.Conv2d(32, 256, kernel_size=3, padding=1),
+            nn.BatchNorm2d(256),
+            nn.ReLU(True)
+        ])  # 32 spatial output
+        module2 = nn.Sequential(*[
+            nn.Conv2d(256, 512, kernel_size=3, padding=1, stride=2),
+            nn.BatchNorm2d(512),
+            nn.ReLU(True)
+        ])  # 16 spatial output
+        module3 = nn.Sequential(*[
+            nn.Conv2d(512, 512, kernel_size=3, padding=1, stride=2),
+            nn.BatchNorm2d(512),
+            nn.ReLU(True)
+        ])  # 8 spatial output
+        module4 = nn.Sequential(*[
+            nn.Conv2d(512, 1300, kernel_size=3, padding=1, stride=1),
+            nn.BatchNorm2d(1300),
+            nn.ReLU(True),
+            nn.AvgPool2d(8),
+        ])  # 8 spatial output
+        fc_num = 1300
         final_cls = nn.Linear(fc_num, num_classes)
 
     # DEFAULT SETTING FOR RESNET
@@ -346,19 +300,38 @@ def build_net(type, opts, num_classes):
             nn.ReLU(True)
         ])  # 8 spatial output
 
-        # TODO
-        # if opts.route == 'EM':
-        #     self.generate_activate = nn.Sequential(*[
-        #         nn.Conv2d(256, 32, kernel_size=3, padding=1),
-        #         nn.BatchNorm2d(32),
-        #         nn.ReLU()
-        #     ])
-        module4 = CapLayer(opts, num_in_caps=opts.primary_cap_num*6*6,
-                           num_out_caps=num_classes, out_dim=16,
-                           num_shared=opts.primary_cap_num, in_dim=8, route=opts.route)
-        final_cls = CapLayer(opts, num_in_caps=opts.primary_cap_num*6*6,
+        module4 = CapLayer(opts, num_in_caps=opts.primary_cap_num*8*8, in_dim=8,
+                           num_out_caps=opts.primary_cap_num*8*8, out_dim=16,
+                           num_shared=opts.primary_cap_num, route=opts.route,
+                           as_conv_output=True)
+        final_cls = CapLayer(opts, num_in_caps=opts.primary_cap_num*8*8, in_dim=16,
                              num_out_caps=num_classes, out_dim=16,
-                             num_shared=opts.primary_cap_num, in_dim=8, route=opts.route)
+                             num_shared=opts.primary_cap_num, route=opts.route)
+
+    elif type == 'encapnet_table1':
+        module1 = nn.Sequential(*[
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(True)
+        ])  # 32 spatial output
+        module2 = nn.Sequential(*[
+            nn.Conv2d(64, 128, kernel_size=3, padding=1, stride=2),
+            nn.BatchNorm2d(128),
+            nn.ReLU(True)
+        ])  # 16 spatial output
+        module3 = nn.Sequential(*[
+            nn.Conv2d(128, 256, kernel_size=3, padding=1, stride=2),
+            nn.BatchNorm2d(256),
+            nn.ReLU(True)
+        ])  # 256 (32, 8), 8 x 8
+
+        module4 = CapConv(ch_num=32*8, ch_out=32*16, groups=32,
+                          kernel_size=(3,), stride=2, pad=(1,),
+                          residual=True, manner=opts.manner)
+        # output after module4: bs, 32*16, 4, 4
+        final_cls = CapFC(in_cap_num=32*4*4, out_cap_num=num_classes,
+                          cap_dim=16, fc_manner='default')
+
     return ot_loss, \
         module1, module2, module3, module4, final_cls, \
            module1_ot_loss, module2_ot_loss, module3_ot_loss, module4_ot_loss

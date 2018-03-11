@@ -1,0 +1,91 @@
+Experiment: resnet_param
+------------ Train and Test Options -----------------
+C_form: l2
+base_save_folder: result/paper
+batch_size_test: 128
+batch_size_train: 128
+beta1: 0.9
+dataset: cifar10
+debug_mode: False
+depth: 14
+device_id: [1]
+draw_hist: False
+encapsulate_G: False
+experiment_name: resnet_param
+file_name: result/paper/resnet_param/opt_train_val_START_epoch_0_END_600.txt
+gamma: 0.1
+less_data_aug: True
+loss_fac: 1.0
+loss_form: margin
+lr: 0.0001
+manual_seed: -1
+max_epoch: 600
+measure_time: False
+momentum: 0.9
+multi_crop_test: False
+net_config: resnet_similar_param
+no_bp_P_L: False
+no_visdom: False
+non_target_j: False
+num_workers: 2
+optim: adam
+ot_loss_fac: 1.0
+phase: train_val
+port_id: 8000
+random_seed: 1022
+remove_bias: False
+s35: False
+save_epoch: 25
+save_folder: result/paper/resnet_param
+schedule: [200, 300, 400]
+show_freq: 100
+show_test_after_epoch: 100
+skip_critic: False
+use_cuda: True
+weight_decay: 0.0005
+withCapRoute: False
+------------------ End --------------------
+EncapNet (
+  (module0): Sequential (
+    (0): Conv2d (3, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)), weights=((32, 3, 3, 3), (32,)), parameters=896
+    (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True), weights=((32,), (32,)), parameters=64
+    (2): ReLU(inplace), weights=(), parameters=0
+  ), weights=((32, 3, 3, 3), (32,), (32,), (32,)), parameters=960
+  (module1): Sequential (
+    (0): Conv2d (32, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)), weights=((256, 32, 3, 3), (256,)), parameters=73984
+    (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True), weights=((256,), (256,)), parameters=512
+    (2): ReLU(inplace), weights=(), parameters=0
+  ), weights=((256, 32, 3, 3), (256,), (256,), (256,)), parameters=74496
+  (module2): Sequential (
+    (0): Conv2d (256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1)), weights=((512, 256, 3, 3), (512,)), parameters=1180160
+    (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True), weights=((512,), (512,)), parameters=1024
+    (2): ReLU(inplace), weights=(), parameters=0
+  ), weights=((512, 256, 3, 3), (512,), (512,), (512,)), parameters=1181184
+  (module3): Sequential (
+    (0): Conv2d (512, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1)), weights=((512, 512, 3, 3), (512,)), parameters=2359808
+    (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True), weights=((512,), (512,)), parameters=1024
+    (2): ReLU(inplace), weights=(), parameters=0
+  ), weights=((512, 512, 3, 3), (512,), (512,), (512,)), parameters=2360832
+  (module4): Sequential (
+    (0): Conv2d (512, 1300, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)), weights=((1300, 512, 3, 3), (1300,)), parameters=5991700
+    (1): BatchNorm2d(1300, eps=1e-05, momentum=0.1, affine=True), weights=((1300,), (1300,)), parameters=2600
+    (2): ReLU(inplace), weights=(), parameters=0
+    (3): AvgPool2d(kernel_size=8, stride=8, padding=0, ceil_mode=False, count_include_pad=True), weights=(), parameters=0
+  ), weights=((1300, 512, 3, 3), (1300,), (1300,), (1300,)), parameters=5994300
+  (final_cls): Linear(in_features=1300, out_features=10), weights=((10, 1300), (10,)), parameters=13010
+)
+Total param num # 36.715630 Mb
+
+init learning rate 0.0001000000 at iter 0
+
+[resnet_param]	epoch/iter [0/600][0/391] ||	Loss: 4.5716, Top1_err: 88.2812, Top5_err: 51.5625 ||	Data/batch time: 0.0603/1.8979
+[resnet_param]	epoch/iter [0/600][100/391] ||	Loss: 0.7351, Top1_err: 63.9697, Top5_err: 15.1918 ||	Data/batch time: 0.0009/0.1511
+[resnet_param]	epoch/iter [0/600][200/391] ||	Loss: 0.5502, Top1_err: 57.5521, Top5_err: 11.6488 ||	Data/batch time: 0.0005/0.1467
+[resnet_param]	epoch/iter [0/600][300/391] ||	Loss: 0.4796, Top1_err: 53.9997, Top5_err: 9.9408 ||	Data/batch time: 0.0004/0.1461
+[resnet_param]	epoch/iter [0/600][390/391] ||	Loss: 0.4430, Top1_err: 51.7140, Top5_err: 8.9480 ||	Data/batch time: 0.0004/0.1482
+Summary	epoch/iter [0/600] ||	TRAIN, Top1_err: 51.7140, Top5_err: 8.9480 ||	TEST, Top1_err: 100.0000, Top5_err: 100.0000 ||
+
+model saved at result/paper/resnet_param/epoch_1.pth
+[resnet_param]	epoch/iter [1/600][0/391] ||	Loss: 0.3142, Top1_err: 41.4062, Top5_err: 6.2500 ||	Data/batch time: 0.0556/0.1101
+[resnet_param]	epoch/iter [1/600][100/391] ||	Loss: 0.3021, Top1_err: 41.2361, Top5_err: 4.8345 ||	Data/batch time: 0.0008/0.1436
+[resnet_param]	epoch/iter [1/600][200/391] ||	Loss: 0.2975, Top1_err: 40.3063, Top5_err: 4.6409 ||	Data/batch time: 0.0005/0.1438

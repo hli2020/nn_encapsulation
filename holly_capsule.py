@@ -37,6 +37,7 @@ visual = Visualizer(args)
 model = EncapNet(opts=args, num_classes=train_loader.dataset.num_classes)
 if args.debug_mode and args.use_cuda:
     model = model.cuda()
+    # model = torch.nn.DataParallel(model).cuda()
 elif args.use_cuda:
     if len(args.device_id) == 1:
         model = model.cuda()
