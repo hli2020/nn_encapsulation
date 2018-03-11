@@ -153,8 +153,7 @@ class CapNet(nn.Module):
     def forward(self, x, target=None,
                 curr_iter=0, vis=None, phase='train'):
         "activation resides in v0; ot_loss in v2; phase is for OT_loss, don't compute it during test"
-        # set ot_loss = [] (NOT 0) when multiple-gpus
-        stats, output, start, activation, ot_loss = [], [], [], [], []
+        stats, output, start, activation = [], [], [], []
         if self.measure_time:
             torch.cuda.synchronize()
             start = time.perf_counter()
@@ -235,6 +234,9 @@ class CapNet(nn.Module):
         else:
             raise NameError('Unknown structure or capsule model type.')
 
+        # set ot_loss = [] (NOT 0) when multiple-gpus if you dont use ot_loss
+        if phase == 'test':
+            ot_loss = []
         return output, stats, activation, ot_loss
 
 

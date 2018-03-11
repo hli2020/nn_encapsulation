@@ -4,6 +4,7 @@ from layers.misc import connect_list
 import torch.nn as nn
 from layers.models.cifar.resnet import BasicBlock, Bottleneck
 
+
 def _make_layer(self, block, planes, blocks, stride=1, use_groupBN=False):
         """make resnet sub-layers"""
         downsample = None
@@ -19,6 +20,7 @@ def _make_layer(self, block, planes, blocks, stride=1, use_groupBN=False):
         for i in range(1, int(blocks)):
             layers.append(block(self.inplanes, planes))
         return nn.Sequential(*layers)
+
 
 def build_net(type, opts):
 

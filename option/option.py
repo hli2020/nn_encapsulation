@@ -17,7 +17,8 @@ class Options(object):
         self.parser.add_argument('--setting', default='top1', type=str, help='[ top1 | top5 | obj_det ]')
         self.parser.add_argument('--bigger_input', action='store_true', help='only valid for imagenet')
 
-        self.parser.add_argument('--debug_mode', default=True, type=str2bool)
+        self.parser.add_argument('--debug_mode', default=True, type=str2bool,
+                                 help='if true, single-gpu mode; display more loss/error per iteration')
         self.parser.add_argument('--measure_time', action='store_true')
         self.parser.add_argument('--s35', action='store_true', help='run on server 2035')
         self.parser.add_argument('--manual_seed', default=-1, type=int)
@@ -28,7 +29,7 @@ class Options(object):
 
         # model params
         # ALMOST DEPRECATED
-        self.parser.add_argument('--cap_model', default='v_base', type=str, help='v_base, v0, ...')
+        self.parser.add_argument('--cap_model', default='v2', type=str, help='v_base, v0, ...')
         # only valid for cap_model=v_base
         self.parser.add_argument('--depth', default=14, type=int)  # 14 or 20, ...
         # only valid for cap_model=v0:
@@ -50,7 +51,7 @@ class Options(object):
 
         # NOTE: add a net_config param to control each module of the configs listed below;
         # if net_config == 'default', all configs below matter; otherwise, see details in 'network.py'
-        self.parser.add_argument('--net_config', default='default', type=str,
+        self.parser.add_argument('--net_config', default='set4', type=str,
                                  help='[default | set1 |...| set_OT]')
         # valid for cap_model=v1_x and above
         self.parser.add_argument('--cap_N', default=4, type=int, help='multiple capLayers')

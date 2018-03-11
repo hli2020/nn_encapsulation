@@ -67,6 +67,7 @@ def create_dataset(opts, phase=None):
         else:
             resize_size, crop_size = 156, 128
         if phase == 'train':
+            # overide previous transform
             transform = T.Compose([
                 T.Resize(resize_size),
                 T.CenterCrop(crop_size),
@@ -82,10 +83,8 @@ def create_dataset(opts, phase=None):
                 T.ToTensor(),
                 normalize
             ])
-
         if hasattr(opts, 'setting') is None:
             raise(RuntimeError("Setting is none in the imagenet case! Are you fucking me?"))
-
         dataset = ImageNet(root_name, opts.setting, transform)
         dataset.num_classes = 150 if opts.setting == 'obj_det' else 200
 
