@@ -9,7 +9,7 @@ CUDA_VISIBLE_DEVICES=$DEVICE_ID python holly_capsule.py \
 --experiment_name=cap_102_v4_new \
 --cap_model=v2 \
 --net_config=default_super \
---loss_fac=100 \
+--loss_fac=100_v_base \
 --schedule 300 400 450 \
 --max_epoch=600 \
 --debug_mode=False \

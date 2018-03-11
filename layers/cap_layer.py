@@ -63,8 +63,6 @@ class CapLayer(nn.Module):
             self.beta_a = Parameter(torch.Tensor(self.num_out_caps))
             nn.init.uniform(self.beta_v.data)
             nn.init.uniform(self.beta_a.data)
-            # self.beta_v = 10
-            # self.beta_a = -self.beta_v
             self.fac_R_init = 1.
             self.fac_temperature = 1.
             self.fac_nor = 10.0
@@ -112,14 +110,7 @@ class CapLayer(nn.Module):
                              spatial_size, spatial_size)
             pred = pred.permute(0, 2, 3, 1, 4, 5).contiguous()
             pred = pred.view(bs, pred.size(1), pred.size(2), -1)
-            # if self.add_cap_BN_relu:
-            #     NotImplementedError()
-            #     # pred = self.cap_BN(pred.permute(0, 3, 1, 2).contiguous())
-            #     # pred = pred.permute(0, 2, 3, 1)
-            #     # pred = self.cap_relu(pred)
-            # if self.add_cap_dropout:
-            #     NotImplementedError()
-            #     # v = self.cap_droput(v)
+
             if self.measure_time:
                 torch.cuda.synchronize()
                 print('\tcap W time: {:.4f}'.format(time.perf_counter() - start))

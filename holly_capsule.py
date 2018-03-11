@@ -4,7 +4,7 @@ import torch.backends.cudnn as cudnn
 import torch.optim as optim
 import torch.utils.data as data
 from data.create_dset import create_dataset
-from layers.network import CapNet
+from layers.network import EncapNet
 from layers.cap_layer import MarginLoss, SpreadLoss
 from layers.train_val import *
 
@@ -34,11 +34,14 @@ train_loader = data.DataLoader(create_dataset(args, 'train'), args.batch_size_tr
 visual = Visualizer(args)
 
 # model
-model = CapNet(num_classes=train_loader.dataset.num_classes, opts=args)
+model = EncapNet(opts=args, num_classes=train_loader.dataset.num_classes)
 if args.debug_mode and args.use_cuda:
     model = model.cuda()
 elif args.use_cuda:
-    model = torch.nn.DataParallel(model).cuda()
+    if len(args.device_id) == 1:
+        model = model.cuda()
+    else:
+        model = torch.nn.DataParallel(model).cuda()
 model_summary, param_num = torch_summarize(model)
 print_log(model_summary, args.file_name)
 print_log('Total param num # {:f} Mb'.format(param_num), args.file_name)

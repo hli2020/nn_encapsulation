@@ -10,7 +10,7 @@ CUDA_VISIBLE_DEVICES=0 python holly_cifar.py \
 --schedule_cifar 150 225 \
 --lr=0.1 \
 --train_batch=128 \
---test_batch=100 \
+--test_batch=100_v_base \
 --deploy
 
 end=`date +%s`

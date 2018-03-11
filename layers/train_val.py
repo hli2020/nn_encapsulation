@@ -1,4 +1,3 @@
-# from utils.from_wyang import AverageMeter, accuracy
 from object_detection.utils.util import *
 from object_detection.utils.eval import accuracy
 from layers.misc import compute_KL, update_all_data
@@ -39,8 +38,9 @@ def train(trainloader, model, criterion, optimizer, opt, visual, epoch):
 
         # Last two entries in 'stats' have mean, std for KL loss
         # 'activation' is for EM routing
-        outputs, stats, activation, ot_loss = \
+        outputs, stats, activation, ot_info = \
             model(inputs, targets)  # 128 x 10 x 16
+        ot_flag, ot_loss = ot_loss[0], ot_loss[1]
         try:
             outputs = outputs.norm(dim=2)
         except RuntimeError:
@@ -63,7 +63,7 @@ def train(trainloader, model, criterion, optimizer, opt, visual, epoch):
         #     loss_KL = opt.KL_factor * compute_KL(stats[-2], stats[-1])
         #     KL_losses.update(loss_KL.data[0], inputs.size(0))
         #     loss += loss_KL
-        if opt.ot_loss:
+        if ot_flag:
             curr_ot_loss = opt.ot_loss_fac * torch.sum(ot_loss)
             # print('ot_loss is {:.4f}'.format(curr_ot_loss))
             loss += curr_ot_loss

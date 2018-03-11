@@ -25,14 +25,17 @@ class Options(object):
         self.parser.add_argument('--num_workers', default=2, type=int, help='Number of workers used in dataloading')
         self.parser.add_argument('--no_visdom', action='store_true')
         self.parser.add_argument('--port_id', default=8000, type=int)
-        self.parser.add_argument('--device_id', default='0', type=str)
+        self.parser.add_argument('--device_id', default='0,1', type=str)
 
         # model params
-        # ALMOST DEPRECATED
-        self.parser.add_argument('--cap_model', default='v2', type=str, help='v_base, v0, ...')
-        # only valid for cap_model=v_base
+        # if net_config == 'xx_default', all configs below matter;
+        # otherwise, see details in 'net_config.py'
+        self.parser.add_argument('--net_config', default='set4', type=str,
+                                 help='[xx_default | set1 |...| set_OT]')
+        # RESNET
         self.parser.add_argument('--depth', default=14, type=int)  # 14 or 20, ...
-        # only valid for cap_model=v0:
+
+        # CAPNET
         self.parser.add_argument('--route', default='dynamic', type=str)
         self.parser.add_argument('--E_step_norm', action='store_true')
         self.parser.add_argument('--route_num', default=3, type=int)
@@ -49,23 +52,16 @@ class Options(object):
         # if comp_cap=True, replace the capLayer with FC layer
         self.parser.add_argument('--comp_cap', action='store_true')
 
-        # NOTE: add a net_config param to control each module of the configs listed below;
-        # if net_config == 'default', all configs below matter; otherwise, see details in 'network.py'
-        self.parser.add_argument('--net_config', default='set4', type=str,
-                                 help='[default | set1 |...| set_OT]')
-        # valid for cap_model=v1_x and above
+        # ENCAPNET
         self.parser.add_argument('--cap_N', default=4, type=int, help='multiple capLayers')
         self.parser.add_argument('--connect_detail', default='all', type=str,
                                  help='residual connections, [default | only_sub | all]')
-        # valid for cap_model=v1_2_x and above
         self.parser.add_argument('--fc_manner', default='default', type=str)
-        # valid for cap_model=v2_x and above
-        # self.parser.add_argument('--more_skip', action='store_true')
         self.parser.add_argument('--layerwise', action='store_true')
         self.parser.add_argument('--wider', action='store_true')
         # capRoute scheme, manner=0, 3, 4, ...
-        self.parser.add_argument('--manner', default='0', type=str, help='str')     #
-        self.parser.add_argument('--coeff_dimwise', action='store_true')  # TODO
+        self.parser.add_argument('--manner', default='0', type=str, help='str')
+        self.parser.add_argument('--coeff_dimwise', action='store_true')  # TODO(low)
         self.parser.add_argument('--use_capBN', action='store_true')
         self.parser.add_argument('--skip_relu', action='store_true')
 
@@ -82,10 +78,8 @@ class Options(object):
         self.parser.add_argument('--batch_size_test', default=128, type=int)
         self.parser.add_argument('--max_epoch', default=600, type=int, help='Number of training epoches')
         self.parser.add_argument('--schedule', default=[200, 300, 400], nargs='+', type=int)
-        # ot loss
-        # TODO: if net_config=set_OT, no need to set ot_loss below
-        self.parser.add_argument('--ot_loss', action='store_true')
         self.parser.add_argument('--ot_loss_fac', default=1.0, type=float)
+        # OT arguments
         # the following is defined on a case-by-case basis(net_config.py, like 'set_OT')
         self.parser.add_argument('--withCapRoute', action='store_true')
         self.parser.add_argument('--remove_bias', action='store_true')
@@ -116,6 +110,7 @@ class Options(object):
 
     def setup_config(self):
 
+        self.opt.device_id = [int(x) for x in self.opt.device_id.split(',')]
         self.opt.save_folder = os.path.join(
             self.opt.base_save_folder, self.opt.experiment_name)
         if not os.path.exists(self.opt.save_folder):

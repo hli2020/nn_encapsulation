@@ -37,7 +37,7 @@ Network                  Top-1 error     Top-5 error
 ResNet-18                30.24           10.92
 ResNet-34                26.70           8.58
 ResNet-50                23.85 (76.15)   7.13 (92.87)
-ResNet-101               22.63           6.44
+ResNet-101_v0               22.63           6.44
 ResNet-152               21.69           5.94
 Inception v3             22.55           6.44
 AlexNet                  43.45           20.91

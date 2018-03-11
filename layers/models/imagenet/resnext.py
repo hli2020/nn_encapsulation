@@ -159,7 +159,7 @@ def resnext50(baseWidth, cardinality):
 
 def resnext101(baseWidth, cardinality):
     """
-    Construct ResNeXt-101.
+    Construct ResNeXt-101_v0.
     """
     model = ResNeXt(baseWidth, cardinality, [3, 4, 23, 3], 1000)
     return model
