@@ -95,7 +95,7 @@ class EncapNet(nn.Module):
 
             if self.net_config[0:6] == 'capnet':
                 activate = self.generate_activate(x).view(x.size(0), -1) if self.route == 'EM' else None
-                x, stats, activation = self.module4(x, target, curr_iter, vis, activate=activate)
+                x, _, activation = self.module4(x, target, curr_iter, vis, activate=activate)
             else:
                 x = self.module4(x)
 

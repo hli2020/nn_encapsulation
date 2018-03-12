@@ -154,7 +154,9 @@ class CapLayer(nn.Module):
             mean, std
         ]
         if self.as_conv_output:
-            v = v.view(v.size(0), -1, spatial_size, spatial_size, v.size(2))
+            spatial_size_out = int(math.sqrt(self.num_out_caps/self.num_shared))
+            # print(spatial_size_out)
+            v = v.view(v.size(0), -1, spatial_size_out, spatial_size_out, v.size(2))
             v = v.permute(0, 1, 4, 2, 3).contiguous()
             v = v.view(v.size(0), -1, v.size(3), v.size(4))
         return v, stats, activation

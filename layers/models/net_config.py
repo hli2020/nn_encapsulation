@@ -301,10 +301,10 @@ def build_net(type, opts, num_classes):
         ])  # 8 spatial output
 
         module4 = CapLayer(opts, num_in_caps=opts.primary_cap_num*8*8, in_dim=8,
-                           num_out_caps=opts.primary_cap_num*8*8, out_dim=16,
+                           num_out_caps=opts.primary_cap_num*4*4, out_dim=16,
                            num_shared=opts.primary_cap_num, route=opts.route,
                            as_conv_output=True)
-        final_cls = CapLayer(opts, num_in_caps=opts.primary_cap_num*8*8, in_dim=16,
+        final_cls = CapLayer(opts, num_in_caps=opts.primary_cap_num*4*4, in_dim=16,
                              num_out_caps=num_classes, out_dim=16,
                              num_shared=opts.primary_cap_num, route=opts.route)
 

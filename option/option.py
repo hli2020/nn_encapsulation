@@ -67,7 +67,7 @@ class Options(object):
         self.parser.add_argument('--gamma', default=0.1, type=float)  # for step lr scheme
         self.parser.add_argument('--beta1', type=float, default=0.9, help='momentum term of adam')
 
-        self.parser.add_argument('--batch_size_train', default=2, type=int)
+        self.parser.add_argument('--batch_size_train', default=32, type=int)
         # self.parser.add_argument('--batch_size_test', default=128, type=int)
         self.parser.add_argument('--max_epoch', default=600, type=int, help='Number of training epoches')
         self.parser.add_argument('--schedule', default=[200, 300, 400], nargs='+', type=int)

@@ -10,19 +10,22 @@ import time
 import torch
 
 
-class CapNet(nn.Module):
+CAP_MODEL='v0'
+PRE_CH_NUM=256
+OT_LOSS=False
+
+class CapNet_old(nn.Module):
     """
     Capsule network.
     """
     def __init__(self, opts, num_classes=100):
-        super(CapNet, self).__init__()
+        super(CapNet_old, self).__init__()
 
         self.use_imagenet = True if opts.dataset == 'tiny_imagenet' else False
-        self.cap_model = opts.cap_model
+        self.cap_model = CAP_MODEL
         # self.use_multiple = opts.use_multiple
         input_ch = 1 if opts.dataset == 'fmnist' or opts.dataset == 'mnist' else 3
         self.measure_time = opts.measure_time
-        self.ot_loss = opts.ot_loss
 
         if self.cap_model == 'v_base':
             # resnet baseline
@@ -56,17 +59,15 @@ class CapNet(nn.Module):
             # original capsule idea in the paper
             self.route = opts.route
             # first conv
-            self.tranfer_conv = nn.Conv2d(input_ch, opts.pre_ch_num, kernel_size=9, padding=1, stride=2)  # 256x13x13
-            self.tranfer_bn = nn.InstanceNorm2d(opts.pre_ch_num, affine=True) \
-                if opts.use_instanceBN else nn.BatchNorm2d(opts.pre_ch_num)
+            self.tranfer_conv = nn.Conv2d(input_ch, PRE_CH_NUM, kernel_size=9, padding=1, stride=2)  # 256x13x13
+            self.tranfer_bn = nn.BatchNorm2d(PRE_CH_NUM)
             self.tranfer_relu = nn.ReLU(True)
 
             # second conv
             factor = 1 if opts.comp_cap else 8
             send_to_cap_ch_num = opts.primary_cap_num * factor
-            self.tranfer_conv1 = nn.Conv2d(opts.pre_ch_num, send_to_cap_ch_num, kernel_size=3, stride=2)  # (say256)x6x6
-            self.tranfer_bn1 = nn.InstanceNorm2d(send_to_cap_ch_num, affine=True) \
-                if opts.use_instanceBN else nn.BatchNorm2d(send_to_cap_ch_num)
+            self.tranfer_conv1 = nn.Conv2d(PRE_CH_NUM, send_to_cap_ch_num, kernel_size=3, stride=2)  # (say256)x6x6
+            self.tranfer_bn1 = nn.BatchNorm2d(send_to_cap_ch_num)
             self.tranfer_relu1 = nn.ReLU(True)
 
             # needed for large spatial input on imagenet
@@ -130,7 +131,7 @@ class CapNet(nn.Module):
                                        cap_dim=16, fc_manner=opts.fc_manner)
 
         elif self.cap_model == 'v2':
-
+            self.ot_loss = opts.ot_loss
             self.module0 = nn.Sequential(*[
                 nn.Conv2d(3, 32, kernel_size=3, padding=1),
                 nn.BatchNorm2d(32),
@@ -235,7 +236,7 @@ class CapNet(nn.Module):
         else:
             raise NameError('Unknown structure or capsule model type.')
 
-        return output, stats, activation, ot_loss
+        return output, stats, activation, [OT_LOSS, ot_loss]
 
     def _make_layer(self, block, planes, blocks, stride=1, use_groupBN=False):
         """make resnet sub-layers"""

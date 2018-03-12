@@ -5,6 +5,7 @@ import torch.optim as optim
 import torch.utils.data as data
 from data.create_dset import create_dataset
 from layers.network import EncapNet
+from layers.network_backup import CapNet_old
 from layers.cap_layer import MarginLoss, SpreadLoss
 from layers.train_val import *
 
@@ -35,6 +36,7 @@ visual = Visualizer(args)
 
 # model
 model = EncapNet(opts=args, num_classes=train_loader.dataset.num_classes)
+# model = CapNet_old(opts=args, num_classes=train_loader.dataset.num_classes)
 if args.debug_mode and args.use_cuda:
     model = model.cuda()
     # model = torch.nn.DataParallel(model).cuda()
