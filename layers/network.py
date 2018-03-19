@@ -29,6 +29,7 @@ class EncapNet(nn.Module):
                 nn.ReLU(True)
             ])  # 32 spatial output
         else:
+            "all net_config models have module0"
             self.module0 = nn.Sequential(*[
                 nn.Conv2d(input_ch, 32, kernel_size=3, padding=1),
                 nn.BatchNorm2d(32),
