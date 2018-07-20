@@ -1,7 +1,8 @@
 # Neural Network Encapsulation
 
-The official implementation of [Neural Network Encapsulation](), published in ECCV 2018.
+The official implementation of the paper [Neural Network Encapsulation](), published in ECCV 2018.
 
+![capsule](data/capsule.png)
 
 ## Lightening Summary: a **Research** side
 
@@ -15,7 +16,7 @@ Network elements are still in form of capsules (vector other than scalar).
 - Adopt the optimal transport algorithm to make higher and lower capsules align better.
 
 
-## Lightening Summary: an **implementation** side
+## Lightening Summary: an **Implementation** side
 
 - PyTorch `0.3.x` or `0.4`
 
@@ -40,7 +41,9 @@ TODO.
 ## Rome-built-in-multi-days
 
 - [x] Code release for orginal capsule papers
-- [] Support pytorch `0.4`
+
+- [] Support PyTorch `0.4`
+
 - [] h-ImageNet dataset and result
 
 
@@ -48,7 +51,7 @@ TODO.
 ```
 @inproceedings{li2018encapsulation,
   author = {Hongyang Li and Xiaoyang Guo and Bo Dai and Wanli Ouyang and Xiaogang Wang},
-  title = {OpenNMT: Open-Source Toolkit for Neural Machine Translation},
+  title = {Neural Network Encapsulation},
   booktitle = {ECCV},
   year = {2018}
 }
