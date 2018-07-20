@@ -1,10 +1,10 @@
-# Neural Network Encapsulation
+# Capsule Research
 
 The official implementation of the paper [Neural Network Encapsulation](), published in ECCV 2018.
 
 ![capsule](data/capsule.png)
 
-## Lightening Summary: a **Research** side
+## Lightening Sum-up: a **Research** side
 
 - Analyze the two routing schemes (Dynamic and EM) in original capsule papers.
 
@@ -16,17 +16,18 @@ Network elements are still in form of capsules (vector other than scalar).
 - Adopt the optimal transport algorithm to make higher and lower capsules align better.
 
 
-## Lightening Summary: an **Implementation** side
+## Lightening Sum-up: an **Implementation** side
 
 - PyTorch `0.3.x` or `0.4`
 
 - Provide our own implementation of the original papers, namely dynamic and EM routing.
 
-- Support multi-gpu (nothing to brag about; still we wanna emphasize here for no reason)
 
 - Use [visdom](https://github.com/facebookresearch/visdom) to visualize training dynamics. You can disable it for sure.
 
 - Datasets: MNIST, CIFAR-10/100, SVHN and a subset of ImageNet.
+
+- Support multi-gpu (nothing to brag about; still we wanna emphasize here for no reason)
 
 
 ## Grab and Go
@@ -42,9 +43,9 @@ TODO.
 
 - [x] Code release for orginal capsule papers
 
-- [] Support PyTorch `0.4`
+- [ ] Support PyTorch `0.4`
 
-- [] h-ImageNet dataset and result
+- [ ] h-ImageNet dataset and result
 
 
 ## Citation
