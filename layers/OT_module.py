@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
-from layers.misc import pad_matrix
 from layers.cap_layer import conv_squash
 EPS = 1e-20
 
@@ -86,7 +85,6 @@ class OptTrans(nn.Module):
             x /= (torch.norm(x, p=2, dim=1, keepdim=True) + EPS)
             y /= (torch.norm(y, p=2, dim=1, keepdim=True) + EPS)
             C = 1 - torch.mm(x, y.permute(1, 0))
-            # TODO: warning: C is slightly negative for some i, j
 
         K = torch.exp(-self.epsilon*C)
 

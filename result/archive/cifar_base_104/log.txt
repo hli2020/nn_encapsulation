@@ -1,1 +1,0 @@
-Epoch	Learning Rate	Train Loss	Test Loss	Train Acc.	Test Acc.	Train Acc5.	Test Acc5.	

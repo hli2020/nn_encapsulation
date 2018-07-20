@@ -1,9 +1,4 @@
 import torch.nn as nn
-from layers.misc import connect_list
-from layers.models.cifar.resnet import BasicBlock, Bottleneck
-from layers.cap_layer import CapLayer, CapConv, CapConv2, CapFC
-from layers.OT_module import OptTrans
-from object_detection.utils.util import weights_init
 from layers.models.net_config import build_net
 from layers.misc import weights_init_cap
 import time
@@ -88,11 +83,6 @@ class EncapNet(nn.Module):
             x = self.module1(x)
             x = self.module2(x)
             x = self.module3(x)
-
-            # if self.measure_time:
-            #     torch.cuda.synchronize()
-            #     print('the whole previous conv time: {:.4f}'.format(time.perf_counter() - start))
-            #     start = time.perf_counter()
 
             if self.net_config[0:6] == 'capnet':
                 activate = self.generate_activate(x).view(x.size(0), -1) if self.route == 'EM' else None

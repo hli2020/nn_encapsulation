@@ -1,7 +1,6 @@
 import torchvision.datasets as dset
 import torchvision.transforms as T
 import torch
-from data.imagenet import ImageNet
 
 
 def create_dataset(opts, phase=None):
@@ -53,41 +52,6 @@ def create_dataset(opts, phase=None):
         dataset = dset.MNIST(root='data', train=phase == 'train',
                              transform=transform, download=True)
         dataset.num_classes = 10
-
-    elif name == 'tiny_imagenet':
-
-        if phase == 'test':
-            phase = 'val'
-        root_name = 'data/imagenet/set1/' + phase
-
-        normalize = T.Normalize(mean=[0.485, 0.456, 0.406],
-                                std=[0.229, 0.224, 0.225])
-        if opts.bigger_input:
-            resize_size, crop_size = 256, 224
-        else:
-            resize_size, crop_size = 156, 128
-        if phase == 'train':
-            # overide previous transform
-            transform = T.Compose([
-                T.Resize(resize_size),
-                T.CenterCrop(crop_size),
-                T.RandomHorizontalFlip(),
-                T.ColorJitter(brightness=.2, contrast=.2, saturation=.2, hue=.2),
-                T.ToTensor(),
-                normalize
-            ])
-        elif phase == 'val':
-            transform = T.Compose([
-                T.Resize(resize_size),
-                T.CenterCrop(crop_size),
-                T.ToTensor(),
-                normalize
-            ])
-        if hasattr(opts, 'setting') is None:
-            raise(RuntimeError("Setting is none in the imagenet case! Are you fucking me?"))
-        dataset = ImageNet(root_name, opts.setting, transform)
-        dataset.num_classes = 150 if opts.setting == 'obj_det' else 200
-
     else:
         raise NameError('Unknown dataset')
 

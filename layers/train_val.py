@@ -1,5 +1,4 @@
-from object_detection.utils.util import *
-from object_detection.utils.eval import accuracy
+from utils.utils import *
 from layers.misc import compute_KL, update_all_data
 
 

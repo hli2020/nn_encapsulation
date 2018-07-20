@@ -1,2 +1,0 @@
-cls_index	ori_num	tidy_up_num(w and h>=50)	train_ori_num	tidy_up_num
-0001	0052	0050	1321	1282

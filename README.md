@@ -1,16 +1,55 @@
-# Capsule project
+# Neural Network Encapsulation
 
-### Explain the mechanism
+The official implementation of [Neural Network Encapsulation](), published in ECCV 2018.
 
-### Multiple capsule layers
 
-### Some theory here
+## Lightening Summary: a **Research** side
 
-### File structure
+- Analyze the two routing schemes (Dynamic and EM) in original capsule papers.
 
-- Most of `utils` functions is directly from those in the
-[object detection repo](https://github.com/hli2020/object_detection/tree/master/utils).
+- Propose an approximation routing workaround to tackle the computational inefficiency, in a supervised manner.
+Network elements are still in form of capsules (vector other than scalar).
 
-- For now the capsule theory is mainly verified on small datasets.
+- That is why we call the network is **encapsulated**.
 
-- Update torchvision: `conda install torchvision -c pytorch`
+- Adopt the optimal transport algorithm to make higher and lower capsules align better.
+
+
+## Lightening Summary: an **implementation** side
+
+- PyTorch `0.3.x` or `0.4`
+
+- Provide our own implementation of the original papers, namely dynamic and EM routing.
+
+- Support multi-gpu (nothing to brag about; still we wanna emphasize here for no reason)
+
+- Use [visdom](https://github.com/facebookresearch/visdom) to visualize training dynamics. You can disable it for sure.
+
+- Datasets: MNIST, CIFAR-10/100, SVHN and a subset of ImageNet.
+
+
+## Grab and Go
+
+TODO.
+
+## File Structure
+
+TODO.
+
+
+## Rome-built-in-multi-days
+
+- [x] Code release for orginal capsule papers
+- [] Support pytorch `0.4`
+- [] h-ImageNet dataset and result
+
+
+## Citation
+```
+@inproceedings{li2018encapsulation,
+  author = {Hongyang Li and Xiaoyang Guo and Bo Dai and Wanli Ouyang and Xiaogang Wang},
+  title = {OpenNMT: Open-Source Toolkit for Neural Machine Translation},
+  booktitle = {ECCV},
+  year = {2018}
+}
+```

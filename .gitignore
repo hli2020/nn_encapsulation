@@ -15,8 +15,7 @@ data/cifar-10-batches-py
 *.npy
 result/base
 
-# DS_Store
-.DS_Store
+*.DS_Store
 
 # pycharm
 .idea/

@@ -1,6 +1,6 @@
 import argparse
 import random
-from object_detection.utils.util import *
+from utils.utils import *
 
 
 class Options(object):
