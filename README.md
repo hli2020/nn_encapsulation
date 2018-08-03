@@ -1,6 +1,6 @@
 # Capsule Research
 
-The official implementation of the paper [Neural Network Encapsulation](), published in ECCV 2018.
+The official implementation of the paper [Neural Network Encapsulation](http://www.ee.cuhk.edu.hk/~yangli/paper/eccv18_capsule.pdf), published in ECCV 2018.
 
 ![capsule](data/capsule.png)
 
