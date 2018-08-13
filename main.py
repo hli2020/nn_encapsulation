@@ -1,5 +1,4 @@
 from __future__ import print_function
-import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import torch.optim as optim
 import torch.utils.data as data
@@ -34,7 +33,6 @@ visual = Visualizer(args)
 
 # model
 model = EncapNet(opts=args, num_classes=train_loader.dataset.num_classes)
-# model = CapNet_old(opts=args, num_classes=train_loader.dataset.num_classes)
 if args.debug_mode and args.use_cuda:
     model = model.cuda()
     # model = torch.nn.DataParallel(model).cuda()
@@ -59,9 +57,7 @@ elif args.optim == 'rmsprop':
     optimizer = optim.RMSprop(model.parameters(), lr=args.lr,
                               weight_decay=args.weight_decay, momentum=args.momentum,
                               alpha=0.9, centered=True)
-# if args.scheduler is not None:
-#     scheduler = set_lr_schedule(optimizer, args.scheduler)
-# loss
+
 if args.loss_form == 'CE':
     criterion = nn.CrossEntropyLoss()
 elif args.loss_form == 'spread':
@@ -119,9 +115,6 @@ for epoch in range(args.max_epoch):
                        test_acc, best_acc, best_epoch, param_num, 0))
 
     # ADJUST LR
-    # if args.scheduler is not None:
-    #     scheduler.step(extra_info['test_acc_error'])
-    # else:
     adjust_learning_rate(optimizer, epoch, args)
 
     new_lr = optimizer.param_groups[0]['lr']
