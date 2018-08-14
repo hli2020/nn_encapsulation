@@ -33,16 +33,22 @@ visual = Visualizer(args)
 
 # model
 model = EncapNet(opts=args, num_classes=train_loader.dataset.num_classes)
-if args.debug_mode and args.use_cuda:
-    model = model.cuda()
-    # model = torch.nn.DataParallel(model).cuda()
-elif args.use_cuda:
+# TODO (low): resume if program stops
+
+if args.use_cuda:
     if len(args.device_id) == 1:
-        model = model.cuda()
+        model = model.cuda() if not args.pt_new else model.to(args.device)
+        print_log('single gpu mode', args.file_name)
     else:
-        model = torch.nn.DataParallel(model).cuda()
+        model = torch.nn.DataParallel(model).cuda() \
+            if not args.pt_new else torch.nn.DataParallel(model.to(args.device))
+        print_log('multi-gpu mode', args.file_name)
+else:
+    raise NotImplementedError('we do not like cpu mode ...')
+
 model_summary, param_num = torch_summarize(model)
-print_log(model_summary, args.file_name)
+print_log('show the network structure in log file; NOT shown in terminal ...', args.file_name)
+print_log(model_summary, args.file_name, quiet_termi=True)
 print_log('Total param num # {:f} Mb'.format(param_num), args.file_name)
 
 # optim
@@ -71,7 +77,7 @@ else:
 criterion = criterion.cuda()
 
 # train and test
-best_acc, best_epoch = 100, 0
+best_acc_error, best_epoch = 100., 0
 epoch_size = len(train_loader)
 grand_start_t = time.perf_counter()
 
@@ -84,35 +90,35 @@ for epoch in range(args.max_epoch):
             old_lr, epoch), args.file_name)
 
     # TRAIN
-    info = train(train_loader, model, criterion, optimizer, args, visual, epoch)
+    train(train_loader, model, criterion, optimizer, args, visual, epoch)
+
+    # TEST
     if epoch >= args.show_test_after_epoch:
-        # TEST
         extra_info = test(test_loader, model, args, visual, epoch, criterion)
     else:
         extra_info = dict()
         extra_info['test_loss'], extra_info['test_acc_error'], extra_info['test_acc5_error'] = 0, 100, 100
 
-    # SHOW EPOCH SUMMARY
-    info.update(extra_info)
-    visual.print_loss(info, (epoch, 0, 0))
+    # SAVE MODEL
+    test_acc_error = extra_info['test_acc_error']
 
-    # SAVE model
-    test_acc = extra_info['test_acc_error']
-    is_best = test_acc < best_acc
+    is_best = test_acc_error < best_acc_error
     best_epoch = epoch if is_best else best_epoch
-    best_acc = min(test_acc, best_acc)
+    best_acc_error = min(test_acc_error, best_acc_error)
+    model_weights = model.state_dict() if len(args.device_id) == 1 else model.module.state_dict()
     save_checkpoint({
             'epoch':                epoch+1,
-            'state_dict':           model.state_dict(),
-            'test_acc_err':         test_acc,
-            'best_test_acc_err':    best_acc,
+            'state_dict':           model_weights,
+            'test_acc_err':         test_acc_error,
+            'best_test_acc_err':    best_acc_error,
             'optimizer':            optimizer.state_dict()},
         is_best, args, epoch)
 
     t_one_epoch = time.time() - t
-    visual.print_info((epoch, epoch_size-1, epoch_size),
-                      (True, old_lr, t_one_epoch/epoch_size,
-                       test_acc, best_acc, best_epoch, param_num, 0))
+    if not args.no_visdom:
+        visual.print_info((epoch, epoch_size-1, epoch_size),
+                          (True, old_lr, t_one_epoch/epoch_size,
+                           test_acc_error, best_acc_error, best_epoch, param_num, 0))
 
     # ADJUST LR
     adjust_learning_rate(optimizer, epoch, args)
@@ -124,17 +130,10 @@ for epoch in range(args.max_epoch):
 
 total_t = time.perf_counter() - grand_start_t
 print_log('\nBest acc error: {:.4f} at epoch {:d}. Training done. Cost total {:.4f} hours.'
-          .format(best_acc, best_epoch, total_t/3600), args.file_name)
-visual.print_info((epoch, epoch_size-1, epoch_size),
-                  (False, old_lr, t_one_epoch/epoch_size,
-                   test_acc, best_acc, best_epoch, param_num, total_t/3600))
+          .format(best_acc_error, best_epoch, total_t/3600), args.file_name)
 
-
-
-
-
-
-
-
-
+if not args.no_visdom:
+    visual.print_info((epoch, epoch_size-1, epoch_size),
+                      (False, old_lr, t_one_epoch/epoch_size,
+                       test_acc_error, best_acc_error, best_epoch, param_num, total_t/3600))
 

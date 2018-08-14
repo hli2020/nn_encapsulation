@@ -6,9 +6,7 @@ EPS = 1e-20
 
 
 class OptTrans(nn.Module):
-    """
-        Optimal transport
-    """
+    """Optimal transport unit"""
     def __init__(self, ch_x, ch_y,
                  spatial_x, spatial_y, epsilon=1., L=10,
                  remove_bias=False, group=1,
@@ -21,8 +19,6 @@ class OptTrans(nn.Module):
         self.no_bp_P_L = no_bp_P_L
         self.C_form = C_form
         self.skip_critic = skip_critic
-        # self.batch_size = batch_size
-        # self.use_dynamic_a = use_dynamic_a
 
         # define G_net
         if spatial_x != spatial_y:
@@ -67,21 +63,15 @@ class OptTrans(nn.Module):
             x = x.view(bs, -1)
             y = y.view(bs, -1)
         else:
-            x = self.critic(x).view(bs, -1)  # bs, 1*spatial_dim*spatial_dim
+            x = self.critic(x).view(bs, -1)         # bs, 1*spatial_dim*spatial_dim
             y = self.critic(y).view(bs, -1)
 
         if self.C_form == 'l2':
             x = x.unsqueeze(dim=2).repeat(1, 1, bs)
             y = y.permute(1, 0).unsqueeze(dim=0)
-            C = torch.norm((x - y), p=2, dim=1)  # C: i, j where i, j are samples
+            C = torch.norm((x - y), p=2, dim=1)     # C: i, j where i, j are samples
 
         elif self.C_form == 'cosine':
-            # # _no = torch.sum(x_ * y_, dim=1)
-            # _no = torch.mm(x, y.permute(1, 0))
-            # norm_x = torch.norm(x, p=2, dim=1, keepdim=True).repeat(1, bs)
-            # norm_y = torch.norm(y, p=2, dim=1, keepdim=True).permute(1, 0)
-            # _deno = norm_x * norm_y
-            # C = 1 - torch.div(_no, _deno)
             x /= (torch.norm(x, p=2, dim=1, keepdim=True) + EPS)
             y /= (torch.norm(y, p=2, dim=1, keepdim=True) + EPS)
             C = 1 - torch.mm(x, y.permute(1, 0))
@@ -89,31 +79,16 @@ class OptTrans(nn.Module):
         K = torch.exp(-self.epsilon*C)
 
         # Sinkhorn iterate
-        # if bs < self.batch_size:
-        #     K = pad_matrix(K, self.batch_size)
-        # init b with ones
-        # b = Variable(torch.ones(self.batch_size, 1)*(1./self.batch_size), requires_grad=True)
-        # const = Variable(torch.ones(self.batch_size, 1)*(1./self.batch_size), requires_grad=False)
         b = Variable(torch.ones(bs, 1)*(1./bs), requires_grad=True)
         const = Variable(torch.ones(bs, 1)*(1./bs), requires_grad=False)
-        # print('\n')
+
         for i in range(self.L):
             a = const / (torch.mm(K, b) + EPS)
             b = const / (torch.mm(K.permute(1, 0), a) + EPS)
-            # print('L={:d}, a_min={:.6f}, a_max={:.6f}, a_mean={:.6f}, a_std={:.6f}'
-            #       '\tb_min={:.6f}, b_max={:.6f}'.format(
-            #         i, a.data.min(), a.data.max(),
-            #         torch.mean(a).data[0], torch.std(a).data[0],
-            #         b.data.min(), b.data.max()))
-
-        # # in case of bs < self.batch_size
-        # if bs < self.batch_size:
-        #     a, b, K = a[0:bs], b[0:bs], K[0:bs, 0:bs]
 
         K = a*K*b.permute(1, 0)
         if self.no_bp_P_L:
             K = K.detach()
-        # dot product of two matrices:
-        # torch.sum(torch.mul())
+
         basic_loss = torch.dot(K.view(-1), C.view(-1))
         return basic_loss

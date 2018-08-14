@@ -8,7 +8,6 @@ def create_dataset(opts, phase=None):
 
     small_dset_resize_size = 34 if opts.less_data_aug else 40
     if phase == 'train':
-        # T.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
         trans_list = [T.Resize(small_dset_resize_size),
                       T.RandomCrop(32),
                       T.RandomHorizontalFlip()]
