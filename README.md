@@ -85,12 +85,12 @@ reside in the `--base_save_folder` (default is `result`).
 - To add more structures or change components:
     - write parallel network design in 
 the ``if-else`` statement starting from this 
-[net_config.py](models/net_config.py#L109) file.
+[net_config.py](layers/models/net_config.py#L109) file.
 
 - To add one encapsulated layer with (or not) OT unit in your own network:
-    - see code block [here](models/net_config.py#L139-L150) 
+    - see code block [here](layers/models/net_config.py#L139-L150) 
     in the  ``net_config.py`` for layer definition and 
-    the forward flow [here](models/network.py#L69-L71) in the ``network.py``.
+    the forward flow [here](layers/network.py#L69-L71) in the ``network.py``.
 
 
 ## Features to come
